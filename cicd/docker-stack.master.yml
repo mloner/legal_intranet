@@ -1,0 +1,63 @@
+version: '3.8'
+services:
+  app:
+    image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}${CI_COMMIT_SHORT_SHA}
+    hostname: intranet-legal_app  
+    networks:      
+      - proxy
+    deploy:
+      replicas: 1
+      placement: 
+        # max_replicas_per_node: 1
+        constraints: 
+          - node.labels.intranet == true # by label
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=proxy"
+        - "traefik.http.routers.intranet-legal.entrypoints=websecure"
+        - "traefik.http.routers.intranet-legal.rule=Host(`intranet.utg.group`) && PathPrefix(`/legal/`)"        
+        - "traefik.http.routers.intranet-legal.service=intranet-legal_app"
+        - "traefik.http.services.intranet-legal_app.loadbalancer.server.port=80"
+        # - "traefik.http.services.intranet-swagger_app.loadbalancer.passhostheader=true"
+
+    stop_grace_period: 1m
+    environment:
+      TZ: Europe/Moscow
+      ASPNETCORE_ENVIRONMENT: Prod
+      ConnectionStrings__UTGDatabase: "Host=$PG_HOST;Port=5432;Database=$UTG_PG_DB;Username=$UTG_PG_USER;Password=$UTG_PG_PASS"      
+      Api__Main: "http://intranet-users_app/api"
+      Queue__Host: "amqps://mq_rabbit:5672"
+      Queue__Login: "intranet-users"
+      Queue__Password: "jn5bLp@tf2J=RbAs"    
+      Queue__IgnoreErrors: "true"
+      KeyCloak__Authority: "$KEY_AUTH"
+      KeyCloak__Issuer:  "$KEY_ISSUER"
+     
+    #### Logiging ####
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://127.0.0.1:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-batch-size: "400"
+        loki-pipeline-stages: |
+          - json:
+              expressions:
+                level: level
+                path: path
+                method: method
+                msg: msg
+          - labels:
+              msg: 
+              level:
+              path:
+              method:
+
+networks:
+  utg:
+    external: true
+  proxy:
+    external: true

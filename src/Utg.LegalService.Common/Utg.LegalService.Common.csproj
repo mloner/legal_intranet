@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Utg.LegalService.Common</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Utg.Common.Packages" Version="0.1.79" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Domain" />
+    <Folder Include="Models\Request" />
+    <Folder Include="Repositories" />
+    <Folder Include="Services" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,49 @@
+variables:
+  SW_STACK_NAME: "intranet-legal"
+  DOCKER_FILE_LOCATION: ./src
+
+stages: # шаги по которым ходит пайплайн > выполняются друг за другом
+  # - build_project # производим build проекта используя значение image как билд внутри dind, сохраняя cach и artefatcs  
+  # - test_project # производим тесты проекта на основании cach + artifacts
+  # - prepare
+  # - release
+  - make_image
+  - deploy_to_develop
+  - deploy_to_test
+  - deploy_to_main
+include:
+  - project: 'templates/cicd-templates'
+    ref: v1.0.0
+    file:
+      - '.gitlab/ci_develop/deploy-to-prod.yml'
+      - '.gitlab/ci_develop/deploy-to-test.yml'
+      - '.gitlab/ci_develop/deploy-to-develop.yml'
+      - '.gitlab/ci_develop/release-image.yml'
+
+############ -----------------------------------Begin compile-----------------------------------------------------
+# compile: # название job. для выполнения job необходимо добавить stage 
+#   stage: build_project
+#   image: maven:3-openjdk-16
+#   environment: $CI_COMMIT_REF_NAME
+#   script:
+#     - mvn -v
+#     - mvn $MAVEN_CLI_OPTS clean package -B -DskipTests
+#     - mkdir target/extracted
+#     - java -Djarmode=layertools -jar target/*.jar extract --destination target/extracted
+#   tags:
+#     - build
+#   only:
+#     - develop
+
+# --------------------------------------Begin tests-----------------------------------------------------
+#tests 1/2:
+#  stage: test_project
+#  image: твой имидж
+#  script:
+#    - echo "твой скрипт"
+#  tags:
+#    - build
+#  only:
+#    - develop
+#    - tags
+
