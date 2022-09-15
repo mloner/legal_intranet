@@ -16,6 +16,7 @@ COPY . .
 WORKDIR "/Utg.LegalService.API"
 RUN dotnet build "Utg.LegalService.API.csproj" -c Release -o /app/build
 
+
 FROM build AS publish
 RUN dotnet publish "Utg.LegalService.API.csproj" -c Release -o /app/publish
 
