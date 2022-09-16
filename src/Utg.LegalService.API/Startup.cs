@@ -129,7 +129,9 @@ namespace Utg.LegalService.API
             builder.UseRouting();
             builder.UseAuthentication();
             builder.UseAuthorization();
+            builder.UseMiddleware<ErrorHandlingMiddleware>();
             builder.UseMiddleware<AuthHeaderWrapperMiddleware>();
+            
 
             builder.UseEndpoints(endpoints => endpoints.MapControllers());
 
