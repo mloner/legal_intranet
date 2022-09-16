@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Utg.LegalService.BL.Services;
+using Utg.LegalService.Common.Services;
 
 namespace Utg.LegalService.BL.Configuration
 {
@@ -6,6 +8,8 @@ namespace Utg.LegalService.BL.Configuration
     {
         public static IServiceCollection ConfigureBL(this IServiceCollection services )
         {
+            services.AddTransient<ITaskService, TaskService>();
+            
             return services;
         }
     }

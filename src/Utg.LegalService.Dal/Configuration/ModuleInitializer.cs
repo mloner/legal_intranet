@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Utg.LegalService.Common.Repositories;
+using Utg.LegalService.Dal.Repositories;
 using Utg.LegalService.Dal.SqlContext;
 
 namespace Utg.LegalService.Dal.Configuration
@@ -25,6 +27,7 @@ namespace Utg.LegalService.Dal.Configuration
 
         private static void AddDependenciesToContainer(IServiceCollection services)
         {
+            services.AddTransient<ITaskRepository, TaskRepository>();
         }
     }
 }
