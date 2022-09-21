@@ -5,7 +5,6 @@ namespace Utg.LegalService.Common.Models.Client.Enum
     public enum TaskType
     {
         [Display(Name = "-")]
-        None = 0,
-        
+        None = 0
     }
 }
