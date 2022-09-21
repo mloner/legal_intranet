@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Utg.LegalService.Dal.SqlContext;
@@ -9,9 +10,10 @@ using Utg.LegalService.Dal.SqlContext;
 namespace Utg.LegalService.Dal.Migrations
 {
     [DbContext(typeof(UtgContext))]
-    partial class UtgContextModelSnapshot : ModelSnapshot
+    [Migration("20220919091144_DropUserProfileIdColimns")]
+    partial class DropUserProfileIdColimns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,27 +32,17 @@ namespace Utg.LegalService.Dal.Migrations
                     b.Property<string>("AuthorFullName")
                         .HasColumnType("text");
 
-                    b.Property<int>("AuthorUserProfileId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreationDateTime")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("DeadlineDateTime")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("LastChangeDateTime")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PerformerFullName")
                         .HasColumnType("text");
-
-                    b.Property<int>("PerformerUserProfileId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");

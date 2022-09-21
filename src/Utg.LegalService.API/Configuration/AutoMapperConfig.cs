@@ -18,6 +18,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.Id))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(x => x.Status))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(x => x.Type))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(x => x.Description))
                 .ForMember(dest => dest.AuthorUserProfileId, opt => opt.MapFrom(x => x.AuthorUserProfileId))
                 .ForMember(dest => dest.AuthorFullName, opt => opt.MapFrom(x => x.AuthorFullName))
                 .ForMember(dest => dest.CreationDateTime, opt => opt.MapFrom(x => x.CreationDateTime))
