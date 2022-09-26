@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Utg.LegalService.Dal.SqlContext;
@@ -9,9 +10,10 @@ using Utg.LegalService.Dal.SqlContext;
 namespace Utg.LegalService.Dal.Migrations
 {
     [DbContext(typeof(UtgContext))]
-    partial class UtgContextModelSnapshot : ModelSnapshot
+    [Migration("20220919111038_AddTaskAttachments")]
+    partial class AddTaskAttachments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +42,6 @@ namespace Utg.LegalService.Dal.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastChangeDateTime")
@@ -70,6 +71,9 @@ namespace Utg.LegalService.Dal.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("EntityId")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("FileId")
                         .HasColumnType("uuid");
 
@@ -79,7 +83,7 @@ namespace Utg.LegalService.Dal.Migrations
                     b.Property<long>("FileSizeInBytes")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("TaskId")
+                    b.Property<int?>("TaskId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -93,9 +97,7 @@ namespace Utg.LegalService.Dal.Migrations
                 {
                     b.HasOne("Utg.LegalService.Common.Models.Domain.Task", "Task")
                         .WithMany("TaskAttachments")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TaskId");
 
                     b.Navigation("Task");
                 });

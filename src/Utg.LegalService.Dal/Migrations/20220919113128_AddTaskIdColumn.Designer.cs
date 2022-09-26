@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Utg.LegalService.Dal.SqlContext;
@@ -9,9 +10,10 @@ using Utg.LegalService.Dal.SqlContext;
 namespace Utg.LegalService.Dal.Migrations
 {
     [DbContext(typeof(UtgContext))]
-    partial class UtgContextModelSnapshot : ModelSnapshot
+    [Migration("20220919113128_AddTaskIdColumn")]
+    partial class AddTaskIdColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +42,6 @@ namespace Utg.LegalService.Dal.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastChangeDateTime")

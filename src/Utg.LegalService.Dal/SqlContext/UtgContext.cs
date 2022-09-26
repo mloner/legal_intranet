@@ -11,7 +11,8 @@ namespace Utg.LegalService.Dal.SqlContext
         }
 
         public DbSet<Task> Tasks { get; set; }
-        
+        public DbSet<TaskAttachment> TaskAttachments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("public");
