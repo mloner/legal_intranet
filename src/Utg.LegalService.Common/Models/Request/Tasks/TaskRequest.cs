@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Utg.Common.Packages.Domain.Models.Request;
-using Utg.LegalService.Common.Models.Client.Enum;
 
-namespace Utg.LegalService.Common.Models.Request
+namespace Utg.LegalService.Common.Models.Request.Tasks
 {
     public class TaskRequest : PagedRequest
     {

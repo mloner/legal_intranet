@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Utg.LegalService.Common.Models.Client.Enum;
 
@@ -19,5 +20,7 @@ namespace Utg.LegalService.Common.Models.Domain
         public string PerformerFullName { get; set; }
         public DateTime DeadlineDateTime { get; set; }
         public DateTime LastChangeDateTime { get; set; }
+        
+        public virtual ICollection<TaskAttachment> TaskAttachments { get; set; }
     }
 }

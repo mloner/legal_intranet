@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Utg.Common.Packages.Domain.MiddleWares;
+using Utg.Common.Packages.FileStorage.Configuration;
 using Utg.Common.Packages.Queue.Configuration;
 using Utg.Common.Packages.ServiceClientProxy.AuthHeader;
 using Utg.Common.Packages.ServiceClientProxy.Configuration;
@@ -87,12 +88,14 @@ namespace Utg.LegalService.API
                         .AllowAnyHeader();
                     }));
 
+            var minioConfiguration = configuration.GetSection("Minio").Get<MinioFileStorageSettings>();
             var config = new MapperConfiguration(cfg => AutoMapperConfig.ConfigureMappings(cfg));
             config.AssertConfigurationIsValid();
             services.AddSingleton(config);
             services.AddSingleton(config.CreateMapper());
             services.AddHangfire(x => x.UsePostgreSqlStorage(configuration.GetConnectionString("UTGDatabase")));
             services.AddSwaggerDocument(opts => opts.Title = "Legal service Api");
+            services.ConfigureMinioFileStorage(minioConfiguration);
             services.ConfigureDal(configuration);
             services.ConfigureBL();
 
