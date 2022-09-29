@@ -308,5 +308,15 @@ namespace Utg.LegalService.BL.Services
 
             await taskRepository.DeleteTask(task.Id);
         }
+
+        public async Task<IEnumerable<UserProfileApiModel>> GetAuthorUserProfiles()
+        {
+            var authorUserProfileIds = await taskRepository.Get()
+                .Select(x => x.AuthorUserProfileId)
+                .Distinct()
+                .ToListAsync();
+            var userProfiles = await usersProxyClient.GetByIdsAsync(authorUserProfileIds.Select(x => x.ToString()));
+            return userProfiles;
+        }
     }
 }
