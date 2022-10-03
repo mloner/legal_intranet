@@ -9,6 +9,7 @@ using Utg.Common.Packages.Domain.Helpers;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Services;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
+using TaskType = Utg.LegalService.Common.Models.Client.Enum.TaskType;
 
 namespace Utg.LegalService.API.Controllers
 {
@@ -34,6 +35,15 @@ namespace Utg.LegalService.API.Controllers
             var result = EnumExtensions.GetEnummValuesWithoutDefault<TaskStatus>();
             return Ok(result);
         }
+
+        [HttpGet("taskType")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<TaskType>> TaskType()
+        {
+            var result = EnumExtensions.GetEnummValuesWithoutDefault<TaskType>();
+            return Ok(result);
+        }
+
         
         [HttpGet("taskAuthorUserProfiles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
