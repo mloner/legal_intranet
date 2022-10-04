@@ -45,6 +45,7 @@ namespace Utg.LegalService.BL.Services
         {
             var query = taskRepository.Get();
 
+            query = FilterByRoles(query, request, authInfo);
             query = Filter(query, request);
             query = Search(query, request);
             
@@ -60,12 +61,28 @@ namespace Utg.LegalService.BL.Services
                 Total = count
             };
         }
-        
+
+        private IQueryable<TaskModel> FilterByRoles(IQueryable<TaskModel> query, TaskRequest request, AuthInfo authInfo)
+        {
+            if (authInfo.Roles.Contains((int)Role.LegalInitiator))
+            {
+                query = query.Where(x => x.AuthorUserProfileId == authInfo.UserProfileId);
+            }
+
+            query = query.Where(x => !(x.Status == TaskStatus.Draft && x.AuthorUserProfileId != authInfo.UserProfileId));
+
+            return query;
+        }
+
         private IQueryable<TaskModel> Filter(IQueryable<TaskModel> query, TaskRequest request)
         {
             if (request.Statuses != null && request.Statuses.Any())
             {
                 query = query.Where(x => request.Statuses.Contains((int)x.Status));
+            }
+            else
+            {
+                query = query.Where(x => x.Status != TaskStatus.Done);
             }
             
             if (request.AuthorUserProfileIds != null && request.AuthorUserProfileIds.Any())
