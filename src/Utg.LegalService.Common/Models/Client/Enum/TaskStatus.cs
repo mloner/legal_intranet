@@ -11,6 +11,9 @@ namespace Utg.LegalService.Common.Models.Client.Enum
         Draft = 1,
         
         [Display(Name = "Новый")]
-        New = 2
+        New = 2,
+        
+        [Display(Name = "Выполнено")]
+        Done = 3
     }
 }
