@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -89,6 +90,19 @@ namespace Utg.LegalService.API.Controllers
             }
             await taskService.DeleteTask(id);
             return Ok();
+        }
+        
+        [HttpGet("report")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<File>> GetReport([FromQuery]TaskReportRequest request)
+        {
+            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            {
+                return Forbid();
+            }
+            var authInfo = await GetAuthInfo();
+            var stream = await taskService.GetReport(request, authInfo);
+            return this.File(stream, MediaTypeNames.Application.Octet, "Отчет о задачах.xlsx");
         }
     }
 }

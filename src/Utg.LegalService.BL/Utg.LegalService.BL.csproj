@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Utg.LegalService.Common\Utg.LegalService.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\ReportTemplates" />
+  </ItemGroup>
+
 </Project>
