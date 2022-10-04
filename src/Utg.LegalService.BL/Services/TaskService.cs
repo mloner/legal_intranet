@@ -223,12 +223,6 @@ namespace Utg.LegalService.BL.Services
         {
             model.AuthorUserProfileId = authInfo.UserProfileId;
             model.AuthorFullName = authInfo.FullName;
-            var performerUserProfile =
-                (await usersProxyClient.GetByIdsAsync(new[] { model.PerformerUserProfileId.ToString() })).FirstOrDefault();
-            if (performerUserProfile != null)
-            {
-                model.PerformerFullName = performerUserProfile.FullName;
-            }
             var now = DateTime.UtcNow;
             model.CreationDateTime = now;
             model.LastChangeDateTime = now;
