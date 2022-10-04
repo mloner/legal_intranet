@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,12 +9,16 @@ using Microsoft.EntityFrameworkCore;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.Domain.Models.Enum;
+using Utg.Common.Packages.ExcelReportBuilder;
 using Utg.Common.Packages.FileStorage;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common;
 using Utg.LegalService.Common.Models;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Enum;
+using Utg.LegalService.Common.Models.Report;
+using Utg.LegalService.Common.Models.Report.Dtos;
+using Utg.LegalService.Common.Models.Report.Helpers;
 using Utg.LegalService.Common.Models.Request;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Repositories;
@@ -28,17 +33,20 @@ namespace Utg.LegalService.BL.Services
         private readonly IFileStorageService fileStorageService;
         private readonly IMapper mapper;
         private readonly IUsersProxyClient usersProxyClient;
+        private readonly IExcelReportBuilder excelReportBuilder;
         
         public TaskService(
             ITaskRepository taskRepository,
             IFileStorageService fileStorageService,
             IMapper mapper,
-            IUsersProxyClient usersProxyClient)
+            IUsersProxyClient usersProxyClient,
+            IExcelReportBuilder excelReportBuilder)
         {
             this.taskRepository = taskRepository;
             this.fileStorageService = fileStorageService;
             this.mapper = mapper;
             this.usersProxyClient = usersProxyClient;
+            this.excelReportBuilder = excelReportBuilder;
         }
 
         public async Task<PagedResult<TaskModel>> GetAll(TaskRequest request, AuthInfo authInfo)
@@ -334,6 +342,44 @@ namespace Utg.LegalService.BL.Services
                 .ToListAsync();
             var userProfiles = await usersProxyClient.GetByIdsAsync(authorUserProfileIds.Select(x => x.ToString()));
             return userProfiles;
+        }
+
+        public async Task<Stream> GetReport(TaskReportRequest request, AuthInfo authInfo)
+        {
+            var data = await GetAll(new TaskRequest()
+            {
+                Statuses = request.Statuses,
+                AuthorUserProfileIds = request.AuthorUserProfileIds
+            }, authInfo);
+            
+            var reportData = data.Result.Select((x, index) => new TaskReportDto()
+            {
+                RowNumber = index + 1,
+                CreationDate = x.CreationDateTime,
+                AuthorFullName = x.AuthorFullName,
+                PerformerFullName = x.PerformerFullName,
+                TaskType = x.TypeName,
+                Status = x.StatusName,
+                Deadline = x.DeadlineDateTime,
+                LastChangeDateTime = x.LastChangeDateTime
+            });
+            
+            var reportStream = excelReportBuilder.BuildNewReport(builder =>
+            {
+                if (!reportData.Any())
+                {
+                    builder
+                        .AddSheetFromTemplateCurrentDomain(TaskReportConstants.TemplatePath, "Лист1");
+                }
+                else
+                {
+                    builder
+                        .AddSheetFromTemplateCurrentDomain(TaskReportConstants.TemplatePath, "Лист1")
+                        .PrintData(reportData, TaskReportConstants.DataStartRow);
+                }
+            });
+
+            return reportStream;
         }
     }
 }

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Utg.Common.Packages.Domain.MiddleWares;
+using Utg.Common.Packages.ExcelReportBuilder.Configuration;
 using Utg.Common.Packages.FileStorage.Configuration;
 using Utg.Common.Packages.Queue.Configuration;
 using Utg.Common.Packages.ServiceClientProxy.AuthHeader;
@@ -105,6 +106,7 @@ namespace Utg.LegalService.API
                 .ConfigureRabbitMq(configuration.GetSection("Queue").Get<RabbitMqSettings>());
 
             services
+                .ConfigureExcelReportBuilder()
                 .ConfigureServiceClientProxy(
                     new ServiceClientProxySettings(
                        this.configuration.GetValue<string>("Api:Main"),

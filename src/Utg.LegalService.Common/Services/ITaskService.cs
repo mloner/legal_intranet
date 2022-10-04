@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
@@ -16,5 +17,6 @@ namespace Utg.LegalService.Common.Services
         Task<TaskModel> UpdateTask(TaskUpdateRequest request, AuthInfo authInfo);
         Task DeleteTask(int id);
         Task<IEnumerable<UserProfileApiModel>> GetAuthorUserProfiles();
+        Task<Stream> GetReport(TaskReportRequest request, AuthInfo authInfo);
     }
 }

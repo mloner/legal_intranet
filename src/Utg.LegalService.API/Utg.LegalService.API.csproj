@@ -31,4 +31,11 @@
     <ProjectReference Include="..\Utg.LegalService.Dal\Utg.LegalService.Dal.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\Utg.LegalService.BL\Services\ReportTemplates\*">
+      <Link>ReportTemplates\%(RecursiveDir)/%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
