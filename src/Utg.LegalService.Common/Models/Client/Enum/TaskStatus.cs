@@ -13,7 +13,13 @@ namespace Utg.LegalService.Common.Models.Client.Enum
         [Display(Name = "Новый")]
         New = 2,
         
+        [Display(Name = "В работе")]
+        InWork = 3,
+        
+        [Display(Name = "На проверке")]
+        UnserReview = 4,
+        
         [Display(Name = "Выполнено")]
-        Done = 3
+        Done = 5
     }
 }

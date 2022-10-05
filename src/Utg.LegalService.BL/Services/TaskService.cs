@@ -34,19 +34,22 @@ namespace Utg.LegalService.BL.Services
         private readonly IMapper mapper;
         private readonly IUsersProxyClient usersProxyClient;
         private readonly IExcelReportBuilder excelReportBuilder;
-        
+        private readonly IDataProxyClient dataProxyClient;
+
         public TaskService(
             ITaskRepository taskRepository,
             IFileStorageService fileStorageService,
             IMapper mapper,
             IUsersProxyClient usersProxyClient,
-            IExcelReportBuilder excelReportBuilder)
+            IExcelReportBuilder excelReportBuilder,
+            IDataProxyClient dataProxyClient)
         {
             this.taskRepository = taskRepository;
             this.fileStorageService = fileStorageService;
             this.mapper = mapper;
             this.usersProxyClient = usersProxyClient;
             this.excelReportBuilder = excelReportBuilder;
+            this.dataProxyClient = dataProxyClient;
         }
 
         public async Task<PagedResult<TaskModel>> GetAll(TaskRequest request, AuthInfo authInfo)
@@ -310,6 +313,28 @@ namespace Utg.LegalService.BL.Services
             }
             var result = await GetById(taskId, authInfo);
             return result;
+        }
+
+        public async Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
+        {
+            var taskId = request.Id;
+            var newTask = new TaskModel
+            {
+                Id = taskId,
+                Status = TaskStatus.InWork,
+                PerformerUserProfileId = request.PerformerUserProfileId,
+                DeadlineDateTime = request.DeadlineDateTime,
+                LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+            };
+            await taskRepository.UpdateTaskMoveToInWork(newTask);
+            var result = await GetById(taskId, authInfo);
+            return result;
+        }
+
+        public async Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles()
+        {
+            var result = dataProxyClient.UserProfilesRoleAsync((int)Role.LegalPerformer);
+            return result.Result;
         }
 
         public async Task DeleteTask(int id)

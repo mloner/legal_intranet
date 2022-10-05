@@ -17,5 +17,6 @@ namespace Utg.LegalService.Common.Repositories
         Task RemoveAttachments(int taskId, IEnumerable<int> attachmentIds);
         Task UpdateTask(TaskModel model);
         Task DeleteTask(int taskId);
+        Task UpdateTaskMoveToInWork(TaskModel newTask);
     }
 }
