@@ -100,11 +100,6 @@ namespace Utg.LegalService.API
             services.ConfigureDal(configuration);
             services.ConfigureBL();
 
-
-
-            services
-                .ConfigureRabbitMq(configuration.GetSection("Queue").Get<RabbitMqSettings>());
-
             services
                 .ConfigureExcelReportBuilder()
                 .ConfigureServiceClientProxy(
@@ -113,8 +108,6 @@ namespace Utg.LegalService.API
                        this.configuration.GetValue<string>("Api:Task")),
                        this.configuration.GetSection("BasicAuth").Get<BasicAuthConfig>())
                 .ConfigureRabbitMq(configuration.GetSection("Queue").Get<RabbitMqSettings>());
-
-
         }
 
         public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)

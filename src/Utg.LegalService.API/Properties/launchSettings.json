@@ -9,10 +9,10 @@
     },
     "Utg.LegalService.API": {
       "commandName": "Project",
-      "launchBrowser": false,
+      "launchBrowser": true,
       "launchUrl": "legal/swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Dev"
       },
       "applicationUrl": "http://localhost:5036"
     }
