@@ -19,5 +19,6 @@ namespace Utg.LegalService.Common.Services
         Task<IEnumerable<UserProfileApiModel>> GetAuthorUserProfiles();
         Task<Stream> GetReport(TaskReportRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo);
+        Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo);
     }
 }

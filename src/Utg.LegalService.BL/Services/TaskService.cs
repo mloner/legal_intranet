@@ -328,6 +328,20 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
+        public async Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo)
+        {
+            var taskId = request.Id;
+            var newTask = new TaskModel
+            {
+                Id = taskId,
+                Status = TaskStatus.UnserReview,
+                LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+            };
+            await taskRepository.UpdateTaskMoveToUnderReview(newTask);
+            var result = await GetById(taskId, authInfo);
+            return result;
+        }
+
         public async Task DeleteTask(int id)
         {
             var task = await GetById(id);
