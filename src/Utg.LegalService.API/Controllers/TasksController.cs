@@ -81,6 +81,18 @@ namespace Utg.LegalService.API.Controllers
             return Ok(result);
         }
         
+        [HttpPatch("inwork")]
+        public async Task<ActionResult<TaskModel>> UpdateMoveToInWork([FromForm] TaskUpdateMoveToInWorkRequest request)
+        {
+            if (!await CanGo(Role.LegalHead, Role.LegalInitiator))
+            {
+                return Forbid();
+            }
+            var authInfo = await GetAuthInfo();
+            var result = await taskService.UpdateTaskMoveToInWork(request, authInfo);
+            return Ok(result);
+        }
+        
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {

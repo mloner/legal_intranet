@@ -312,6 +312,22 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
+        public async Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
+        {
+            var taskId = request.Id;
+            var newTask = new TaskModel
+            {
+                Id = taskId,
+                Status = TaskStatus.InWork,
+                PerformerUserProfileId = request.PerformerUserProfileId,
+                DeadlineDateTime = request.DeadlineDateTime,
+                LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+            };
+            await taskRepository.UpdateTaskMoveToInWork(newTask);
+            var result = await GetById(taskId, authInfo);
+            return result;
+        }
+
         public async Task DeleteTask(int id)
         {
             var task = await GetById(id);

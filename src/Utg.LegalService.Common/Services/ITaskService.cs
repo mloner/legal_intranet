@@ -18,5 +18,6 @@ namespace Utg.LegalService.Common.Services
         Task DeleteTask(int id);
         Task<IEnumerable<UserProfileApiModel>> GetAuthorUserProfiles();
         Task<Stream> GetReport(TaskReportRequest request, AuthInfo authInfo);
+        Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo);
     }
 }
