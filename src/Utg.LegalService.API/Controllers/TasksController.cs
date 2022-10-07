@@ -93,6 +93,18 @@ namespace Utg.LegalService.API.Controllers
             return Ok(result);
         }
         
+        [HttpPatch("underreview")]
+        public async Task<ActionResult<TaskModel>> UpdateMoveToUnderReview([FromForm] TaskUpdateMoveToUnderReviewRequest request)
+        {
+            if (!await CanGo(Role.LegalPerformer))
+            {
+                return Forbid();
+            }
+            var authInfo = await GetAuthInfo();
+            var result = await taskService.UpdateTaskMoveToUnderReview(request, authInfo);
+            return Ok(result);
+        }
+        
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {

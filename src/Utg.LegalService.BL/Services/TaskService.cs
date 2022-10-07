@@ -59,13 +59,13 @@ namespace Utg.LegalService.BL.Services
             query = FilterByRoles(query, request, authInfo);
             query = Filter(query, request);
             query = Search(query, request);
-            
+
             var count = query.Count();
             query = SkipAndTake(query, request);
 
             var list = query.AsEnumerable();
             list = FillAccessRights(list, authInfo);
-            
+
             return new PagedResult<TaskModel>()
             {
                 Result = list,
@@ -95,7 +95,7 @@ namespace Utg.LegalService.BL.Services
             {
                 query = query.Where(x => x.Status != TaskStatus.Done);
             }
-            
+
             if (request.AuthorUserProfileIds != null && request.AuthorUserProfileIds.Any())
             {
                 query = query.Where(x => request.AuthorUserProfileIds.Contains(x.AuthorUserProfileId));
@@ -103,7 +103,7 @@ namespace Utg.LegalService.BL.Services
 
             return query;
         }
-        
+
         private IQueryable<TaskModel> Search(IQueryable<TaskModel> query, TaskRequest request)
         {
             if (!string.IsNullOrEmpty(request.Search))
@@ -119,7 +119,7 @@ namespace Utg.LegalService.BL.Services
 
             return query;
         }
-        
+
         private IQueryable<TaskModel> SkipAndTake(IQueryable<TaskModel> query, TaskRequest request)
         {
             if (request.Skip.HasValue)
@@ -135,11 +135,11 @@ namespace Utg.LegalService.BL.Services
         }
         private IEnumerable<TaskModel> FillAccessRights(IEnumerable<TaskModel> models, AuthInfo authInfo)
         {
-            
+
             models = models.Select(x =>
             {
                 x.AccessRights = GetAccessRights(x, authInfo);
-                
+
                 return x;
             });
 
@@ -173,18 +173,18 @@ namespace Utg.LegalService.BL.Services
         }
         private static bool CanEdit(TaskModel model, AuthInfo authInfo)
         {
-            return new int[] { (int)Role.LegalHead, (int)Role.LegalInitiator}
+            return new int[] { (int)Role.LegalHead, (int)Role.LegalInitiator }
                 .Intersect(authInfo.Roles)
                 .Any() &&
                    model.Status == TaskStatus.Draft;
         }
-        
+
         private static bool CanDelete(TaskModel model, AuthInfo authInfo)
         {
             return authInfo.Roles.Contains((int)Role.LegalInitiator) &&
                    model.Status == TaskStatus.Draft;
         }
-        
+
         private static bool CanMakeReport(TaskModel model, AuthInfo authInfo)
         {
             return authInfo.Roles.Contains((int)Role.LegalHead);
@@ -196,7 +196,7 @@ namespace Utg.LegalService.BL.Services
             task.AccessRights = GetAccessRights(task, authInfo);
             return task;
         }
-        
+
         public async Task<TaskModel> CreateTask(TaskCreateRequest request, AuthInfo authInfo)
         {
             var attachments = Enumerable.Empty<TaskAttachmentModel>();
@@ -204,7 +204,7 @@ namespace Utg.LegalService.BL.Services
             {
                 var inputModel = mapper.Map<TaskModel>(request);
                 await FillCreateTaskModel(inputModel, authInfo);
-                
+
                 var task = await taskRepository.CreateTask(inputModel);
 
                 if (request.Attachments?.Any() == true)
@@ -241,7 +241,7 @@ namespace Utg.LegalService.BL.Services
                 }
             }
         }
-        
+
         private async Task<IEnumerable<TaskAttachmentModel>> AddAttachments(int taskId, IEnumerable<IFormFile> attachments)
         {
             var customAttachments = new List<TaskAttachmentModel>();
@@ -283,7 +283,7 @@ namespace Utg.LegalService.BL.Services
                     LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
                 };
                 await taskRepository.UpdateTask(newTask);
-                
+
                 if (request.AddedAttachments?.Any() == true)
                 {
                     attachments = await this.AddAttachments(taskId, request.AddedAttachments);
@@ -299,7 +299,7 @@ namespace Utg.LegalService.BL.Services
                 await DeleteAttachmentFiles(attachments);
                 throw;
             }
-            
+
             if (request.RemovedAttachmentIds?.Any() == true)
             {
                 var filesToRemove = oldTask.Attachments
@@ -331,6 +331,21 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
+        public async Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo)
+        {
+            var taskId = request.Id;
+            var newTask = new TaskModel
+            {
+                Id = taskId,
+                Status = TaskStatus.UnserReview,
+                LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+            };
+            await taskRepository.UpdateTaskMoveToUnderReview(newTask);
+            var result = await GetById(taskId, authInfo);
+            return result;
+        }
+
+
         public async Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles()
         {
             var result = dataProxyClient.UserProfilesRoleAsync((int)Role.LegalPerformer);
@@ -340,7 +355,7 @@ namespace Utg.LegalService.BL.Services
         public async Task DeleteTask(int id)
         {
             var task = await GetById(id);
-            
+
             if (task.Attachments?.Any() == true)
             {
                 await taskRepository.RemoveAttachments(task.Id, task.Attachments.Select(x => x.Id));
@@ -370,7 +385,7 @@ namespace Utg.LegalService.BL.Services
                 Statuses = request.Statuses,
                 AuthorUserProfileIds = request.AuthorUserProfileIds
             }, authInfo);
-            
+
             var reportData = data.Result.Select((x, index) => new TaskReportDto()
             {
                 RowNumber = index + 1,
@@ -382,7 +397,7 @@ namespace Utg.LegalService.BL.Services
                 Deadline = x.DeadlineDateTime,
                 LastChangeDateTime = x.LastChangeDateTime
             });
-            
+
             var reportStream = excelReportBuilder.BuildNewReport(builder =>
             {
                 if (!reportData.Any())

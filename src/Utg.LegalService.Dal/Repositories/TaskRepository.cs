@@ -129,5 +129,23 @@ namespace Utg.LegalService.Dal.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        public async System.Threading.Tasks.Task UpdateTaskMoveToUnderReview(TaskModel model)
+        {
+            var entity = await GetTaskEntity(model.Id);
+            _mapper.Map(model, entity);
+            _context.Entry(entity).Property(x => x.Status).IsModified = true;
+            _context.Entry(entity).Property(x => x.Type).IsModified = false;
+            _context.Entry(entity).Property(x => x.Description).IsModified = false;
+            _context.Entry(entity).Property(x => x.AuthorUserProfileId).IsModified = false;
+            _context.Entry(entity).Property(x => x.AuthorFullName).IsModified = false;
+            _context.Entry(entity).Property(x => x.CreationDateTime).IsModified = false;
+            _context.Entry(entity).Property(x => x.PerformerUserProfileId).IsModified = false;
+            _context.Entry(entity).Property(x => x.PerformerFullName).IsModified = false;
+            _context.Entry(entity).Property(x => x.DeadlineDateTime).IsModified = false;
+            _context.Entry(entity).Property(x => x.LastChangeDateTime).IsModified = true;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

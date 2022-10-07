@@ -18,5 +18,6 @@ namespace Utg.LegalService.Common.Repositories
         Task UpdateTask(TaskModel model);
         Task DeleteTask(int taskId);
         Task UpdateTaskMoveToInWork(TaskModel newTask);
+        Task UpdateTaskMoveToUnderReview(TaskModel newTask);
     }
 }
