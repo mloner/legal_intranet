@@ -35,7 +35,10 @@ services:
       Queue__IgnoreErrors: "true"
       KeyCloak__Authority: "$KEY_AUTH"
       KeyCloak__Issuer:  "$KEY_ISSUER"
-     
+      Minio__MailAccessKey: "intranet-mail-connector"
+      Minio__MailSecretKey: "m4yStKM4o4Bp"
+      Minio__MailBucket: "intranet-mail-storage"
+
     #### Logiging ####
     logging:
       driver: loki

@@ -37,6 +37,10 @@ services:
       Queue__IgnoreErrors: "true"
       KeyCloak__Authority: "$KEY_AUTH"
       KeyCloak__Issuer:  "$KEY_ISSUER"
+      Minio__MailAccessKey: "intranet-mail-service"
+      Minio__MailSecretKey: "weuXilrAxwtu"
+      Minio__MailBucket: "intranet-mail"
+
      
     #### Logiging ####
     logging:
