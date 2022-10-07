@@ -317,6 +317,22 @@ namespace Utg.LegalService.BL.Services
 
         public async Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
         {
+            TaskModel result;
+            var task = await GetById(request.Id, authInfo);
+
+            switch (task.Status)
+            {
+                case TaskStatus.UnderReview:
+                default:
+                    result = await UpdateTaskMoveToInWorkCommon(request, authInfo);
+                    break;
+            }
+            
+            return result;
+        }
+
+        private async Task<TaskModel> UpdateTaskMoveToInWorkCommon(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
+        {
             var taskId = request.Id;
             var newTask = new TaskModel
             {
@@ -333,11 +349,26 @@ namespace Utg.LegalService.BL.Services
 
         public async Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo)
         {
+            TaskModel result;
+            var task = await GetById(request.Id, authInfo);
+
+            switch (task.Status)
+            {
+                default:
+                    result = await UpdateTaskMoveToUnderReviewCommon(request, authInfo);
+                    break;
+            }
+            
+            return result;
+        }
+
+        private async Task<TaskModel> UpdateTaskMoveToUnderReviewCommon(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo)
+        {
             var taskId = request.Id;
             var newTask = new TaskModel
             {
                 Id = taskId,
-                Status = TaskStatus.UnserReview,
+                Status = TaskStatus.UnderReview,
                 LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
             };
             await taskRepository.UpdateTaskMoveToUnderReview(newTask);
@@ -345,6 +376,35 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
+        public async Task<TaskModel> UpdateTaskMoveToDone(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo)
+        {
+            TaskModel result;
+            var task = await GetById(request.Id, authInfo);
+            switch (task.Status)
+            {
+                case TaskStatus.UnderReview:
+                default:
+                    result = await UpdateTaskMoveToDoneCommon(request, authInfo);
+                    break;
+            }
+            
+            
+            return result;
+        }
+
+        private async Task<TaskModel> UpdateTaskMoveToDoneCommon(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo)
+        {
+            var taskId = request.Id;
+            var newTask = new TaskModel
+            {
+                Id = taskId,
+                Status = TaskStatus.Done,
+                LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+            };
+            await taskRepository.UpdateTaskMoveToDone(newTask);
+            var result = await GetById(taskId, authInfo);
+            return result;
+        }
 
         public async Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles()
         {

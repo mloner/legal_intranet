@@ -105,6 +105,18 @@ namespace Utg.LegalService.API.Controllers
             return Ok(result);
         }
         
+        [HttpPatch("done")]
+        public async Task<ActionResult<TaskModel>> UpdateMoveToDone([FromForm] TaskUpdateMoveToDoneRequest request)
+        {
+            if (!await CanGo(Role.LegalHead))
+            {
+                return Forbid();
+            }
+            var authInfo = await GetAuthInfo();
+            var result = await taskService.UpdateTaskMoveToDone(request, authInfo);
+            return Ok(result);
+        }
+        
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
