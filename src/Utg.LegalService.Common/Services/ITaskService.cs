@@ -20,6 +20,7 @@ namespace Utg.LegalService.Common.Services
         Task<Stream> GetReport(TaskReportRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo);
+        Task<TaskModel> UpdateTaskMoveToDone(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo);
         Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles();
     }
 }

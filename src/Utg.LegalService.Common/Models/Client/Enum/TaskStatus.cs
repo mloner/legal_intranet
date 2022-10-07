@@ -17,7 +17,7 @@ namespace Utg.LegalService.Common.Models.Client.Enum
         InWork = 3,
         
         [Display(Name = "На проверке")]
-        UnserReview = 4,
+        UnderReview = 4,
         
         [Display(Name = "Выполнено")]
         Done = 5
