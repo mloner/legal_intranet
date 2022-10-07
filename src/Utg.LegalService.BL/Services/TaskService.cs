@@ -80,6 +80,11 @@ namespace Utg.LegalService.BL.Services
                 query = query.Where(x => x.AuthorUserProfileId == authInfo.UserProfileId);
             }
 
+            if (authInfo.Roles.Contains((int)Role.LegalPerformer))
+            {
+                query = query.Where(x => x.PerformerUserProfileId == authInfo.UserProfileId);
+            }
+
             query = query.Where(x => !(x.Status == TaskStatus.Draft && x.AuthorUserProfileId != authInfo.UserProfileId));
 
             return query;
