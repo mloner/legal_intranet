@@ -8,5 +8,6 @@
         public bool CanDelete { get; set; }
         public bool CanMakeReport { get; set; }
         public bool CanPerform { get; set; }
+        public bool CanReview { get; set; }
     }
 }

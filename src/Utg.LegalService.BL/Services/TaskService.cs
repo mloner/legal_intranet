@@ -161,10 +161,15 @@ namespace Utg.LegalService.BL.Services
                 result.CanDelete = CanDelete(model, authInfo);
                 result.CanMakeReport = CanMakeReport(model, authInfo);
                 result.CanPerform = CanPerform(model, authInfo);
+                result.CanReview = CanReview(model, authInfo);
             }
 
             return result;
         }
+
+        private static bool CanReview(TaskModel model, AuthInfo authInfo)
+         => authInfo.Roles.Contains((int)Role.LegalHead) &&
+                    model.Status == TaskStatus.UnderReview;
 
         private static bool IsPerformerAvailable(AuthInfo authInfo)
         {
@@ -196,10 +201,9 @@ namespace Utg.LegalService.BL.Services
         }
 
         private static bool CanPerform(TaskModel model, AuthInfo authInfo)
-        => authInfo.Roles.Contains((int)Role.LegalPerformer) &&
-             model.PerformerUserProfileId == authInfo.UserProfileId;
-
-
+                => authInfo.Roles.Contains((int)Role.LegalPerformer) &&
+                    model.Status ==  TaskStatus.InWork && 
+                    model.PerformerUserProfileId == authInfo.UserProfileId;
 
 
         public async Task<TaskModel> GetById(int id, AuthInfo authInfo = null)
