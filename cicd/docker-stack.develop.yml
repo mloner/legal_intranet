@@ -40,7 +40,7 @@ services:
       KeyCloak__Issuer:  "$KEY_ISSUER"     
       Minio__MailSecretKey: "weuXilrAxwtu"
       Minio__MailBucket: "intranet-mail"
-      Minio__Url": "$S3_HOST"
+      Minio__Url: "$S3_HOST"
       Minio__AccessKey: "$S3_ACCESS_KEY"
       Minio__SecretKey: "$S3_SECRET_KEY"
       Minio__Region: "$S3_REGION"
