@@ -157,7 +157,7 @@ namespace Utg.LegalService.BL.Services
             {
                 result.IsPerformerAvailable = IsPerformerAvailable(authInfo);
                 result.CanShowDetails = CanShowDetails(authInfo);
-                result.CanEdit = CanEdit(model, authInfo);
+                result.CanEdit = CanEdit(model, authInfo);                
                 result.CanDelete = CanDelete(model, authInfo);
                 result.CanMakeReport = CanMakeReport(model, authInfo);
             }
@@ -177,12 +177,11 @@ namespace Utg.LegalService.BL.Services
                     .Any();
         }
         private static bool CanEdit(TaskModel model, AuthInfo authInfo)
-        {
-            return new int[] { (int)Role.LegalHead, (int)Role.LegalInitiator }
-                .Intersect(authInfo.Roles)
-                .Any() &&
-                   model.Status == TaskStatus.Draft;
-        }
+           => authInfo.Roles.Contains((int)Role.LegalInitiator)
+                && model.Status == TaskStatus.Draft ||
+            authInfo.Roles.Contains((int)Role.LegalHead)
+                && model.Status == TaskStatus.New;
+
 
         private static bool CanDelete(TaskModel model, AuthInfo authInfo)
         {
