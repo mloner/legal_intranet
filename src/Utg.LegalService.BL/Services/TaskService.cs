@@ -157,9 +157,10 @@ namespace Utg.LegalService.BL.Services
             {
                 result.IsPerformerAvailable = IsPerformerAvailable(authInfo);
                 result.CanShowDetails = CanShowDetails(authInfo);
-                result.CanEdit = CanEdit(model, authInfo);                
+                result.CanEdit = CanEdit(model, authInfo);
                 result.CanDelete = CanDelete(model, authInfo);
                 result.CanMakeReport = CanMakeReport(model, authInfo);
+                result.CanPerform = CanPerform(model, authInfo);
             }
 
             return result;
@@ -193,6 +194,13 @@ namespace Utg.LegalService.BL.Services
         {
             return authInfo.Roles.Contains((int)Role.LegalHead);
         }
+
+        private static bool CanPerform(TaskModel model, AuthInfo authInfo)
+        => authInfo.Roles.Contains((int)Role.LegalPerformer) &&
+             model.PerformerUserProfileId == authInfo.UserProfileId;
+
+
+
 
         public async Task<TaskModel> GetById(int id, AuthInfo authInfo = null)
         {
@@ -331,7 +339,7 @@ namespace Utg.LegalService.BL.Services
                     result = await UpdateTaskMoveToInWorkCommon(request, authInfo);
                     break;
             }
-            
+
             return result;
         }
 
@@ -362,7 +370,7 @@ namespace Utg.LegalService.BL.Services
                     result = await UpdateTaskMoveToUnderReviewCommon(request, authInfo);
                     break;
             }
-            
+
             return result;
         }
 
@@ -391,8 +399,8 @@ namespace Utg.LegalService.BL.Services
                     result = await UpdateTaskMoveToDoneCommon(request, authInfo);
                     break;
             }
-            
-            
+
+
             return result;
         }
 

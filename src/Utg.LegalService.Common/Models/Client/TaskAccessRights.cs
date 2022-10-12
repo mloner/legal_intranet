@@ -7,5 +7,6 @@
         public bool CanEdit { get; set; }
         public bool CanDelete { get; set; }
         public bool CanMakeReport { get; set; }
+        public bool CanPerform { get; set; }
     }
 }
