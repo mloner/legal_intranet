@@ -29,7 +29,7 @@ services:
     stop_grace_period: 1m
     environment:
       TZ: Europe/Moscow
-      ASPNETCORE_ENVIRONMENT: Dev
+      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__UTGDatabase: "Host=$PG_HOST;Port=5432;Database=$UTG_PG_DB;Username=$UTG_PG_USER;Password=$UTG_PG_PASS"      
       Api__Main: "http://intranet-users_app/api"
       Queue__Host: "amqps://mq_rabbit:5672"
