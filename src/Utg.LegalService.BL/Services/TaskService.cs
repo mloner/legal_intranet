@@ -118,7 +118,8 @@ namespace Utg.LegalService.BL.Services
 
                 query = query.Where(x
                         => EF.Functions.ILike(x.Description, ilikeQuery)
-                           || EF.Functions.ToTsVector(Const.PgFtsConfig, x.Description).Matches(EF.Functions.ToTsQuery(Const.PgFtsConfig, ftsQuery)))
+                           || EF.Functions.ToTsVector(Const.PgFtsConfig, x.Description)
+                               .Matches(EF.Functions.PlainToTsQuery(Const.PgFtsConfig, ftsQuery)))
                     ;
             }
 
