@@ -18,7 +18,7 @@ namespace Utg.LegalService.Common.Models.Client
         public DateTime CreationDateTime { get; set; }
         public int PerformerUserProfileId { get; set; }
         public string PerformerFullName { get; set; }
-        public DateTime DeadlineDateTime { get; set; }
+        public DateTime? DeadlineDateTime { get; set; }
         public DateTime LastChangeDateTime { get; set; }
         public IEnumerable<TaskAttachmentModel> Attachments { get; set; }
         public TaskAccessRights AccessRights { get; set; }
