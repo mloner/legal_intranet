@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Utg.Common.Packages.Domain;
@@ -30,8 +31,10 @@ namespace Utg.LegalService.BL.Services
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository taskRepository;
+        private readonly ITaskAttachmentRepository _taskAttachmentRepository;
+        private readonly ITaskCommentService _taskCommentService;
         private readonly IFileStorageService fileStorageService;
-        private readonly IMapper mapper;
+        private readonly IMapper _mapper;
         private readonly IUsersProxyClient usersProxyClient;
         private readonly IExcelReportBuilder excelReportBuilder;
         private readonly IDataProxyClient dataProxyClient;
@@ -42,19 +45,24 @@ namespace Utg.LegalService.BL.Services
             IMapper mapper,
             IUsersProxyClient usersProxyClient,
             IExcelReportBuilder excelReportBuilder,
-            IDataProxyClient dataProxyClient)
+            IDataProxyClient dataProxyClient,
+            ITaskAttachmentRepository taskAttachmentRepository,
+            ITaskCommentService taskCommentService)
         {
             this.taskRepository = taskRepository;
             this.fileStorageService = fileStorageService;
-            this.mapper = mapper;
+            this._mapper = mapper;
             this.usersProxyClient = usersProxyClient;
             this.excelReportBuilder = excelReportBuilder;
             this.dataProxyClient = dataProxyClient;
+            _taskAttachmentRepository = taskAttachmentRepository;
+            _taskCommentService = taskCommentService;
         }
 
         public async Task<PagedResult<TaskModel>> GetAll(TaskRequest request, AuthInfo authInfo)
         {
-            var query = taskRepository.Get();
+            var query = taskRepository.Get()
+                .ProjectTo<TaskModel>(_mapper.ConfigurationProvider);
 
             query = FilterByRoles(query, request, authInfo);
             query = Filter(query, request);
@@ -72,6 +80,7 @@ namespace Utg.LegalService.BL.Services
                 Total = count
             };
         }
+        
 
         private IQueryable<TaskModel> FilterByRoles(IQueryable<TaskModel> query, TaskRequest request, AuthInfo authInfo)
         {
@@ -211,6 +220,7 @@ namespace Utg.LegalService.BL.Services
         {
             var task = await taskRepository.GetById(id);
             task.AccessRights = GetAccessRights(task, authInfo);
+            task.TaskComments = await _taskCommentService.GetByTaskId(task.Id);
             return task;
         }
 
@@ -219,7 +229,7 @@ namespace Utg.LegalService.BL.Services
             var attachments = Enumerable.Empty<TaskAttachmentModel>();
             try
             {
-                var inputModel = mapper.Map<TaskModel>(request);
+                var inputModel = _mapper.Map<TaskModel>(request);
                 await FillCreateTaskModel(inputModel, authInfo);
 
                 var task = await taskRepository.CreateTask(inputModel);
@@ -277,7 +287,7 @@ namespace Utg.LegalService.BL.Services
                     });
             }
 
-            await taskRepository.CreateAttachments(taskId, customAttachments);
+            await _taskAttachmentRepository.CreateAttachments(taskId, customAttachments);
             return customAttachments;
         }
 
@@ -308,7 +318,7 @@ namespace Utg.LegalService.BL.Services
 
                 if (request.RemovedAttachmentIds?.Any() == true)
                 {
-                    await taskRepository.RemoveAttachments(taskId, request.RemovedAttachmentIds);
+                    await _taskAttachmentRepository.RemoveAttachments(taskId, request.RemovedAttachmentIds);
                 }
             }
             catch (Exception e)
@@ -435,7 +445,7 @@ namespace Utg.LegalService.BL.Services
 
             if (task.Attachments?.Any() == true)
             {
-                await taskRepository.RemoveAttachments(task.Id, task.Attachments.Select(x => x.Id));
+                await _taskAttachmentRepository.RemoveAttachments(task.Id, task.Attachments.Select(x => x.Id));
                 foreach (var attachment in task.Attachments)
                 {
                     await this.fileStorageService.DeleteFile(attachment.FileId);

@@ -9,6 +9,8 @@ namespace Utg.LegalService.BL.Configuration
         public static IServiceCollection ConfigureBL(this IServiceCollection services )
         {
             services.AddTransient<ITaskService, TaskService>();
+            services.AddTransient<ITaskCommentService, TaskCommentService>();
+            services.AddTransient<IAgregateService, AgregateService>();
             
             return services;
         }

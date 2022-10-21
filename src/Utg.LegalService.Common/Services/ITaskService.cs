@@ -5,6 +5,7 @@ using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Request;
+using Utg.LegalService.Common.Models.Request.TaskComments;
 using Utg.LegalService.Common.Models.Request.Tasks;
 
 namespace Utg.LegalService.Common.Services

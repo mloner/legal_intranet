@@ -29,11 +29,11 @@ namespace Utg.LegalService.Dal.Repositories
             _mapper = mapper;
         }
 
-        public IQueryable<TaskModel> Get()
+        public IQueryable<Task> Get()
         {
             return _context.Tasks
-                .AsQueryable()
-                .ProjectTo<TaskModel>(_mapper.ConfigurationProvider);
+                .AsQueryable();
+            
         }
 
         private async Task<Task> GetTaskEntity(int id)
@@ -64,27 +64,6 @@ namespace Utg.LegalService.Dal.Repositories
             await _context.SaveChangesAsync();
             var model = _mapper.Map<TaskModel>(entity);
             return model;
-        }
-
-        public async Task<IEnumerable<TaskAttachmentModel>> CreateAttachments(int taskId, IEnumerable<TaskAttachmentModel> attachments)
-        {
-            var entities = _mapper.Map<IEnumerable<TaskAttachment>>(attachments);
-            await _context.TaskAttachments.AddRangeAsync(entities);
-            await _context.SaveChangesAsync();
-            
-            var models = _mapper.Map<IEnumerable<TaskAttachmentModel>>(entities);
-            return models;
-        }
-
-        public async System.Threading.Tasks.Task RemoveAttachments(int taskId, IEnumerable<int> attachmentIds)
-        {
-            var attachmentsToRemove = await _context.TaskAttachments
-                .Where(attachment => attachment.TaskId == taskId &&
-                                     attachmentIds.Contains(attachment.Id))
-                .ToArrayAsync();
-
-            _context.TaskAttachments.RemoveRange(attachmentsToRemove);
-            await _context.SaveChangesAsync();
         }
 
         public async System.Threading.Tasks.Task UpdateTask(TaskModel model)
