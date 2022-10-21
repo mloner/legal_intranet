@@ -440,6 +440,23 @@ namespace Utg.LegalService.BL.Services
             return result.Result;
         }
 
+        public async Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo)
+        {
+            var attachments = Enumerable.Empty<TaskAttachmentModel>();
+            try
+            {
+                if (request.Attachment != null)
+                {
+                    await this.AddAttachments(request.TaskId, new []{request.Attachment});
+                }
+            }
+            catch (Exception e)
+            {
+                await DeleteAttachmentFiles(attachments);
+                throw;
+            }
+        }
+
         public async Task DeleteTask(int id)
         {
             var task = await GetById(id);
