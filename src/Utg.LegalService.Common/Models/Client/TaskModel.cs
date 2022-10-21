@@ -22,5 +22,6 @@ namespace Utg.LegalService.Common.Models.Client
         public DateTime LastChangeDateTime { get; set; }
         public IEnumerable<TaskAttachmentModel> Attachments { get; set; }
         public TaskAccessRights AccessRights { get; set; }
+        public IEnumerable<TaskCommentModel> TaskComments { get; set; }
     }
 }

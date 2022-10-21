@@ -28,6 +28,9 @@ namespace Utg.LegalService.Dal.Configuration
         private static void AddDependenciesToContainer(IServiceCollection services)
         {
             services.AddTransient<ITaskRepository, TaskRepository>();
+            services.AddTransient<ITaskAttachmentRepository, TaskAttachmentRepository>();
+            services.AddTransient<ITaskCommentRepository, TaskCommentRepository>();
+            services.AddTransient<IAgregateRepository, AgregateRepository>();
         }
     }
 }

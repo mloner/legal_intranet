@@ -10,11 +10,9 @@ namespace Utg.LegalService.Common.Repositories
 {
     public interface ITaskRepository
     {
-        IQueryable<TaskModel> Get();
+        IQueryable<Models.Domain.Task> Get();
         Task<TaskModel> GetById(int id);
         Task<TaskModel> CreateTask(TaskModel inputModel);
-        Task<IEnumerable<TaskAttachmentModel>>  CreateAttachments(int taskId, IEnumerable<TaskAttachmentModel> attachments);
-        Task RemoveAttachments(int taskId, IEnumerable<int> attachmentIds);
         Task UpdateTask(TaskModel model);
         Task DeleteTask(int taskId);
         Task UpdateTaskMoveToInWork(TaskModel newTask);
