@@ -1,26 +1,21 @@
-﻿using System;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.Domain.Models.Enum;
 using Utg.Common.Packages.ExcelReportBuilder;
 using Utg.Common.Packages.FileStorage;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
-using Utg.LegalService.Common;
-using Utg.LegalService.Common.Models;
 using Utg.LegalService.Common.Models.Client;
-using Utg.LegalService.Common.Models.Client.Enum;
-using Utg.LegalService.Common.Models.Report;
 using Utg.LegalService.Common.Models.Report.Dtos;
 using Utg.LegalService.Common.Models.Report.Helpers;
-using Utg.LegalService.Common.Models.Request;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Common.Services;
@@ -36,6 +31,7 @@ namespace Utg.LegalService.BL.Services
         private readonly IFileStorageService fileStorageService;
         private readonly IMapper _mapper;
         private readonly IUsersProxyClient usersProxyClient;
+        private readonly IAgregateRepository _agregateRepository;
         private readonly IExcelReportBuilder excelReportBuilder;
         private readonly IDataProxyClient dataProxyClient;
 
@@ -47,7 +43,8 @@ namespace Utg.LegalService.BL.Services
             IExcelReportBuilder excelReportBuilder,
             IDataProxyClient dataProxyClient,
             ITaskAttachmentRepository taskAttachmentRepository,
-            ITaskCommentService taskCommentService)
+            ITaskCommentService taskCommentService,
+            IAgregateRepository agregateRepository)
         {
             this.taskRepository = taskRepository;
             this.fileStorageService = fileStorageService;
@@ -57,11 +54,13 @@ namespace Utg.LegalService.BL.Services
             this.dataProxyClient = dataProxyClient;
             _taskAttachmentRepository = taskAttachmentRepository;
             _taskCommentService = taskCommentService;
+            _agregateRepository = agregateRepository;
         }
 
         public async Task<PagedResult<TaskModel>> GetAll(TaskRequest request, AuthInfo authInfo)
         {
             var query = taskRepository.Get()
+                .OrderByDescending(task => task.CreationDateTime)
                 .ProjectTo<TaskModel>(_mapper.ConfigurationProvider);
 
             query = FilterByRoles(query, request, authInfo);
@@ -80,7 +79,7 @@ namespace Utg.LegalService.BL.Services
                 Total = count
             };
         }
-        
+
 
         private IQueryable<TaskModel> FilterByRoles(IQueryable<TaskModel> query, TaskRequest request, AuthInfo authInfo)
         {
@@ -212,7 +211,7 @@ namespace Utg.LegalService.BL.Services
 
         private static bool CanPerform(TaskModel model, AuthInfo authInfo)
                 => authInfo.Roles.Contains((int)Role.LegalPerformer) &&
-                    model.Status ==  TaskStatus.InWork && 
+                    model.Status == TaskStatus.InWork &&
                     model.PerformerUserProfileId == authInfo.UserProfileId;
 
 
@@ -361,11 +360,13 @@ namespace Utg.LegalService.BL.Services
         private async Task<TaskModel> UpdateTaskMoveToInWorkCommon(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
         {
             var taskId = request.Id;
+            var performer = await _agregateRepository.GetUserProfiles().FirstOrDefaultAsync(userProfile => userProfile.UserProfileId == request.PerformerUserProfileId);
             var newTask = new TaskModel
             {
                 Id = taskId,
                 Status = TaskStatus.InWork,
                 PerformerUserProfileId = request.PerformerUserProfileId,
+                PerformerFullName = performer?.FullName,
                 DeadlineDateTime = request.DeadlineDateTime,
                 LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
             };
