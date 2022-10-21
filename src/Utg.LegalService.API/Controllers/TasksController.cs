@@ -69,6 +69,18 @@ namespace Utg.LegalService.API.Controllers
             return this.Ok(result);
         }
         
+        [HttpPost("files")]
+        public async Task<ActionResult> UploadFile([FromForm] TaskUploadFileRequest request)
+        {
+            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            {
+                return Forbid();
+            }
+            var authInfo = await GetAuthInfo();
+            await taskService.UploadFile(request, authInfo);
+            return this.Ok();
+        }
+        
         [HttpPatch]
         public async Task<ActionResult<TaskModel>> Update([FromForm] TaskUpdateRequest request)
         {
