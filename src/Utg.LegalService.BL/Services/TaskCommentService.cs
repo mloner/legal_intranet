@@ -34,9 +34,11 @@ namespace Utg.LegalService.BL.Services
         {
             var models = await _taskCommentRepository.Get()
                 .AsNoTracking()
-                .Where(x => x.TaskId == taskId)
+                .Where(comment => comment.TaskId == taskId)
                 .ProjectTo<TaskCommentModel>(_mapper.ConfigurationProvider)
+                .OrderByDescending(comment => comment.DateTime)
                 .ToListAsync();
+
             var userProfileIds = models.Select(x => x.UserProfileId);
             var userProfiles = await _agregateService.GetUserProfiles(userProfileIds);
             models = models.Select(m =>
