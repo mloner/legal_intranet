@@ -445,9 +445,9 @@ namespace Utg.LegalService.BL.Services
             var attachments = Enumerable.Empty<TaskAttachmentModel>();
             try
             {
-                if (request.Attachment != null)
+                if (request.Attachments?.Any() == true)
                 {
-                    await this.AddAttachments(request.TaskId, new []{request.Attachment});
+                    attachments = await this.AddAttachments(request.TaskId, request.Attachments);
                 }
             }
             catch (Exception e)
