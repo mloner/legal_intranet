@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using LinqKit;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.Domain.Models.Enum;
@@ -83,16 +84,22 @@ namespace Utg.LegalService.BL.Services
 
         private IQueryable<TaskModel> FilterByRoles(IQueryable<TaskModel> query, TaskRequest request, AuthInfo authInfo)
         {
+            var predicate = PredicateBuilder.New<TaskModel>(true);
+
             if (authInfo.Roles.Contains((int)Role.LegalInitiator))
             {
-                query = query.Where(x => x.AuthorUserProfileId == authInfo.UserProfileId);
+                predicate = PredicateBuilder.New<TaskModel>(
+                    model => model.AuthorUserProfileId == authInfo.UserProfileId);
             }
 
             if (authInfo.Roles.Contains((int)Role.LegalPerformer))
             {
-                query = query.Where(x => x.PerformerUserProfileId == authInfo.UserProfileId);
+                predicate = predicate.Or(
+                    model => model.PerformerUserProfileId == authInfo.UserProfileId);
             }
 
+            query = query.Where(predicate).AsQueryable();
+            
             query = query.Where(x => !(x.Status == TaskStatus.Draft && x.AuthorUserProfileId != authInfo.UserProfileId));
 
             return query;
