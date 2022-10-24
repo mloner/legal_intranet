@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,7 +29,7 @@ namespace Utg.LegalService.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<TaskModel>> Create([FromForm] TaskCommentCreateRequest request)
+        public async Task<ActionResult<List<TaskCommentModel>>> Create([FromForm] TaskCommentCreateRequest request)
         {
             if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
             {
@@ -36,7 +37,19 @@ namespace Utg.LegalService.API.Controllers
             }
             var authInfo = await GetAuthInfo();
             await _taskCommentService.CreateTaskComment(request, authInfo);
-            return Ok();
+            var result = await GetByTaskId(request.TaskId);
+            return result;
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<List<TaskCommentModel>>> GetByTaskId(int taskId)
+        {
+            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            {
+                return Forbid();
+            }
+            var comments = await _taskCommentService.GetByTaskId(taskId);
+            return Ok(comments);
         }
     }
 }
