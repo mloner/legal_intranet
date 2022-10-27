@@ -97,6 +97,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.FileSizeInBytes, opt => opt.MapFrom(x => x.FileSizeInBytes))
                 .ForMember(dest => dest.TaskId, opt => opt.MapFrom(x => x.TaskId))
                 .ForMember(dest => dest.Task, opt => opt.MapFrom(x => x.Task))
+                .ForMember(dest => dest.Bytes, opt => opt.Ignore())
                 ;
             
             config.CreateMap<TaskComment, TaskCommentModel>()

@@ -464,6 +464,17 @@ namespace Utg.LegalService.BL.Services
             }
         }
 
+        public async Task<TaskAttachmentModel> DownloadFile(int attachmentId)
+        {
+            var attachment = await _taskAttachmentRepository.Get()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == attachmentId);
+            var attachmentModel = _mapper.Map<TaskAttachmentModel>(attachment);
+            var file = await fileStorageService.GetFile(attachment.FileId);
+            attachmentModel.Bytes = file;
+            return attachmentModel;
+        }
+
         public async Task DeleteTask(int id)
         {
             var task = await GetById(id);

@@ -22,7 +22,12 @@ namespace Utg.LegalService.Dal.Repositories
             _context = context;
             _mapper = mapper;
         }
-        
+
+        public IQueryable<TaskAttachment> Get()
+        {
+            return _context.TaskAttachments.AsQueryable();
+        }
+
         public async Task<IEnumerable<TaskAttachmentModel>> CreateAttachments(int taskId, IEnumerable<TaskAttachmentModel> attachments)
         {
             var entities = _mapper.Map<IEnumerable<TaskAttachment>>(attachments);

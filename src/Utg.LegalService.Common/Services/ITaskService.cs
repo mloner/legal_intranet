@@ -24,5 +24,6 @@ namespace Utg.LegalService.Common.Services
         Task<TaskModel> UpdateTaskMoveToDone(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo);
         Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles();
         Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo);
+        Task<TaskAttachmentModel> DownloadFile(int attachmentId);
     }
 }
