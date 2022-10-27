@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +9,6 @@ using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.Domain.Models.Enum;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client;
-using Utg.LegalService.Common.Models.Request;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Services;
 
@@ -68,19 +66,7 @@ namespace Utg.LegalService.API.Controllers
             var result = await taskService.CreateTask(request, authInfo);
             return this.Ok(result);
         }
-        
-        [HttpPost("files")]
-        public async Task<ActionResult> UploadFile([FromForm] TaskUploadFileRequest request)
-        {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
-            {
-                return Forbid();
-            }
-            var authInfo = await GetAuthInfo();
-            await taskService.UploadFile(request, authInfo);
-            return this.Ok();
-        }
-        
+
         [HttpPatch]
         public async Task<ActionResult<TaskModel>> Update([FromForm] TaskUpdateRequest request)
         {
