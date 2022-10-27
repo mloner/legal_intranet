@@ -132,8 +132,8 @@ namespace Utg.LegalService.BL.Services
                 var ilikeQuery = $"%{request.Search}%";
 
                 query = query.Where(x
-                        => EF.Functions.ILike(x.Description, ilikeQuery)
-                           || EF.Functions.ToTsVector(Const.PgFtsConfig, x.Description)
+                        => EF.Functions.ILike(x.AuthorFullName, ilikeQuery)
+                           || EF.Functions.ToTsVector(Const.PgFtsConfig, x.AuthorFullName)
                                .Matches(EF.Functions.PlainToTsQuery(Const.PgFtsConfig, ftsQuery)))
                     ;
             }
