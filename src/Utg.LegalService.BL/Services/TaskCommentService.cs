@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Utg.Common.Packages.Domain.Enums;
+using Utg.Common.Packages.Domain.Models.Notification;
+using Utg.Common.Packages.Domain.Models.Push;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.TaskComments;
@@ -19,15 +23,18 @@ namespace Utg.LegalService.BL.Services
         private readonly ITaskCommentRepository _taskCommentRepository;
         private readonly IMapper _mapper;
         private readonly IAgregateService _agregateService;
+        private readonly INotificationService _notificationService;
 
         public TaskCommentService(
             IMapper mapper,
             ITaskCommentRepository taskCommentRepository,
-            IAgregateService agregateService)
+            IAgregateService agregateService,
+            INotificationService notificationService)
         {
             _mapper = mapper;
             _taskCommentRepository = taskCommentRepository;
             _agregateService = agregateService;
+            _notificationService = notificationService;
         }
 
         public async Task<List<TaskCommentModel>> GetByTaskId(int taskId)
@@ -63,6 +70,53 @@ namespace Utg.LegalService.BL.Services
             entity.UserProfileId = authInfo.UserProfileId;
 
             await _taskCommentRepository.CreateComment(entity);
+            var comment = await _taskCommentRepository.Get()
+                .Include(x => x.Task)
+                .FirstOrDefaultAsync(x => x.TaskId == entity.TaskId);
+            await CreateTaskCommentEmitEvents(comment, authInfo);
+        }
+        
+        private async Task CreateTaskCommentEmitEvents(TaskComment taskComment, AuthInfo authInfo)
+        {
+            var now = DateTime.UtcNow;
+            var notifications = Enumerable.Empty<NotificationModel>();
+            var task = taskComment.Task;
+
+            if (authInfo.UserProfileId != task.AuthorUserProfileId)
+            {
+                notifications = notifications.Append(new NotificationModel
+                {
+                    NotificationType = NotificationTaskType.LegalTaskCommentCreated,
+                    ToUserProfileId = task.AuthorUserProfileId,
+                    ToUserProfileFullName = task.AuthorFullName,
+                    Date = now,
+                    Data = JsonConvert.SerializeObject(
+                        new BaseMessage
+                        {
+                            Id = task.Id,
+                            Text = $"Оставлен комментарий под задачей"
+                        })
+                });
+            }
+            if (task.PerformerUserProfileId.HasValue &&
+                authInfo.UserProfileId != task.PerformerUserProfileId)
+            {
+                notifications = notifications.Append(new NotificationModel
+                {
+                    NotificationType = NotificationTaskType.LegalTaskCommentCreated,
+                    ToUserProfileId = task.PerformerUserProfileId.Value,
+                    ToUserProfileFullName = task.PerformerFullName,
+                    Date = now,
+                    Data = JsonConvert.SerializeObject(
+                        new BaseMessage
+                        {
+                            Id = task.Id,
+                            Text = $"Оставлен комментарий под задачей"
+                        })
+                });
+            }
+
+            _notificationService.Notify(notifications);
         }
     }
 }

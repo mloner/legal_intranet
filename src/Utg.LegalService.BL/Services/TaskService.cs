@@ -8,9 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqKit;
+using Newtonsoft.Json;
 using Utg.Common.Packages.Domain;
+using Utg.Common.Packages.Domain.Helpers;
 using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.Domain.Models.Enum;
+using Utg.Common.Packages.Domain.Models.Notification;
+using Utg.Common.Packages.Domain.Models.Push;
 using Utg.Common.Packages.ExcelReportBuilder;
 using Utg.Common.Packages.FileStorage;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
@@ -20,6 +24,7 @@ using Utg.LegalService.Common.Models.Report.Helpers;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Common.Services;
+using NotificationTaskType = Utg.Common.Packages.Domain.Enums.NotificationTaskType;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
 
 namespace Utg.LegalService.BL.Services
@@ -35,6 +40,7 @@ namespace Utg.LegalService.BL.Services
         private readonly IAgregateRepository _agregateRepository;
         private readonly IExcelReportBuilder excelReportBuilder;
         private readonly IDataProxyClient dataProxyClient;
+        private readonly INotificationService _notificationService;
 
         public TaskService(
             ITaskRepository taskRepository,
@@ -45,7 +51,8 @@ namespace Utg.LegalService.BL.Services
             IDataProxyClient dataProxyClient,
             ITaskAttachmentRepository taskAttachmentRepository,
             ITaskCommentService taskCommentService,
-            IAgregateRepository agregateRepository)
+            IAgregateRepository agregateRepository,
+            INotificationService notificationService)
         {
             this.taskRepository = taskRepository;
             this.fileStorageService = fileStorageService;
@@ -56,6 +63,7 @@ namespace Utg.LegalService.BL.Services
             _taskAttachmentRepository = taskAttachmentRepository;
             _taskCommentService = taskCommentService;
             _agregateRepository = agregateRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<PagedResult<TaskModel>> GetAll(TaskRequest request, AuthInfo authInfo)
@@ -278,21 +286,53 @@ namespace Utg.LegalService.BL.Services
                 var inputModel = _mapper.Map<TaskModel>(request);
                 await FillCreateTaskModel(inputModel, authInfo);
 
-                var task = await taskRepository.CreateTask(inputModel);
+                var createdTask = await taskRepository.CreateTask(inputModel);
 
                 if (request.Attachments?.Any() == true)
                 {
-                    attachments = await AddAttachments(task.Id, request.Attachments, authInfo);
+                    attachments = await AddAttachments(createdTask.Id, request.Attachments, authInfo);
                 }
 
-                var result = await GetById(task.Id, authInfo);
-                return result;
+                var createdTaskEnriched = await GetById(createdTask.Id, authInfo);
+
+                await CreateTaskEmitEvents(createdTaskEnriched);
+ 
+                return createdTaskEnriched;
             }
             catch (Exception e)
             {
                 await DeleteAttachmentFiles(attachments);
                 throw;
             }
+        }
+
+        private async Task CreateTaskEmitEvents(TaskModel taskModel)
+        {
+            var now = DateTime.UtcNow;
+            var notifications = Enumerable.Empty<NotificationModel>();
+            if (taskModel.Status == TaskStatus.New)
+            {
+                var legalHeadUserProfiles =
+                    await dataProxyClient.UserProfilesRoleAsync((int)Role.LegalHead);
+                foreach (var legalHeadUserProfile in legalHeadUserProfiles)
+                {
+                    notifications = notifications.Append(new NotificationModel
+                    {
+                        NotificationType = NotificationTaskType.LegalTaskCreated,
+                        ToUserProfileId = legalHeadUserProfile.Id,
+                        ToUserProfileFullName = legalHeadUserProfile.FullName,
+                        Date = now,
+                        Data = JsonConvert.SerializeObject(
+                            new BaseMessage
+                            {
+                                Id = taskModel.Id,
+                                Text = $"Создана задача"
+                            })
+                    });
+                }
+            }
+            
+            _notificationService.Notify(notifications);
         }
 
         private async Task FillCreateTaskModel(TaskModel model, AuthInfo authInfo)
@@ -394,18 +434,20 @@ namespace Utg.LegalService.BL.Services
 
         public async Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
         {
-            TaskModel result;
-            var task = await GetById(request.Id, authInfo);
+            TaskModel changedTask;
+            var oldTask = await GetById(request.Id, authInfo);
 
-            switch (task.Status)
+            switch (oldTask.Status)
             {
                 case TaskStatus.UnderReview:
                 default:
-                    result = await UpdateTaskMoveToInWorkCommon(request, authInfo);
+                    changedTask = await UpdateTaskMoveToInWorkCommon(request, authInfo);
                     break;
             }
 
-            return result;
+            await UpdateTaskMoveToInWorkEmitEvents(oldTask, changedTask);
+            
+            return changedTask;
         }
 
         private async Task<TaskModel> UpdateTaskMoveToInWorkCommon(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
@@ -426,19 +468,89 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
+        private async Task UpdateTaskMoveToInWorkEmitEvents(TaskModel oldTask,
+            TaskModel changedTask)
+        {
+            var now = DateTime.UtcNow;
+            var notifications = Enumerable.Empty<NotificationModel>();
+            if (oldTask.Status == TaskStatus.New)
+            {
+                notifications = notifications.Append(new NotificationModel
+                {
+                    NotificationType = NotificationTaskType.LegalTaskStatusChanged,
+                    ToUserProfileId = changedTask.AuthorUserProfileId,
+                    ToUserProfileFullName = changedTask.AuthorFullName,
+                    Date = now,
+                    Data = JsonConvert.SerializeObject(
+                        new BaseMessage
+                        {
+                            Id = changedTask.Id,
+                            Text = $"Статус задачи сменен на \"{changedTask.Status.GetDisplayName()}\""
+                        })
+                });
+            }
+            else if(oldTask.Status == TaskStatus.UnderReview)
+            {
+                notifications = notifications.Append(new NotificationModel
+                {
+                    NotificationType = NotificationTaskType.LegalTaskStatusChanged,
+                    ToUserProfileId = changedTask.PerformerUserProfileId,
+                    ToUserProfileFullName = changedTask.PerformerFullName,
+                    Date = now,
+                    Data = JsonConvert.SerializeObject(
+                        new BaseMessage
+                        {
+                            Id = changedTask.Id,
+                            Text = $"Статус задачи сменен на \"{changedTask.Status.GetDisplayName()}\""
+                        })
+                });
+            }
+            
+            _notificationService.Notify(notifications);
+        }
+        
         public async Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo)
         {
-            TaskModel result;
-            var task = await GetById(request.Id, authInfo);
+            TaskModel changedTask;
+            var oldTask = await GetById(request.Id, authInfo);
 
-            switch (task.Status)
+            switch (oldTask.Status)
             {
                 default:
-                    result = await UpdateTaskMoveToUnderReviewCommon(request, authInfo);
+                    changedTask = await UpdateTaskMoveToUnderReviewCommon(request, authInfo);
                     break;
             }
+            
+            await UpdateTaskMoveToUnderReviewEmitEvents(oldTask, changedTask);
 
-            return result;
+            return changedTask;
+        }
+        
+        private async Task UpdateTaskMoveToUnderReviewEmitEvents(TaskModel oldTask,
+            TaskModel changedTask)
+        {
+            var now = DateTime.UtcNow;
+            var notifications = Enumerable.Empty<NotificationModel>();
+            var legalHeadUserProfiles = 
+                await dataProxyClient.UserProfilesRoleAsync((int)Role.LegalHead);
+            foreach (var legalHeadUserProfile in legalHeadUserProfiles)
+            {
+                notifications = notifications.Append(new NotificationModel
+                {
+                    NotificationType = NotificationTaskType.LegalTaskStatusChanged,
+                    ToUserProfileId = legalHeadUserProfile.Id,
+                    ToUserProfileFullName = legalHeadUserProfile.FullName,
+                    Date = now,
+                    Data = JsonConvert.SerializeObject(
+                        new BaseMessage
+                        {
+                            Id = changedTask.Id,
+                            Text = $"Статус задачи сменен на \"{changedTask.Status.GetDisplayName()}\""
+                        })
+                });
+            }
+            
+            _notificationService.Notify(notifications);
         }
 
         private async Task<TaskModel> UpdateTaskMoveToUnderReviewCommon(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo)
@@ -457,18 +569,44 @@ namespace Utg.LegalService.BL.Services
 
         public async Task<TaskModel> UpdateTaskMoveToDone(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo)
         {
-            TaskModel result;
-            var task = await GetById(request.Id, authInfo);
-            switch (task.Status)
+            TaskModel changedTask;
+            var oldTask = await GetById(request.Id, authInfo);
+            switch (oldTask.Status)
             {
                 case TaskStatus.UnderReview:
                 default:
-                    result = await UpdateTaskMoveToDoneCommon(request, authInfo);
+                    changedTask = await UpdateTaskMoveToDoneCommon(request, authInfo);
                     break;
             }
 
-
-            return result;
+            await UpdateTaskMoveToDoneEmitEvents(oldTask, changedTask);
+            
+            return changedTask;
+        }
+        
+        private async Task UpdateTaskMoveToDoneEmitEvents(TaskModel oldTask,
+            TaskModel changedTask)
+        {
+            var now = DateTime.UtcNow;
+            var notifications = Enumerable.Empty<NotificationModel>();
+            if (oldTask.Status == TaskStatus.UnderReview)
+            {
+                notifications = notifications.Append(new NotificationModel
+                {
+                    NotificationType = NotificationTaskType.LegalTaskStatusChanged,
+                    ToUserProfileId = changedTask.AuthorUserProfileId,
+                    ToUserProfileFullName = changedTask.AuthorFullName,
+                    Date = now,
+                    Data = JsonConvert.SerializeObject(
+                        new BaseMessage
+                        {
+                            Id = changedTask.Id,
+                            Text = $"Статус задачи сменен на \"{changedTask.Status.GetDisplayName()}\""
+                        })
+                });
+            }
+            
+            _notificationService.Notify(notifications);
         }
 
         private async Task<TaskModel> UpdateTaskMoveToDoneCommon(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo)
