@@ -94,7 +94,7 @@ namespace Utg.LegalService.BL.Services
                         new BaseMessage
                         {
                             Id = task.Id,
-                            Text = $"Оставлен комментарий под задачей"
+                            Text = $"В задаче появился новый комментарий"
                         })
                 });
             }
@@ -111,7 +111,7 @@ namespace Utg.LegalService.BL.Services
                         new BaseMessage
                         {
                             Id = task.Id,
-                            Text = $"Оставлен комментарий под задачей"
+                            Text = $"В задаче появился новый комментарий"
                         })
                 });
             }

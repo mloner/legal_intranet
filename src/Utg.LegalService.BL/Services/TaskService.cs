@@ -485,7 +485,7 @@ namespace Utg.LegalService.BL.Services
                         new BaseMessage
                         {
                             Id = changedTask.Id,
-                            Text = $"Статус задачи сменен на \"{changedTask.Status.GetDisplayName()}\""
+                            Text = $"Статус задачи изменён на \"{changedTask.Status.GetDisplayName()}\""
                         })
                 });
             }
@@ -501,7 +501,7 @@ namespace Utg.LegalService.BL.Services
                         new BaseMessage
                         {
                             Id = changedTask.Id,
-                            Text = $"Статус задачи сменен на \"{changedTask.Status.GetDisplayName()}\""
+                            Text = $"Статус задачи изменён на \"{changedTask.Status.GetDisplayName()}\""
                         })
                 });
             }
@@ -545,7 +545,7 @@ namespace Utg.LegalService.BL.Services
                         new BaseMessage
                         {
                             Id = changedTask.Id,
-                            Text = $"Статус задачи сменен на \"{changedTask.Status.GetDisplayName()}\""
+                            Text = $"Статус задачи изменён на \"{changedTask.Status.GetDisplayName()}\""
                         })
                 });
             }
@@ -601,7 +601,7 @@ namespace Utg.LegalService.BL.Services
                         new BaseMessage
                         {
                             Id = changedTask.Id,
-                            Text = $"Статус задачи сменен на \"{changedTask.Status.GetDisplayName()}\""
+                            Text = $"Статус задачи изменён на \"{changedTask.Status.GetDisplayName()}\""
                         })
                 });
             }
