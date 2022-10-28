@@ -10,7 +10,9 @@
     <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Utg.Common.Packages" Version="0.1.85" />
+    <PackageReference Include="Utg.Common.Packages.Domain" Version="1.0.4" />
+    <PackageReference Include="Utg.Common.Packages.ExcelReportBuilder" Version="1.0.0" />
+    <PackageReference Include="Utg.Common.Packages.ServiceClientProxy" Version="1.0.3" />
   </ItemGroup>
 
 </Project>

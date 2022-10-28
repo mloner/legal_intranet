@@ -55,5 +55,16 @@ namespace Utg.LegalService.API.Controllers
             await _taskService.UploadFile(request, authInfo);
             return this.Ok();
         }
+        
+        [HttpDelete]
+        public async Task<ActionResult> DeleteFile([FromQuery] int attachmentId)
+        {
+            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            {
+                return Forbid();
+            }
+            await _taskService.DeleteFile(attachmentId);
+            return Ok();
+        }
     }
 }

@@ -163,14 +163,13 @@ namespace Utg.LegalService.BL.Services
 
             models = models.Select(x =>
             {
-                x.AccessRights = GetAccessRights(x, authInfo);
-
+                x.AccessRights = GetTaskAccessRights(x, authInfo);
                 return x;
             });
 
             return models;
         }
-        private static TaskAccessRights GetAccessRights(TaskModel model, AuthInfo authInfo)
+        private static TaskAccessRights GetTaskAccessRights(TaskModel model, AuthInfo authInfo)
         {
             var result = new TaskAccessRights();
             if (authInfo != null)
@@ -229,9 +228,46 @@ namespace Utg.LegalService.BL.Services
         public async Task<TaskModel> GetById(int id, AuthInfo authInfo = null)
         {
             var task = await taskRepository.GetById(id);
-            task.AccessRights = GetAccessRights(task, authInfo);
+            task.AccessRights = GetTaskAccessRights(task, authInfo);
             task.TaskComments = await _taskCommentService.GetByTaskId(task.Id);
+            var attachmentsTasks = task.Attachments.Select(async attachment => 
+            {
+                attachment.AccessRights = await GetAttachmentAccessRights(task, attachment, authInfo);
+                return attachment;
+            }).ToList();
+            task.Attachments = await Task.WhenAll(attachmentsTasks);
             return task;
+        }
+
+        private async Task<AttachmentAccessRights> GetAttachmentAccessRights(TaskModel task,
+            TaskAttachmentModel attachment, AuthInfo authInfo)
+        {
+            var result = new AttachmentAccessRights();
+            if (authInfo != null)
+            {
+                var attachmentAuthorUserProfile =
+                    (await usersProxyClient.GetByIdsAsync(
+                        new []{(attachment.UserProfileId == null ? 
+                            0 : attachment.UserProfileId.Value).ToString()})).FirstOrDefault();
+                result.CanDelete = CanDeleteAttachment(task, attachment, authInfo, attachmentAuthorUserProfile);
+            }
+
+            return result;
+        }
+
+        private bool CanDeleteAttachment(TaskModel task, 
+            TaskAttachmentModel attachment, AuthInfo authInfo,
+            UserProfileApiModel attachmentAuthorUserProfile)
+        {
+            if (!attachment.UserProfileId.HasValue || attachmentAuthorUserProfile == null)
+            {
+                return true;
+            }
+
+            var isFileOwn = attachment.UserProfileId.Value == authInfo.UserProfileId;
+            return isFileOwn ||
+                   authInfo.Roles.Contains((int)Role.LegalHead) &&
+                   attachmentAuthorUserProfile.Roles.Contains((int)Role.LegalPerformer);
         }
 
         public async Task<TaskModel> CreateTask(TaskCreateRequest request, AuthInfo authInfo)
@@ -246,7 +282,7 @@ namespace Utg.LegalService.BL.Services
 
                 if (request.Attachments?.Any() == true)
                 {
-                    attachments = await AddAttachments(task.Id, request.Attachments);
+                    attachments = await AddAttachments(task.Id, request.Attachments, authInfo);
                 }
 
                 var result = await GetById(task.Id, authInfo);
@@ -279,13 +315,16 @@ namespace Utg.LegalService.BL.Services
             }
         }
 
-        private async Task<IEnumerable<TaskAttachmentModel>> AddAttachments(int taskId, IEnumerable<IFormFile> attachments)
+        private async Task<IEnumerable<TaskAttachmentModel>> AddAttachments(int taskId,
+            IEnumerable<IFormFile> attachments, AuthInfo authInfo)
         {
             var customAttachments = new List<TaskAttachmentModel>();
 
             foreach (var attachment in attachments)
             {
-                var attachmentFileId = await this.fileStorageService.SaveFile(attachment.OpenReadStream(), attachment.ContentType);
+                var attachmentFileId =
+                    await this.fileStorageService.SaveFile(attachment.OpenReadStream(),
+                        attachment.ContentType);
 
                 customAttachments.Add(
                     new TaskAttachmentModel()
@@ -293,7 +332,8 @@ namespace Utg.LegalService.BL.Services
                         TaskId = taskId,
                         FileId = attachmentFileId,
                         FileName = attachment.FileName,
-                        FileSizeInBytes = attachment.Length
+                        FileSizeInBytes = attachment.Length,
+                        UserProfileId = authInfo.UserProfileId
                     });
             }
 
@@ -323,7 +363,7 @@ namespace Utg.LegalService.BL.Services
 
                 if (request.AddedAttachments?.Any() == true)
                 {
-                    attachments = await this.AddAttachments(taskId, request.AddedAttachments);
+                    attachments = await this.AddAttachments(taskId, request.AddedAttachments, authInfo);
                 }
 
                 if (request.RemovedAttachmentIds?.Any() == true)
@@ -458,7 +498,7 @@ namespace Utg.LegalService.BL.Services
             {
                 if (request.Attachments?.Any() == true)
                 {
-                    attachments = await this.AddAttachments(request.TaskId, request.Attachments);
+                    attachments = await this.AddAttachments(request.TaskId, request.Attachments, authInfo);
                 }
             }
             catch (Exception e)
@@ -477,6 +517,14 @@ namespace Utg.LegalService.BL.Services
             var file = await fileStorageService.GetFile(attachment.FileId);
             attachmentModel.Bytes = file;
             return attachmentModel;
+        }
+
+        public async Task DeleteFile(int attachmentId)
+        {
+            var attachment = await _taskAttachmentRepository.Get()
+                .FirstOrDefaultAsync(x => x.Id == attachmentId);
+            await _taskAttachmentRepository.Delete(attachment);
+            await this.fileStorageService.DeleteFile(attachment.FileId);
         }
 
         public async Task DeleteTask(int id)
