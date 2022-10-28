@@ -12,5 +12,6 @@ namespace Utg.LegalService.Common.Repositories
         IQueryable<TaskAttachment> Get();
         Task<IEnumerable<TaskAttachmentModel>>  CreateAttachments(int taskId, IEnumerable<TaskAttachmentModel> attachments);
         Task RemoveAttachments(int taskId, IEnumerable<int> attachmentIds);
+        Task Delete(TaskAttachment taskAttachment);
     }
 }

@@ -7,6 +7,7 @@ using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Dal.SqlContext;
+using Task = System.Threading.Tasks.Task;
 
 namespace Utg.LegalService.Dal.Repositories
 {
@@ -46,6 +47,12 @@ namespace Utg.LegalService.Dal.Repositories
                 .ToArrayAsync();
 
             _context.TaskAttachments.RemoveRange(attachmentsToRemove);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Delete(TaskAttachment taskAttachment)
+        {
+            _context.TaskAttachments.Remove(taskAttachment);
             await _context.SaveChangesAsync();
         }
     }

@@ -25,5 +25,6 @@ namespace Utg.LegalService.Common.Services
         Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles();
         Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo);
         Task<TaskAttachmentModel> DownloadFile(int attachmentId);
+        Task DeleteFile(int attachmentId);
     }
 }
