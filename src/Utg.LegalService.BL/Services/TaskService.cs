@@ -397,7 +397,9 @@ namespace Utg.LegalService.BL.Services
                     Description = !string.IsNullOrEmpty(request.Description) ? request.Description : oldTask.Description,
                     PerformerUserProfileId = request.PerformerUserProfileId ?? oldTask.PerformerUserProfileId,
                     DeadlineDateTime = request.DeadlineDateTime ?? oldTask.DeadlineDateTime,
-                    LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+                    LastChangeDateTime = DateTime.SpecifyKind(DateTimeOffset.UtcNow.DateTime,
+                            DateTimeKind.Utc)
+                ,
                 };
                 await taskRepository.UpdateTask(newTask);
 
@@ -461,7 +463,8 @@ namespace Utg.LegalService.BL.Services
                 PerformerUserProfileId = request.PerformerUserProfileId,
                 PerformerFullName = performer?.FullName,
                 DeadlineDateTime = request.DeadlineDateTime,
-                LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+                LastChangeDateTime = DateTime.SpecifyKind(DateTimeOffset.UtcNow.DateTime,
+                            DateTimeKind.Utc)
             };
             await taskRepository.UpdateTaskMoveToInWork(newTask);
             var result = await GetById(taskId, authInfo);
@@ -560,7 +563,8 @@ namespace Utg.LegalService.BL.Services
             {
                 Id = taskId,
                 Status = TaskStatus.UnderReview,
-                LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+                LastChangeDateTime = DateTime.SpecifyKind(DateTimeOffset.UtcNow.DateTime,
+                            DateTimeKind.Utc)
             };
             await taskRepository.UpdateTaskMoveToUnderReview(newTask);
             var result = await GetById(taskId, authInfo);
@@ -616,7 +620,8 @@ namespace Utg.LegalService.BL.Services
             {
                 Id = taskId,
                 Status = TaskStatus.Done,
-                LastChangeDateTime = DateTimeOffset.UtcNow.DateTime,
+                LastChangeDateTime = DateTime.SpecifyKind(DateTimeOffset.UtcNow.DateTime,
+                            DateTimeKind.Utc)
             };
             await taskRepository.UpdateTaskMoveToDone(newTask);
             var result = await GetById(taskId, authInfo);
