@@ -330,19 +330,6 @@ namespace Utg.LegalService.BL.Services
                             })
                     });
                 }
-                notifications = notifications.Append(new NotificationModel
-                {
-                    NotificationType = NotificationTaskType.LegalTaskCreated,
-                    ToUserProfileId = taskModel.PerformerUserProfileId,
-                    ToUserProfileFullName = taskModel.PerformerFullName,
-                    Date = now,
-                    Data = JsonConvert.SerializeObject(
-                        new BaseMessage
-                        {
-                            Id = taskModel.Id,
-                            Text = $"Назначена задача"
-                        })
-                });
             }
             
             _notificationService.Notify(notifications);
@@ -505,22 +492,19 @@ namespace Utg.LegalService.BL.Services
                         })
                 });
             }
-            else if(oldTask.Status == TaskStatus.UnderReview)
+            notifications = notifications.Append(new NotificationModel
             {
-                notifications = notifications.Append(new NotificationModel
-                {
-                    NotificationType = NotificationTaskType.LegalTaskStatusChanged,
-                    ToUserProfileId = changedTask.PerformerUserProfileId,
-                    ToUserProfileFullName = changedTask.PerformerFullName,
-                    Date = now,
-                    Data = JsonConvert.SerializeObject(
-                        new BaseMessage
-                        {
-                            Id = changedTask.Id,
-                            Text = $"Статус задачи изменён на \"{changedTask.Status.GetDisplayName()}\""
-                        })
-                });
-            }
+                NotificationType = NotificationTaskType.LegalTaskStatusChanged,
+                ToUserProfileId = changedTask.PerformerUserProfileId,
+                ToUserProfileFullName = changedTask.PerformerFullName,
+                Date = now,
+                Data = JsonConvert.SerializeObject(
+                    new BaseMessage
+                    {
+                        Id = changedTask.Id,
+                        Text = $"Статус задачи изменён на \"{changedTask.Status.GetDisplayName()}\""
+                    })
+            });
             
             _notificationService.Notify(notifications);
         }
