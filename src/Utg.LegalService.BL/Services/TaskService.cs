@@ -330,6 +330,19 @@ namespace Utg.LegalService.BL.Services
                             })
                     });
                 }
+                notifications = notifications.Append(new NotificationModel
+                {
+                    NotificationType = NotificationTaskType.LegalTaskCreated,
+                    ToUserProfileId = taskModel.PerformerUserProfileId,
+                    ToUserProfileFullName = taskModel.PerformerFullName,
+                    Date = now,
+                    Data = JsonConvert.SerializeObject(
+                        new BaseMessage
+                        {
+                            Id = taskModel.Id,
+                            Text = $"Назначена задача"
+                        })
+                });
             }
             
             _notificationService.Notify(notifications);
