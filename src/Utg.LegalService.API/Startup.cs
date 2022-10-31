@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -112,6 +113,7 @@ namespace Utg.LegalService.API
 
         public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             builder.UseRequestResponseLogging();
             builder.UseCors(_corsPolicy);
             builder.UseHangfireServer();
