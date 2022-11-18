@@ -4,7 +4,7 @@
     {
         public const string TemplatePath = @"ReportTemplates//TaskReportTemplate.xlsx";
 
-        public const int DataStartRow = 12;
+        public const int DataStartRow = 2;
     
         public const int RowNumColIndex = 1;
     }
