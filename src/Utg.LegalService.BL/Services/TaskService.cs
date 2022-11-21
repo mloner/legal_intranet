@@ -724,7 +724,11 @@ namespace Utg.LegalService.BL.Services
                 {
                     builder
                         .AddSheetFromTemplateCurrentDomain(TaskReportConstants.TemplatePath, "Лист1")
-                        .PrintData(reportData, TaskReportConstants.DataStartRow);
+                        .PrintData(reportData, TaskReportConstants.DataStartRow)
+                        .CustomAction(worksheet =>
+                        {
+                            worksheet.Columns("E:I").AdjustToContents();
+                        });
                 }
             });
 
