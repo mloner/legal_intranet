@@ -19,6 +19,8 @@ using Utg.Common.Packages.ExcelReportBuilder;
 using Utg.Common.Packages.FileStorage;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client;
+using Utg.LegalService.Common.Models.Client.Attachment;
+using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Report.Dtos;
 using Utg.LegalService.Common.Models.Report.Helpers;
 using Utg.LegalService.Common.Models.Request.Tasks;
@@ -495,7 +497,7 @@ namespace Utg.LegalService.BL.Services
             notifications = notifications.Append(new NotificationModel
             {
                 NotificationType = NotificationTaskType.LegalTaskStatusChanged,
-                ToUserProfileId = changedTask.PerformerUserProfileId,
+                ToUserProfileId = changedTask.PerformerUserProfileId.Value,
                 ToUserProfileFullName = changedTask.PerformerFullName,
                 Date = now,
                 Data = JsonConvert.SerializeObject(

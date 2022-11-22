@@ -23,7 +23,7 @@ using Utg.Common.Packages.ServiceClientProxy.AuthHeader;
 using Utg.Common.Packages.ServiceClientProxy.Configuration;
 using Utg.LegalService.API.Configuration;
 using Utg.LegalService.API.Middlewares;
-using Utg.LegalService.BL.Configuration;
+using Utg.LegalService.BL;
 using Utg.LegalService.Dal.Configuration;
 
 namespace Utg.LegalService.API
@@ -98,8 +98,7 @@ namespace Utg.LegalService.API
             services.AddHangfire(x => x.UsePostgreSqlStorage(configuration.GetConnectionString("UTGDatabase")));
             services.AddSwaggerDocument(opts => opts.Title = "Legal service Api");
             services.ConfigureMinioFileStorage(minioConfiguration);
-            services.ConfigureDal(configuration);
-            services.ConfigureBL();
+            services.AddBusiness(configuration);
 
             services
                 .ConfigureExcelReportBuilder()

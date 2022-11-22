@@ -33,4 +33,8 @@
     <Folder Include="Migrations" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Migrations\20221122142918_ParentTask.cs" />
+  </ItemGroup>
+
 </Project>

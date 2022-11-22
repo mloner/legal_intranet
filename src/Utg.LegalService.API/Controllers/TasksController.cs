@@ -1,5 +1,7 @@
 ﻿using System.Net.Mime;
 using System.Threading.Tasks;
+using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +10,9 @@ using Microsoft.Extensions.Logging;
 using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.Domain.Models.Enum;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
+using Utg.LegalService.BL.Features.SubTask.Create;
 using Utg.LegalService.Common.Models.Client;
+using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Services;
 
@@ -19,15 +23,18 @@ namespace Utg.LegalService.API.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TasksController : BaseController
     {
-        private readonly ITaskService taskService;
+        private readonly ITaskService _taskService;
+        private readonly IMediator _mediator;
         
         public TasksController(
             IUsersProxyClient usersClient,
             ILogger<BaseController> logger,
-            ITaskService taskService)
+            ITaskService taskService,
+            IMediator mediator)
             : base(logger, usersClient)
         {
-            this.taskService = taskService;
+            this._taskService = taskService;
+            _mediator = mediator;
         }
 
         [HttpGet]
@@ -39,7 +46,7 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var result = await taskService.GetAll(request, authInfo);
+            var result = await _taskService.GetAll(request, authInfo);
             return result;
         }
         
@@ -51,7 +58,7 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var result = await taskService.GetById(id, authInfo);
+            var result = await _taskService.GetById(id, authInfo);
             return Ok(result);
         }
         
@@ -63,22 +70,27 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var result = await taskService.CreateTask(request, authInfo);
-            return this.Ok(result);
-        }
-
-        [HttpPatch]
-        public async Task<ActionResult<TaskModel>> Update([FromForm] TaskUpdateRequest request)
-        {
-            if (!await CanGo(Role.LegalHead, Role.IntranetUser))
-            {
-                return Forbid();
-            }
-            var authInfo = await GetAuthInfo();
-            var result = await taskService.UpdateTask(request, authInfo);
+            var result = await _taskService.CreateTask(request, authInfo);
             return Ok(result);
         }
         
+        [HttpPost("subtask")]
+        public async Task<ActionResult<TaskModel>> CreateSubtask(
+            [FromForm] SubtaskCreateRequest request)
+        {
+            if (!await CanGo(Role.LegalHead, Role.LegalPerformer))
+            {
+                return Forbid();
+            }
+
+            var authInfo = await GetAuthInfo();
+            var command = request.Adapt<CreateSubtaskCommand>();
+            command.AuthInfo = authInfo;
+            var response = await _mediator.Send(command, HttpContext.RequestAborted);
+
+            return response.Success ? Ok(response.Data) : StatusCode(response.StatusCode, response.Message);
+        }
+
         [HttpPatch("inwork")]
         public async Task<ActionResult<TaskModel>> UpdateMoveToInWork([FromForm] TaskUpdateMoveToInWorkRequest request)
         {
@@ -87,7 +99,7 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var result = await taskService.UpdateTaskMoveToInWork(request, authInfo);
+            var result = await _taskService.UpdateTaskMoveToInWork(request, authInfo);
             return Ok(result);
         }
         
@@ -99,7 +111,7 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var result = await taskService.UpdateTaskMoveToUnderReview(request, authInfo);
+            var result = await _taskService.UpdateTaskMoveToUnderReview(request, authInfo);
             return Ok(result);
         }
         
@@ -111,7 +123,7 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var result = await taskService.UpdateTaskMoveToDone(request, authInfo);
+            var result = await _taskService.UpdateTaskMoveToDone(request, authInfo);
             return Ok(result);
         }
         
@@ -122,7 +134,7 @@ namespace Utg.LegalService.API.Controllers
             {
                 return Forbid();
             }
-            await taskService.DeleteTask(id);
+            await _taskService.DeleteTask(id);
             return Ok();
         }
         
@@ -135,7 +147,7 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var stream = await taskService.GetReport(request, authInfo);
+            var stream = await _taskService.GetReport(request, authInfo);
             return this.File(stream, MediaTypeNames.Application.Octet, "Отчет о задачах.xlsx");
         }
     }

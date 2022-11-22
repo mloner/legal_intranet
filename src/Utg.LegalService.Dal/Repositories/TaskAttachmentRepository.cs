@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Utg.Common.EF.Repositories.Implementations;
 using Utg.LegalService.Common.Models.Client;
+using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Dal.SqlContext;
@@ -11,7 +13,8 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Utg.LegalService.Dal.Repositories
 {
-    public class TaskAttachmentRepository : ITaskAttachmentRepository
+    public class TaskAttachmentRepository 
+        : BaseRepositoryAdvanced<TaskAttachment>, ITaskAttachmentRepository
     {
         private readonly UtgContext _context;
         private readonly IMapper _mapper;
@@ -19,6 +22,7 @@ namespace Utg.LegalService.Dal.Repositories
         public TaskAttachmentRepository(
             UtgContext context,
             IMapper mapper)
+            : base(context)
         {
             _context = context;
             _mapper = mapper;

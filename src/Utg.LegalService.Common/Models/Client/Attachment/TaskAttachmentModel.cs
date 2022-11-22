@@ -1,6 +1,7 @@
 ﻿using System.IO;
+using Utg.LegalService.Common.Models.Client.Task;
 
-namespace Utg.LegalService.Common.Models.Client
+namespace Utg.LegalService.Common.Models.Client.Attachment
 {
     public class TaskAttachmentModel : CustomFileModel
     {

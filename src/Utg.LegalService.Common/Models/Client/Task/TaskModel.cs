@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Utg.Common.Packages.Domain.Helpers;
+using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Client.Enum;
 
-namespace Utg.LegalService.Common.Models.Client
+namespace Utg.LegalService.Common.Models.Client.Task
 {
     public class TaskModel
     {
@@ -16,7 +17,7 @@ namespace Utg.LegalService.Common.Models.Client
         public int AuthorUserProfileId { get; set; }
         public string AuthorFullName { get; set; }
         public DateTime CreationDateTime { get; set; }
-        public int PerformerUserProfileId { get; set; }
+        public int? PerformerUserProfileId { get; set; }
         public string PerformerFullName { get; set; }
         public DateTime? DeadlineDateTime { get; set; }
         public DateTime LastChangeDateTime { get; set; }
