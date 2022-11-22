@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Utg.LegalService.Dal.SqlContext;
 
+#nullable disable
+
 namespace Utg.LegalService.Dal.Migrations
 {
     [DbContext(typeof(UtgContext))]
@@ -16,16 +18,18 @@ namespace Utg.LegalService.Dal.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("public")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.13")
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                .HasAnnotation("ProductVersion", "6.0.11")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.Task", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuthorFullName")
                         .HasColumnType("text");
@@ -34,17 +38,16 @@ namespace Utg.LegalService.Dal.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDateTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("DeadlineDateTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastChangeDateTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PerformerFullName")
                         .HasColumnType("text");
@@ -60,15 +63,16 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("Tasks", "public");
                 });
 
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.TaskAttachment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("FileId")
                         .HasColumnType("uuid");
@@ -89,18 +93,19 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.HasIndex("TaskId");
 
-                    b.ToTable("TaskAttachments");
+                    b.ToTable("TaskAttachments", "public");
                 });
 
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.TaskComment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TaskId")
                         .HasColumnType("integer");
@@ -115,15 +120,16 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.HasIndex("TaskId");
 
-                    b.ToTable("TaskComments");
+                    b.ToTable("TaskComments", "public");
                 });
 
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.UserProfileAgregate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CompanyId")
                         .HasColumnType("integer");
@@ -138,7 +144,7 @@ namespace Utg.LegalService.Dal.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("DismissalDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FullName")
                         .HasColumnType("text");
@@ -175,7 +181,7 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserProfileAgregates");
+                    b.ToTable("UserProfileAgregates", "public");
                 });
 
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.TaskAttachment", b =>

@@ -11,7 +11,6 @@ namespace Utg.LegalService.Common.Models.Domain
         public int Id { get; set; }
         public TaskStatus Status { get; set; }
         public TaskType Type { get; set; }
-        [Required(AllowEmptyStrings = false)]
         public string Description { get; set; }
         public int AuthorUserProfileId { get; set; }
         public string AuthorFullName { get; set; }
