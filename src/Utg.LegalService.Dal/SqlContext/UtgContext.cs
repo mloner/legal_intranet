@@ -5,7 +5,7 @@ namespace Utg.LegalService.Dal.SqlContext
 {
     public class UtgContext : DbContext
     {
-        public UtgContext(DbContextOptions options)
+        public UtgContext(DbContextOptions<UtgContext> options)
             : base(options)
         {
         }

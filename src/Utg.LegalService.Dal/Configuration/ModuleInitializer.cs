@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Utg.LegalService.Common.Repositories;
+using Utg.LegalService.Dal.Interceptors;
 using Utg.LegalService.Dal.Repositories;
 using Utg.LegalService.Dal.SqlContext;
 
@@ -19,9 +21,11 @@ namespace Utg.LegalService.Dal.Configuration
 
         private static void SetSettings(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<UtgContext>(options =>
+            services.AddDbContextPool<UtgContext>(options =>
             {
+                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                 options.UseNpgsql(configuration.GetConnectionString("UTGDatabase"));
+                options.AddInterceptors(new DateTimeStampsInterceptor());
             });
         }
 
