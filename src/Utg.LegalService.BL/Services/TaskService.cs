@@ -78,9 +78,13 @@ namespace Utg.LegalService.BL.Services
             query = Filter(query, request);
             query = Search(query, request);
 
+            query = FilterByRoles(query, request, authInfo);
+            query = Filter(query, request);
+            query = Search(query, request);
+            
             var count = query.Count();
             query = SkipAndTake(query, request);
-
+            
             var list = query.AsEnumerable();
             list = FillAccessRights(list, authInfo);
 
