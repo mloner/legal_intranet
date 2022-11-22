@@ -24,7 +24,6 @@ using Utg.Common.Packages.ServiceClientProxy.Configuration;
 using Utg.LegalService.API.Configuration;
 using Utg.LegalService.API.Middlewares;
 using Utg.LegalService.BL;
-using Utg.LegalService.Dal.Configuration;
 
 namespace Utg.LegalService.API
 {
@@ -147,8 +146,6 @@ namespace Utg.LegalService.API
                     options.DocumentPath = $"/{swaggerPath}/" + "v1" + "/swagger.json";
                 });
             }
-
-            Dal.Configuration.Startup.Initialize(builder);
         }
 
         private bool DoValidation(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
