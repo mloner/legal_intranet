@@ -34,6 +34,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.Attachments, opt => opt.Ignore())
                 .ForMember(dest => dest.AccessRights, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskComments, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentTaskId, opt => opt.Ignore())
                 ;
             
             config.CreateMap<Task, TaskModel>()

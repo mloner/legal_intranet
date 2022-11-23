@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using Mapster;
 using MediatR;
@@ -13,13 +12,12 @@ using Utg.LegalService.BL.Features.Attachments.Delete;
 using Utg.LegalService.BL.Features.SubTask.CreateEmitEvents;
 using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Client.Task;
-using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL.Features.SubTask.Create;
 
 public class CreateSubtaskCommandHandler 
-    : IRequestHandler<CreateSubtaskCommand, Result<SubtaskModel>>
+    : IRequestHandler<CreateSubtaskCommand, Result<TaskModel>>
 {
     private readonly ILogger<CreateSubtaskCommandHandler> _logger;
     private readonly IMediator _mediator;
@@ -35,7 +33,7 @@ public class CreateSubtaskCommandHandler
         _mediator = mediator;
     }
 
-    public async System.Threading.Tasks.Task<Result<SubtaskModel>> Handle(
+    public async System.Threading.Tasks.Task<Result<TaskModel>> Handle(
         CreateSubtaskCommand command, 
         CancellationToken cancellationToken)
     {
@@ -48,7 +46,7 @@ public class CreateSubtaskCommandHandler
                 ).FirstOrDefaultAsync(cancellationToken);
             if (parentTask == null)
             {
-                return Result<SubtaskModel>.Bad("No such parent task");
+                return Result<TaskModel>.Bad("No such parent task");
             }
             var now = DateTime.UtcNow;
             var task = new Common.Models.Domain.Task
@@ -77,19 +75,19 @@ public class CreateSubtaskCommandHandler
                 }, cancellationToken);
             if (!createAttachmentsComResp.Success)
             {
-                return Result<SubtaskModel>.Failed(createAttachmentsComResp);
+                return Result<TaskModel>.Failed(createAttachmentsComResp);
             }
             attachments = createAttachmentsComResp.Data;
             
             var emitEventsResp = 
                 await _mediator.Send(new CreateSubtaskEmitEventsCommand()
                 {
-                    Task = task.Adapt<SubtaskModel>(),
+                    Task = task.Adapt<TaskModel>(),
                     AuthInfo = command.AuthInfo
                 }, cancellationToken);
             if (!emitEventsResp.Success)
             {
-                return Result<SubtaskModel>.Failed(emitEventsResp);
+                return Result<TaskModel>.Failed(emitEventsResp);
             }
 
             var resultTask = await _uow.TaskItems.GetQuery(
@@ -97,7 +95,7 @@ public class CreateSubtaskCommandHandler
                 null).
                 Include(x => x.TaskAttachments)
                 .FirstOrDefaultAsync(cancellationToken);
-            var taskModel = resultTask.Adapt<SubtaskModel>();
+            var taskModel = resultTask.Adapt<TaskModel>();
             
             var getTarCommand = new GetTaskAccessRightsCommand()
             {
@@ -107,11 +105,11 @@ public class CreateSubtaskCommandHandler
             var getTarsCommandResp = 
                 await _mediator.Send(getTarCommand, cancellationToken);
             if(!getTarsCommandResp.Success)
-                return Result<SubtaskModel>.Failed(getTarsCommandResp);
+                return Result<TaskModel>.Failed(getTarsCommandResp);
             taskModel.AccessRights = getTarsCommandResp.Data;
             
-            return Result<SubtaskModel>.Created(
-                resultTask.Adapt<SubtaskModel>());
+            return Result<TaskModel>.Created(
+                resultTask.Adapt<TaskModel>());
         }
         catch (Exception e)
         {
@@ -122,11 +120,11 @@ public class CreateSubtaskCommandHandler
                 }, cancellationToken);
             if (!deleteAttachmentFilesResp.Success)
             {
-                return Result<SubtaskModel>.Failed(deleteAttachmentFilesResp);
+                return Result<TaskModel>.Failed(deleteAttachmentFilesResp);
             }
             _logger.LogError(e, "Failed to add subtask. {@Command}", command);
             
-            return Result<SubtaskModel>.Internal("Failed to add subtask.");
+            return Result<TaskModel>.Internal("Failed to add subtask.");
         }
     }
 

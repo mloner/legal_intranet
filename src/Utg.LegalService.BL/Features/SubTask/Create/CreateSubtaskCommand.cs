@@ -9,7 +9,7 @@ using Utg.LegalService.Common.Models.Client.Task;
 
 namespace Utg.LegalService.BL.Features.SubTask.Create;
 
-public class CreateSubtaskCommand :  IRequest<Result<SubtaskModel>>
+public class CreateSubtaskCommand :  IRequest<Result<TaskModel>>
 {
     public int ParentTaskId { get; set; }
     

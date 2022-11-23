@@ -7,6 +7,6 @@ namespace Utg.LegalService.BL.Features.SubTask.CreateEmitEvents;
 
 public class CreateSubtaskEmitEventsCommand :  IRequest<Result>
 {
-    public SubtaskModel Task { get; set; }
+    public TaskModel Task { get; set; }
     public AuthInfo AuthInfo { get; set; }
 }

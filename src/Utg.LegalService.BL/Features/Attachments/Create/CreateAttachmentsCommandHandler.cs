@@ -48,7 +48,7 @@ public class CreateAttachmentsCommandHandler
             foreach (var attachment in command.Attachments)
             {
                 var attachmentFileId =
-                    await _fileStorageService.SaveFile((attachment).OpenReadStream(),
+                    await _fileStorageService.SaveFile(attachment.OpenReadStream(),
                         attachment.ContentType,
                         cancellationToken);
 

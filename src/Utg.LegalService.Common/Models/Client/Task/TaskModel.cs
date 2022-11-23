@@ -24,5 +24,6 @@ namespace Utg.LegalService.Common.Models.Client.Task
         public IEnumerable<TaskAttachmentModel> Attachments { get; set; }
         public TaskAccessRights AccessRights { get; set; }
         public IEnumerable<TaskCommentModel> TaskComments { get; set; }
+        public int? ParentTaskId { get; set; }
     }
 }

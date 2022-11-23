@@ -11,7 +11,7 @@ public class Mapping : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<Task, SubtaskModel>()
+        config.NewConfig<Task, TaskModel>()
             .Map(src => src.Attachments, dst => dst.TaskAttachments)
             .MaxDepth(2);
         
