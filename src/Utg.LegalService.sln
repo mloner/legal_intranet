@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utg.LegalService.Common", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utg.LegalService.BL", "Utg.LegalService.BL\Utg.LegalService.BL.csproj", "{32D58323-BC9C-45CE-8DA0-6C523743746E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utg.LegalService.Jobs", "Utg.LegalService.Jobs\Utg.LegalService.Jobs.csproj", "{5A84EDEF-0410-4ED8-94FB-350210AACBF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utg.LegalService.Tests", "Utg.LegalService.Tests\Utg.LegalService.Tests.csproj", "{A1FE9DF2-EABD-4506-8299-64134F8EE4FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{32D58323-BC9C-45CE-8DA0-6C523743746E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32D58323-BC9C-45CE-8DA0-6C523743746E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32D58323-BC9C-45CE-8DA0-6C523743746E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A84EDEF-0410-4ED8-94FB-350210AACBF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A84EDEF-0410-4ED8-94FB-350210AACBF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A84EDEF-0410-4ED8-94FB-350210AACBF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A84EDEF-0410-4ED8-94FB-350210AACBF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1FE9DF2-EABD-4506-8299-64134F8EE4FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1FE9DF2-EABD-4506-8299-64134F8EE4FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1FE9DF2-EABD-4506-8299-64134F8EE4FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1FE9DF2-EABD-4506-8299-64134F8EE4FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

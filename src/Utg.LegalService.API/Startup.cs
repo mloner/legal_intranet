@@ -24,6 +24,8 @@ using Utg.Common.Packages.ServiceClientProxy.Configuration;
 using Utg.LegalService.API.Configuration;
 using Utg.LegalService.API.Middlewares;
 using Utg.LegalService.BL;
+using Utg.LegalService.Jobs;
+using Utg.LegalService.Jobs.NotifyExpiredSoonTasksJob;
 
 namespace Utg.LegalService.API
 {
@@ -107,6 +109,7 @@ namespace Utg.LegalService.API
                        this.configuration.GetValue<string>("Api:Task")),
                        this.configuration.GetSection("BasicAuth").Get<BasicAuthConfig>())
                 .ConfigureRabbitMq(configuration.GetSection("Queue").Get<RabbitMqSettings>());
+            AddJobs(services);
         }
 
         public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)
@@ -146,11 +149,36 @@ namespace Utg.LegalService.API
                     options.DocumentPath = $"/{swaggerPath}/" + "v1" + "/swagger.json";
                 });
             }
+            
+            ConfigureJobs();
         }
 
         private bool DoValidation(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
             return true;
+        }
+        
+        private void AddJobs(IServiceCollection services)
+        {
+            services.AddScoped<NotifyExpiredSoonTasksJob, NotifyExpiredSoonTasksJob>();
+        }
+        
+        private void ConfigureJobs()
+        {
+            ConfigureJob<NotifyExpiredSoonTasksJob>(configuration);
+        }
+        
+        private static void ConfigureJob<T>(
+            IConfiguration configuration,
+            string timeTable = "",
+            string queueName = "default")
+            where T : BaseJob
+        {
+            var timetable = configuration[$"Jobs:{nameof(T)}:Timetable"];
+            if (!string.IsNullOrWhiteSpace(timetable))
+            {
+                RecurringJob.AddOrUpdate<T>(nameof(T), x => x.Start(), timetable, queue: queueName);
+            }
         }
     }
 }

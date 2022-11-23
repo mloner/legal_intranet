@@ -32,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Utg.LegalService.BL\Utg.LegalService.BL.csproj" />
     <ProjectReference Include="..\Utg.LegalService.Dal\Utg.LegalService.Dal.csproj" />
+    <ProjectReference Include="..\Utg.LegalService.Jobs\Utg.LegalService.Jobs.csproj" />
   </ItemGroup>
 
   <ItemGroup>
