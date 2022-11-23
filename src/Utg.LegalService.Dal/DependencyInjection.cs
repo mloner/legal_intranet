@@ -6,6 +6,7 @@ using Utg.Common.EF.Repositories;
 using Utg.Common.Extensions;
 using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Dal;
+using Utg.LegalService.Dal.Interceptors;
 using Utg.LegalService.Dal.Repositories;
 using Utg.LegalService.Dal.SqlContext;
 
@@ -30,6 +31,7 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString(sectionName));
             options.EnableSensitiveDataLogging();
             options.EnableDetailedErrors();
+            options.AddInterceptors(new DateTimeStampsInterceptor());
         });
 
         AddDependenciesToContainer(services);

@@ -44,7 +44,6 @@ public class DeleteAttachmentFilesCommandHandler
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to delete attachment files. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
             
             return Result.Internal("Failed to delete attachment files.");
         }

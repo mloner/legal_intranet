@@ -65,7 +65,6 @@ public class CreateSubtaskEmitEventsCommandHandler
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to create subtask emit events. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
             
             return Result.Internal("Failed to create subtask emit events.");
         }

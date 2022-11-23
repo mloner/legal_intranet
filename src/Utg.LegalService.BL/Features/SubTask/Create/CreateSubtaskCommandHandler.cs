@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
+using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.Attachments.Create;
 using Utg.LegalService.BL.Features.Attachments.Delete;
 using Utg.LegalService.BL.Features.SubTask.CreateEmitEvents;
 using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Client.Task;
+using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL.Features.SubTask.Create;
@@ -74,24 +77,38 @@ public class CreateSubtaskCommandHandler
                 }, cancellationToken);
             if (!createAttachmentsComResp.Success)
             {
-                return Result<SubtaskModel>.Internal(createAttachmentsComResp.Message);
+                return Result<SubtaskModel>.Failed(createAttachmentsComResp);
             }
             attachments = createAttachmentsComResp.Data;
-            
             
             var emitEventsResp = 
                 await _mediator.Send(new CreateSubtaskEmitEventsCommand()
                 {
-                    Task = task.Adapt<SubtaskModel>()
+                    Task = task.Adapt<SubtaskModel>(),
+                    AuthInfo = command.AuthInfo
                 }, cancellationToken);
             if (!emitEventsResp.Success)
             {
-                return Result<SubtaskModel>.Internal(emitEventsResp.Message);
+                return Result<SubtaskModel>.Failed(emitEventsResp);
             }
 
             var resultTask = await _uow.TaskItems.GetQuery(
-                x => x.Id == task.Id, null)
+                x => x.Id == task.Id,
+                null).
+                Include(x => x.TaskAttachments)
                 .FirstOrDefaultAsync(cancellationToken);
+            var taskModel = resultTask.Adapt<SubtaskModel>();
+            
+            var getTarCommand = new GetTaskAccessRightsCommand()
+            {
+                Task = taskModel,
+                AuthInfo = command.AuthInfo
+            };
+            var getTarsCommandResp = 
+                await _mediator.Send(getTarCommand, cancellationToken);
+            if(!getTarsCommandResp.Success)
+                return Result<SubtaskModel>.Failed(getTarsCommandResp);
+            taskModel.AccessRights = getTarsCommandResp.Data;
             
             return Result<SubtaskModel>.Created(
                 resultTask.Adapt<SubtaskModel>());
@@ -101,14 +118,13 @@ public class CreateSubtaskCommandHandler
             var deleteAttachmentFilesResp = 
                 await _mediator.Send(new DeleteAttachmentFilesCommand()
                 {
-                    Attachments = attachments,
+                    Attachments = attachments
                 }, cancellationToken);
             if (!deleteAttachmentFilesResp.Success)
             {
-                return Result<SubtaskModel>.Internal(deleteAttachmentFilesResp.Message);
+                return Result<SubtaskModel>.Failed(deleteAttachmentFilesResp);
             }
             _logger.LogError(e, "Failed to add subtask. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
             
             return Result<SubtaskModel>.Internal("Failed to add subtask.");
         }

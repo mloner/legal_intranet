@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Mapster;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
 using Utg.Common.Packages.FileStorage;
@@ -47,7 +48,7 @@ public class CreateAttachmentsCommandHandler
             foreach (var attachment in command.Attachments)
             {
                 var attachmentFileId =
-                    await _fileStorageService.SaveFile(attachment.OpenReadStream(),
+                    await _fileStorageService.SaveFile((attachment).OpenReadStream(),
                         attachment.ContentType,
                         cancellationToken);
 
@@ -69,9 +70,7 @@ public class CreateAttachmentsCommandHandler
         }
         catch (Exception e)
         {
-            //await DeleteAttachmentFiles(attachments);
             _logger.LogError(e, "Failed to add subtask. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
             
             return Result<IEnumerable<TaskAttachmentModel>>.Internal("Failed to add subtask.");
         }

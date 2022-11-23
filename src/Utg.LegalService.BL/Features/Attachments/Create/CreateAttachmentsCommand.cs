@@ -10,6 +10,6 @@ namespace Utg.LegalService.BL.Features.Attachments.Create;
 public class CreateAttachmentsCommand :  IRequest<Result<IEnumerable<TaskAttachmentModel>>>
 { 
     public int TaskId { get; set; }
-    public IFormFile[] Attachments { get; set; }
+    public IEnumerable<IFormFile> Attachments { get; set; }
     public AuthInfo AuthInfo { get; set; }
 }

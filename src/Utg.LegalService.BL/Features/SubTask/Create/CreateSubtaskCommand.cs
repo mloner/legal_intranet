@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Utg.Common.Models;
@@ -17,7 +18,7 @@ public class CreateSubtaskCommand :  IRequest<Result<SubtaskModel>>
     public string Description { get; set; }
     public DateTime? DeadLine { get; set; }
         
-    public IFormFile[] Attachments { get; set; }
+    public IEnumerable<IFormFile> Attachments { get; set; }
     
     public AuthInfo AuthInfo { get; set; }
 }

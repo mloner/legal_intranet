@@ -95,7 +95,6 @@ namespace Utg.LegalService.BL.Services
             };
         }
 
-
         private IQueryable<TaskModel> FilterByRoles(IQueryable<TaskModel> query, TaskRequest request, AuthInfo authInfo)
         {
             var predicate = PredicateBuilder.New<TaskModel>(true);
