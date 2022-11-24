@@ -26,7 +26,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.17.0" />
-    <PackageReference Include="Utg.Common.Packages.Queue" Version="1.1.0-UTG-2210-Nikita" />
+    <PackageReference Include="Utg.Common.Packages.Queue" Version="1.1.0-UTG-UTG-2213-Nikita-1" />
   </ItemGroup>
 
   <ItemGroup>
