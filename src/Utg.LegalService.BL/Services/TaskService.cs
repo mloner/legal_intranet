@@ -709,6 +709,7 @@ namespace Utg.LegalService.BL.Services
             var reportData = data.Result.Select((x, index) => new TaskReportDto()
             {
                 RowNumber = index + 1,
+                ParentTaskId = x.ParentTaskId,
                 CreationDate = x.CreationDateTime,
                 AuthorFullName = x.AuthorFullName,
                 PerformerFullName = x.PerformerFullName,
@@ -732,7 +733,7 @@ namespace Utg.LegalService.BL.Services
                         .PrintData(reportData, TaskReportConstants.DataStartRow)
                         .CustomAction(worksheet =>
                         {
-                            worksheet.Columns("E:I").AdjustToContents();
+                            worksheet.Columns("E:J").AdjustToContents();
                         });
                 }
             });
