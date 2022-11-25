@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Models.Notification;
 using Utg.Common.Packages.Domain.Models.Push;
+using Utg.LegalService.BL.Features.Agregates.GetList;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.TaskComments;
@@ -22,19 +24,19 @@ namespace Utg.LegalService.BL.Services
     {
         private readonly ITaskCommentRepository _taskCommentRepository;
         private readonly IMapper _mapper;
-        private readonly IAgregateService _agregateService;
         private readonly INotificationService _notificationService;
+        private readonly IMediator _mediator;
 
         public TaskCommentService(
             IMapper mapper,
             ITaskCommentRepository taskCommentRepository,
-            IAgregateService agregateService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IMediator mediator)
         {
             _mapper = mapper;
             _taskCommentRepository = taskCommentRepository;
-            _agregateService = agregateService;
             _notificationService = notificationService;
+            _mediator = mediator;
         }
 
         public async Task<List<TaskCommentModel>> GetByTaskId(int taskId)
@@ -47,7 +49,12 @@ namespace Utg.LegalService.BL.Services
                 .ToListAsync();
 
             var userProfileIds = models.Select(x => x.UserProfileId);
-            var userProfiles = await _agregateService.GetUserProfiles(userProfileIds);
+            var getAgregatesCommand = new GetListUserProfileAgregatesCommand()
+            {
+                UserProfileIds = userProfileIds
+            };
+            var getAgregatesCommandResponse = await _mediator.Send(getAgregatesCommand);
+            var userProfiles = getAgregatesCommandResponse.Data;
             models = models.Select(m =>
             {
                 var userProfile = userProfiles.FirstOrDefault(x => x.UserProfileId == m.UserProfileId);

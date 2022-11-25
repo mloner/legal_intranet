@@ -13,6 +13,7 @@
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.31" />
     <PackageReference Include="Hangfire.Core" Version="1.7.31" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
+    <PackageReference Include="MediatR" Version="11.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.11">
@@ -24,12 +25,12 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.17.0" />
-    <PackageReference Include="Utg.Common.Packages.Queue" Version="1.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Utg.LegalService.BL\Utg.LegalService.BL.csproj" />
     <ProjectReference Include="..\Utg.LegalService.Dal\Utg.LegalService.Dal.csproj" />
+    <ProjectReference Include="..\Utg.LegalService.Jobs\Utg.LegalService.Jobs.csproj" />
   </ItemGroup>
 
   <ItemGroup>
