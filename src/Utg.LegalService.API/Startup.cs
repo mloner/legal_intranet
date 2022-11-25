@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -23,8 +22,13 @@ using Utg.Common.Packages.ServiceClientProxy.AuthHeader;
 using Utg.Common.Packages.ServiceClientProxy.Configuration;
 using Utg.LegalService.API.Configuration;
 using Utg.LegalService.API.Middlewares;
+using Utg.LegalService.BL;
 using Utg.LegalService.BL.Configuration;
 using Utg.LegalService.Dal.Configuration;
+using Utg.LegalService.Jobs.UpdateJobs.UpdateCompanyHostedService;
+using Utg.LegalService.Jobs.UpdateJobs.UpdateDepartmentHostedService;
+using Utg.LegalService.Jobs.UpdateJobs.UpdatePositionHostedService;
+using Utg.LegalService.Jobs.UpdateJobs.UpdateUserProfileHostedService;
 
 namespace Utg.LegalService.API
 {
@@ -98,8 +102,9 @@ namespace Utg.LegalService.API
             services.AddHangfire(x => x.UsePostgreSqlStorage(configuration.GetConnectionString("UTGDatabase")));
             services.AddSwaggerDocument(opts => opts.Title = "Legal service Api");
             services.ConfigureMinioFileStorage(minioConfiguration);
-            services.ConfigureDal(configuration);
             services.ConfigureBL();
+            services.ConfigureDal(configuration);
+            services.AddBusiness(configuration);
 
             services
                 .ConfigureExcelReportBuilder()
@@ -109,6 +114,8 @@ namespace Utg.LegalService.API
                        this.configuration.GetValue<string>("Api:Task")),
                        this.configuration.GetSection("BasicAuth").Get<BasicAuthConfig>())
                 .ConfigureRabbitMq(configuration.GetSection("Queue").Get<RabbitMqSettings>());
+            
+            AddJobs(services);
         }
 
         public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)
@@ -155,6 +162,14 @@ namespace Utg.LegalService.API
         private bool DoValidation(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
             return true;
+        }
+        
+        private void AddJobs(IServiceCollection services)
+        {
+            services.AddHostedService<UpdateCompanyHostedService>();
+            services.AddHostedService<UpdateDepartmentHostedService>();
+            services.AddHostedService<UpdatePositionHostedService>();
+            services.AddHostedService<UpdateUserProfileHostedService>();
         }
     }
 }

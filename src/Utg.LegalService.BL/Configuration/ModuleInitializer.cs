@@ -10,7 +10,6 @@ namespace Utg.LegalService.BL.Configuration
         {
             services.AddTransient<ITaskService, TaskService>();
             services.AddTransient<ITaskCommentService, TaskCommentService>();
-            services.AddTransient<IAgregateService, AgregateService>();
             services.AddTransient<INotificationService, NotificationService>();
             
             return services;
