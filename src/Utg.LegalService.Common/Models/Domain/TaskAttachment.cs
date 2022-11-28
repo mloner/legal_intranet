@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Utg.Common.Models.Domain;
 
 namespace Utg.LegalService.Common.Models.Domain
 {

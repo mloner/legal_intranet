@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Utg.Common.EF.Repositories.Implementations;
 using Utg.Common.Packages.Domain.Exceptions;
 using Utg.LegalService.Common.Models;
 using Utg.LegalService.Common.Models.Client;
+using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Repositories;
@@ -16,7 +18,8 @@ using Task = Utg.LegalService.Common.Models.Domain.Task;
 
 namespace Utg.LegalService.Dal.Repositories
 {
-    public class TaskRepository : ITaskRepository
+    public class TaskRepository 
+        : BaseRepository<UtgContext, Task>, ITaskRepository
     {
         private readonly UtgContext _context;
         private readonly IMapper _mapper;
@@ -24,6 +27,7 @@ namespace Utg.LegalService.Dal.Repositories
         public TaskRepository(
             UtgContext context,
             IMapper mapper)
+        : base(context)
         {
             _context = context;
             _mapper = mapper;

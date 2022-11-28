@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Utg.LegalService.Common.Models;
-using Utg.LegalService.Common.Models.Client;
-using Utg.LegalService.Common.Models.Request.Tasks;
+using Utg.Common.EF.Repositories;
+using Utg.LegalService.Common.Models.Client.Task;
 
 namespace Utg.LegalService.Common.Repositories
 {
-    public interface ITaskRepository
+    public interface ITaskRepository : IBaseRepositoryAdvanced<Models.Domain.Task>
     {
         IQueryable<Models.Domain.Task> Get();
         Task<TaskModel> GetById(int id);

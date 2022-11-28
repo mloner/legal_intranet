@@ -23,8 +23,6 @@ using Utg.Common.Packages.ServiceClientProxy.Configuration;
 using Utg.LegalService.API.Configuration;
 using Utg.LegalService.API.Middlewares;
 using Utg.LegalService.BL;
-using Utg.LegalService.BL.Configuration;
-using Utg.LegalService.Dal.Configuration;
 using Utg.LegalService.Jobs.UpdateJobs.UpdateCompanyHostedService;
 using Utg.LegalService.Jobs.UpdateJobs.UpdateDepartmentHostedService;
 using Utg.LegalService.Jobs.UpdateJobs.UpdatePositionHostedService;
@@ -102,8 +100,6 @@ namespace Utg.LegalService.API
             services.AddHangfire(x => x.UsePostgreSqlStorage(configuration.GetConnectionString("UTGDatabase")));
             services.AddSwaggerDocument(opts => opts.Title = "Legal service Api");
             services.ConfigureMinioFileStorage(minioConfiguration);
-            services.ConfigureBL();
-            services.ConfigureDal(configuration);
             services.AddBusiness(configuration);
 
             services
@@ -155,8 +151,6 @@ namespace Utg.LegalService.API
                     options.DocumentPath = $"/{swaggerPath}/" + "v1" + "/swagger.json";
                 });
             }
-
-            Dal.Configuration.Startup.Initialize(builder);
         }
 
         private bool DoValidation(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)

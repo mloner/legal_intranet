@@ -11,6 +11,8 @@ using Utg.LegalService.BL.Features.Agregates.UpdateDepartment;
 using Utg.LegalService.BL.Features.Agregates.UpdatePosition;
 using Utg.LegalService.BL.Features.Agregates.UpdateUserProfile;
 using Utg.LegalService.Common.Models.Client;
+using Utg.LegalService.Common.Models.Client.Attachment;
+using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.TaskComments;
 using Utg.LegalService.Common.Models.Request.Tasks;
@@ -41,6 +43,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.Attachments, opt => opt.Ignore())
                 .ForMember(dest => dest.AccessRights, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskComments, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentTaskId, opt => opt.Ignore())
                 ;
             
             config.CreateMap<Task, TaskModel>()
@@ -73,6 +76,10 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.DeadlineDateTime, opt => opt.MapFrom(x => x.DeadlineDateTime))
                 .ForMember(dest => dest.LastChangeDateTime, opt => opt.MapFrom(x => x.LastChangeDateTime))
                 .ForMember(dest => dest.TaskAttachments, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentTaskId, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentTask, opt => opt.Ignore())
+                .ForMember(dest => dest.Created, opt => opt.Ignore())
+                .ForMember(dest => dest.Updated, opt => opt.Ignore())
                 ;
             
             config.CreateMap<TaskCreateRequest, Task>()
@@ -88,6 +95,10 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.DeadlineDateTime, opt => opt.Ignore())
                 .ForMember(dest => dest.LastChangeDateTime, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskAttachments, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentTaskId, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentTask, opt => opt.Ignore())
+                .ForMember(dest => dest.Created, opt => opt.Ignore())
+                .ForMember(dest => dest.Updated, opt => opt.Ignore())
                 ;
 
             config.CreateMap<TaskAttachmentModel, TaskAttachment>()

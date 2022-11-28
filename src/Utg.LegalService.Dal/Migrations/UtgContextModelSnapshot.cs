@@ -37,17 +37,23 @@ namespace Utg.LegalService.Dal.Migrations
                     b.Property<int>("AuthorUserProfileId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<DateTime>("CreationDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("DeadlineDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastChangeDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("ParentTaskId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("PerformerFullName")
                         .HasColumnType("text");
@@ -61,7 +67,12 @@ namespace Utg.LegalService.Dal.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentTaskId");
 
                     b.ToTable("Tasks", "public");
                 });
@@ -74,7 +85,8 @@ namespace Utg.LegalService.Dal.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("FileId")
                         .HasColumnType("uuid");
@@ -87,6 +99,9 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.Property<int>("TaskId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("UserProfileId")
                         .HasColumnType("integer");
@@ -107,7 +122,7 @@ namespace Utg.LegalService.Dal.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("TaskId")
                         .HasColumnType("integer");
@@ -149,7 +164,7 @@ namespace Utg.LegalService.Dal.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("DismissalDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("FullName")
                         .HasColumnType("text");
@@ -190,6 +205,15 @@ namespace Utg.LegalService.Dal.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserProfileAgregates", "public");
+                });
+
+            modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.Task", b =>
+                {
+                    b.HasOne("Utg.LegalService.Common.Models.Domain.Task", "ParentTask")
+                        .WithMany()
+                        .HasForeignKey("ParentTaskId");
+
+                    b.Navigation("ParentTask");
                 });
 
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.TaskAttachment", b =>

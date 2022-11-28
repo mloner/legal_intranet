@@ -2,7 +2,9 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Utg.Common.EF.Repositories;
+using Utg.LegalService.Common.Repositories;
+using Utg.LegalService.Dal.Interceptors;
+using Utg.LegalService.Dal.Repositories;
 using Utg.LegalService.Dal.SqlContext;
 
 namespace Utg.LegalService.Dal;
@@ -26,9 +28,10 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString(sectionName));
             options.EnableSensitiveDataLogging();
             options.EnableDetailedErrors();
+            options.AddInterceptors(new DateTimeStampsInterceptor());
         });
 
-        services.AddScoped<UnitOfWork>();
+        AddDependenciesToContainer(services);
         using (var serviceScope = services.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
             var context = serviceScope.ServiceProvider.GetService<UtgContext>();
@@ -36,6 +39,15 @@ public static class DependencyInjection
         }
 
         return services;
+    }
+    
+    private static void AddDependenciesToContainer(IServiceCollection services)
+    {
+        services.AddTransient<ITaskRepository, TaskRepository>();
+        services.AddTransient<ITaskAttachmentRepository, TaskAttachmentRepository>();
+        services.AddTransient<ITaskCommentRepository, TaskCommentRepository>();
+        services.AddTransient<IAgregateRepository, AgregateRepository>();
+        services.AddScoped<UnitOfWork>();
     }
 }
 

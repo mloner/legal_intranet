@@ -1,8 +1,9 @@
 ﻿using System;
+using Utg.Common.Models.Domain;
 
 namespace Utg.LegalService.Common.Models
 {
-    public class CustomFileModel
+    public class CustomFileModel : BaseEntity
     {
         public string FileName { get; set; } = default!;
 
