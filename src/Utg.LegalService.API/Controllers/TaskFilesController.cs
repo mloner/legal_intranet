@@ -31,7 +31,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpGet]
         public async Task<ActionResult> DownloadFile([FromQuery] int attachmentId)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
@@ -45,7 +45,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpPost]
         public async Task<ActionResult> UploadFile([FromForm] TaskUploadFileRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
@@ -57,7 +57,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpDelete]
         public async Task<ActionResult> DeleteFile([FromQuery] int attachmentId)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }

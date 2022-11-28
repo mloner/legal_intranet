@@ -98,7 +98,7 @@ namespace Utg.LegalService.BL.Services
         {
             var predicate = PredicateBuilder.New<TaskModel>(true);
 
-            if (authInfo.Roles.Contains((int)Role.LegalInitiator))
+            if (authInfo.Roles.Contains((int)Role.IntranetUser))
             {
                 predicate = PredicateBuilder.New<TaskModel>(
                     model => model.AuthorUserProfileId == authInfo.UserProfileId);
@@ -209,12 +209,12 @@ namespace Utg.LegalService.BL.Services
 
         private static bool CanShowDetails(AuthInfo authInfo)
         {
-            return new int[] { (int)Role.LegalHead, (int)Role.LegalInitiator, (int)Role.LegalPerformer }
+            return new int[] { (int)Role.LegalHead, (int)Role.IntranetUser, (int)Role.LegalPerformer }
                     .Intersect(authInfo.Roles)
                     .Any();
         }
         private static bool CanEdit(TaskModel model, AuthInfo authInfo)
-           => authInfo.Roles.Contains((int)Role.LegalInitiator)
+           => authInfo.Roles.Contains((int)Role.IntranetUser)
                 && model.Status == TaskStatus.Draft ||
             authInfo.Roles.Contains((int)Role.LegalHead)
                 && model.Status == TaskStatus.New;
@@ -222,7 +222,7 @@ namespace Utg.LegalService.BL.Services
 
         private static bool CanDelete(TaskModel model, AuthInfo authInfo)
         {
-            return authInfo.Roles.Contains((int)Role.LegalInitiator) &&
+            return authInfo.Roles.Contains((int)Role.IntranetUser) &&
                    model.Status == TaskStatus.Draft;
         }
 

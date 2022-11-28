@@ -31,7 +31,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpPost]
         public async Task<ActionResult<List<TaskCommentModel>>> Create([FromForm] TaskCommentCreateRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
@@ -44,7 +44,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<TaskCommentModel>>> GetByTaskId(int taskId)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
