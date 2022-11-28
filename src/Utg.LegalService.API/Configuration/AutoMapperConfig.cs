@@ -1,6 +1,15 @@
 ﻿using System;
 using AutoMapper;
+using Utg.Common.Packages.Domain.Models.UpdateModels;
+using Utg.Common.Packages.Domain.Models.UpdateModels.CompanyUpdate;
+using Utg.Common.Packages.Domain.Models.UpdateModels.DepartmentUpdate;
+using Utg.Common.Packages.Domain.Models.UpdateModels.PositionUpdate;
+using Utg.Common.Packages.Domain.Models.UpdateModels.UserProfileUpdate;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
+using Utg.LegalService.BL.Features.Agregates.UpdateCompany;
+using Utg.LegalService.BL.Features.Agregates.UpdateDepartment;
+using Utg.LegalService.BL.Features.Agregates.UpdatePosition;
+using Utg.LegalService.BL.Features.Agregates.UpdateUserProfile;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Client.Task;
@@ -160,6 +169,8 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dst => dst.IsRemoved, src => src.MapFrom(x => x.IsRemoved))
                 .ForMember(dst => dst.HeadUserProfileId, src => src.MapFrom(x => x.HeadUserProfileId))
                 .ForMember(dst => dst.DismissalDate, src => src.MapFrom(x => x.DismissalDate != null ?  x.DismissalDate.Value.UtcDateTime : (DateTime?)null))
+                .ForMember(dst => dst.Created, src => src.Ignore())
+                .ForMember(dst => dst.Updated, src => src.Ignore())
                 ;
 
             config.CreateMap<UserProfileAgregate, UserProfileAgregateModel>()
@@ -179,6 +190,19 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dst => dst.IsRemoved, src => src.MapFrom(x => x.IsRemoved))
                 .ForMember(dst => dst.DismissalDate, src => src.MapFrom(x => x.DismissalDate))
                 .ForMember(dst => dst.HeadUserProfileId, src => src.MapFrom(x => x.HeadUserProfileId))
+                ;
+            
+            config.CreateMap<UpdateEvent<PositionUpdateEventModel>, UpdateUserProfileAgregatePositionCommand>()
+                .ForMember(dst => dst.EventModel, src => src.MapFrom(x => x))
+                ;
+            config.CreateMap<UpdateEvent<CompanyUpdateEventModel>, UpdateUserProfileAgregateCompanyCommand>()
+                .ForMember(dst => dst.EventModel, src => src.MapFrom(x => x))
+                ;
+            config.CreateMap<UpdateEvent<DepartmentUpdateEventModel>, UpdateUserProfileAgregateDepartmentCommand>()
+                .ForMember(dst => dst.EventModel, src => src.MapFrom(x => x))
+                ;
+            config.CreateMap<UpdateEvent<UserProfileUpdateEventModel>, UpdateUserProfileAgregateCommand>()
+                .ForMember(dst => dst.EventModel, src => src.MapFrom(x => x))
                 ;
             
             #endregion

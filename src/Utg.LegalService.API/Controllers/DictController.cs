@@ -32,7 +32,7 @@ namespace Utg.LegalService.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TaskStatus>> TaskStatus()
         {
-            var result = EnumExtensions.GetEnummValuesWithoutDefault<TaskStatus>();
+            var result = EnumExtensions.GetEnumValuesWithoutDefault<TaskStatus>();
             return Ok(result);
         }
 
@@ -40,7 +40,7 @@ namespace Utg.LegalService.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TaskType>> TaskType()
         {
-            var result = EnumExtensions.GetEnummValuesWithoutDefault<TaskType>();
+            var result = EnumExtensions.GetEnumValuesWithoutDefault<TaskType>();
             return Ok(result);
         }
 

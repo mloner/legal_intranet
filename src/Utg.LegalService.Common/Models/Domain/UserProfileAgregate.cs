@@ -1,9 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Utg.Common.Models.Domain;
 
 namespace Utg.LegalService.Common.Models.Domain
 {
-	public class UserProfileAgregate
+	public class UserProfileAgregate : BaseEntity
 	{
 		[Key]
 		public int Id { get; set; }

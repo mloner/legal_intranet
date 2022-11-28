@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using AutoMapper;
 using Utg.Common.EF.Repositories.Implementations;
 using Utg.LegalService.Common.Repositories;
@@ -9,6 +9,9 @@ namespace Utg.LegalService.Dal;
 
 public class UnitOfWork : UnitOfWorkBase<UtgContext>
 {
+    private readonly Lazy<IAgregateRepository> _agregateItems;
+    public IAgregateRepository AgregateItems => _agregateItems.Value;
+
     private readonly Lazy<ITaskRepository> _taskItems;
     public ITaskRepository TaskItems => _taskItems.Value;
     
@@ -20,6 +23,9 @@ public class UnitOfWork : UnitOfWorkBase<UtgContext>
         IMapper mapper) 
         : base(dbContext)
     {
+        _agregateItems = new Lazy<IAgregateRepository>(() => new AgregateRepository(dbContext));
+
+        
         _taskItems = 
             new Lazy<ITaskRepository>(() =>
                 new TaskRepository(dbContext, mapper));

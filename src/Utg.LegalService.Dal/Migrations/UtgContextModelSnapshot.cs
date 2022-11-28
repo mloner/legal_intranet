@@ -154,6 +154,9 @@ namespace Utg.LegalService.Dal.Migrations
                     b.Property<string>("CompanyName")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("integer");
 
@@ -189,6 +192,9 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");

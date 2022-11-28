@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -107,6 +106,8 @@ namespace Utg.LegalService.API
                        this.configuration.GetValue<string>("Api:Task")),
                        this.configuration.GetSection("BasicAuth").Get<BasicAuthConfig>())
                 .ConfigureRabbitMq(configuration.GetSection("Queue").Get<RabbitMqSettings>());
+            
+            AddJobs(services);
         }
 
         public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)
@@ -151,6 +152,14 @@ namespace Utg.LegalService.API
         private bool DoValidation(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
             return true;
+        }
+        
+        private void AddJobs(IServiceCollection services)
+        {
+            services.AddHostedService<UpdateCompanyHostedService>();
+            services.AddHostedService<UpdateDepartmentHostedService>();
+            services.AddHostedService<UpdatePositionHostedService>();
+            services.AddHostedService<UpdateUserProfileHostedService>();
         }
     }
 }

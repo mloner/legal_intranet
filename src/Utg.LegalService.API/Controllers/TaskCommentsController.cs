@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Utg.Common.Packages.Domain.Models.Enum;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Request.TaskComments;
 using Utg.LegalService.Common.Services;
+using Utg.Common.Packages.Domain.Enums;
 
 namespace Utg.LegalService.API.Controllers
 {

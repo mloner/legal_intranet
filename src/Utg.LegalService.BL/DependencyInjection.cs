@@ -2,9 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Utg.Common.MediatR;
-using Utg.LegalService.BL.Services;
-using Utg.LegalService.Common.Services;
-using Utg.ProductionCalendar.DataAccess;
+using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL;
 
