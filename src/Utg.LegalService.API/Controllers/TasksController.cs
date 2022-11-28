@@ -34,7 +34,7 @@ namespace Utg.LegalService.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<TaskModel>>> Get([FromQuery]TaskRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
@@ -46,7 +46,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<TaskModel>> GetById(int id)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
@@ -58,7 +58,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpPost]
         public async Task<ActionResult<TaskModel>> Create([FromForm] TaskCreateRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
@@ -70,7 +70,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpPatch]
         public async Task<ActionResult<TaskModel>> Update([FromForm] TaskUpdateRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser))
             {
                 return Forbid();
             }
@@ -118,7 +118,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            if (!await CanGo(Role.LegalInitiator))
+            if (!await CanGo(Role.IntranetUser))
             {
                 return Forbid();
             }
@@ -130,7 +130,7 @@ namespace Utg.LegalService.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<File>> GetReport([FromQuery]TaskReportRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalInitiator, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
