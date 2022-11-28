@@ -707,7 +707,7 @@ namespace Utg.LegalService.BL.Services
 
             var reportData = data.Result.Select((x, index) => new TaskReportDto()
             {
-                RowNumber = index + 1,
+                RowNumber = x.Id,
                 CreationDate = x.CreationDateTime,
                 AuthorFullName = x.AuthorFullName,
                 PerformerFullName = x.PerformerFullName,
