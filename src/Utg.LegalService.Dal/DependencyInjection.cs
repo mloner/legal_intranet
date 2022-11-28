@@ -2,15 +2,12 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Utg.Common.EF.Repositories;
-using Utg.Common.Extensions;
 using Utg.LegalService.Common.Repositories;
-using Utg.LegalService.Dal;
 using Utg.LegalService.Dal.Interceptors;
 using Utg.LegalService.Dal.Repositories;
 using Utg.LegalService.Dal.SqlContext;
 
-namespace Utg.ProductionCalendar.DataAccess;
+namespace Utg.LegalService.Dal;
 
 /// <summary>
 /// Этот класс изолирует настройку уровня доступа к данным от основного проекта api

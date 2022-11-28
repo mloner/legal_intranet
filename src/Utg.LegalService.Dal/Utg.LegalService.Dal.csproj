@@ -23,19 +23,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Utg.Common.EF" Version="1.4.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Utg.LegalService.Common\Utg.LegalService.Common.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Migrations\20221122142918_ParentTask.cs" />
-  </ItemGroup>
-
 </Project>

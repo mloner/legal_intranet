@@ -23,6 +23,10 @@ using Utg.Common.Packages.ServiceClientProxy.Configuration;
 using Utg.LegalService.API.Configuration;
 using Utg.LegalService.API.Middlewares;
 using Utg.LegalService.BL;
+using Utg.LegalService.Jobs.UpdateJobs.UpdateCompanyHostedService;
+using Utg.LegalService.Jobs.UpdateJobs.UpdateDepartmentHostedService;
+using Utg.LegalService.Jobs.UpdateJobs.UpdatePositionHostedService;
+using Utg.LegalService.Jobs.UpdateJobs.UpdateUserProfileHostedService;
 
 namespace Utg.LegalService.API
 {

@@ -19,7 +19,7 @@ using Task = Utg.LegalService.Common.Models.Domain.Task;
 namespace Utg.LegalService.Dal.Repositories
 {
     public class TaskRepository 
-        : BaseRepositoryAdvanced<Task>, ITaskRepository
+        : BaseRepository<Task>, ITaskRepository
     {
         private readonly UtgContext _context;
         private readonly IMapper _mapper;

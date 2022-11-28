@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Utg.Common.Models;
 using Utg.Common.Packages.Domain.Enums;
-using Utg.Common.Packages.Domain.Models.Enum;
 using Utg.Common.Packages.Domain.Models.Notification;
 using Utg.Common.Packages.Domain.Models.Push;
 using Utg.LegalService.Common.Services;

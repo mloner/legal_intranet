@@ -14,7 +14,7 @@ using Task = System.Threading.Tasks.Task;
 namespace Utg.LegalService.Dal.Repositories
 {
     public class TaskAttachmentRepository 
-        : BaseRepositoryAdvanced<TaskAttachment>, ITaskAttachmentRepository
+        : BaseRepository<TaskAttachment>, ITaskAttachmentRepository
     {
         private readonly UtgContext _context;
         private readonly IMapper _mapper;
