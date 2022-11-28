@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Services;
