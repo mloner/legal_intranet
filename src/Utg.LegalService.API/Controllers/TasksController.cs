@@ -78,7 +78,7 @@ namespace Utg.LegalService.API.Controllers
         public async Task<ActionResult<TaskModel>> CreateSubtask(
             [FromForm] SubtaskCreateRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser))
             {
                 return Forbid();
             }
