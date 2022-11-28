@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Helpers;
 using Utg.Common.Packages.Domain.Models.Client;
-using Utg.Common.Packages.Domain.Models.Enum;
+using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Models.Notification;
 using Utg.Common.Packages.Domain.Models.Push;
 using Utg.Common.Packages.ExcelReportBuilder;
@@ -28,6 +28,7 @@ using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Common.Services;
 using NotificationTaskType = Utg.Common.Packages.Domain.Enums.NotificationTaskType;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
+using Utg.Common.Packages.Domain.Enums;
 
 namespace Utg.LegalService.BL.Services
 {
@@ -460,7 +461,10 @@ namespace Utg.LegalService.BL.Services
         private async Task<TaskModel> UpdateTaskMoveToInWorkCommon(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
         {
             var taskId = request.Id;
-            var performer = await _agregateRepository.GetUserProfiles().FirstOrDefaultAsync(userProfile => userProfile.UserProfileId == request.PerformerUserProfileId);
+            var performer = await _agregateRepository
+                .GetQuery(x => true, null)
+                .FirstOrDefaultAsync(
+                    userProfile => userProfile.UserProfileId == request.PerformerUserProfileId);
             var newTask = new TaskModel
             {
                 Id = taskId,
@@ -708,7 +712,7 @@ namespace Utg.LegalService.BL.Services
 
             var reportData = data.Result.Select((x, index) => new TaskReportDto()
             {
-                RowNumber = index + 1,
+                RowNumber = x.Id,
                 ParentTaskId = x.ParentTaskId,
                 CreationDate = x.CreationDateTime,
                 AuthorFullName = x.AuthorFullName,

@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Utg.Common.Packages.Domain.Models.Enum;
+using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client;
 using ProblemDetails = Microsoft.AspNetCore.Mvc.ProblemDetails;

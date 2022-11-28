@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
-using Utg.Common.Packages.Domain.Models.Enum;
+using Utg.Common.Packages.Domain.Enums;
 using Utg.LegalService.BL.Features.Task.Get;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Enum;

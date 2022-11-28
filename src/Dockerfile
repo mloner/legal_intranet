@@ -1,5 +1,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 RUN apt-get update && apt-get install -y libgdiplus
+RUN apt-get update
+RUN apt-get install -y --allow-unauthenticated \
+        libc6-dev \
+        libgdiplus \
+        libx11-dev
 WORKDIR /app
 EXPOSE 80
 

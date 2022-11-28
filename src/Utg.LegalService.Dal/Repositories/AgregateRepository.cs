@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Utg.Common.EF.Repositories.Implementations;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Dal.SqlContext;
@@ -7,23 +6,10 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Utg.LegalService.Dal.Repositories;
 
-public class AgregateRepository : IAgregateRepository
+public class AgregateRepository 
+    : BaseRepository<UtgContext, UserProfileAgregate>, IAgregateRepository
 {
-    private readonly UtgContext _context;
-
-    public AgregateRepository(UtgContext context)
+    public AgregateRepository(UtgContext context) : base(context)
     {
-        _context = context;
-    }
-
-    public IQueryable<UserProfileAgregate> GetUserProfiles()
-    {
-        return _context.UserProfileAgregates.AsQueryable();
-    }
-
-    public async Task AddUserProfiles(IEnumerable<UserProfileAgregate> userProfileAgregates)
-    {
-        await _context.UserProfileAgregates.AddRangeAsync(userProfileAgregates);
-        await _context.SaveChangesAsync();
     }
 }

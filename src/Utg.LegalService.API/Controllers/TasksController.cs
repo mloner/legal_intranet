@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Models.Client;
-using Utg.Common.Packages.Domain.Models.Enum;
+using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.BL.Features.SubTask.Create;
 using Utg.LegalService.Common.Models.Client;
@@ -74,11 +75,23 @@ namespace Utg.LegalService.API.Controllers
             return Ok(result);
         }
         
+        [HttpPatch]
+        public async Task<ActionResult<TaskModel>> Update([FromForm] TaskUpdateRequest request)
+        {
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser))
+            {
+                return Forbid();
+            }
+            var authInfo = await GetAuthInfo();
+            var result = await _taskService.UpdateTask(request, authInfo);
+            return Ok(result);
+        }
+        
         [HttpPost("subtask")]
         public async Task<ActionResult<TaskModel>> CreateSubtask(
             [FromForm] SubtaskCreateRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.LegalPerformer))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser))
             {
                 return Forbid();
             }
