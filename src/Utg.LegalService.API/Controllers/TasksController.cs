@@ -74,6 +74,18 @@ namespace Utg.LegalService.API.Controllers
             return Ok(result);
         }
         
+        [HttpPatch]
+        public async Task<ActionResult<TaskModel>> Update([FromForm] TaskUpdateRequest request)
+        {
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser))
+            {
+                return Forbid();
+            }
+            var authInfo = await GetAuthInfo();
+            var result = await _taskService.UpdateTask(request, authInfo);
+            return Ok(result);
+        }
+        
         [HttpPost("subtask")]
         public async Task<ActionResult<TaskModel>> CreateSubtask(
             [FromForm] SubtaskCreateRequest request)
