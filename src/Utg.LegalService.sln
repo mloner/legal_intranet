@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utg.LegalService.Common", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utg.LegalService.BL", "Utg.LegalService.BL\Utg.LegalService.BL.csproj", "{32D58323-BC9C-45CE-8DA0-6C523743746E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utg.LegalService.Jobs", "Utg.LegalService.Jobs\Utg.LegalService.Jobs.csproj", "{5A84EDEF-0410-4ED8-94FB-350210AACBF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utg.LegalService.Jobs", "Utg.LegalService.Jobs\Utg.LegalService.Jobs.csproj", "{5A84EDEF-0410-4ED8-94FB-350210AACBF1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utg.LegalService.Tests", "Utg.LegalService.Tests\Utg.LegalService.Tests.csproj", "{A1FE9DF2-EABD-4506-8299-64134F8EE4FB}"
 EndProject

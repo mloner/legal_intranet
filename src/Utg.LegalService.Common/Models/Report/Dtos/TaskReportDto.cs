@@ -13,20 +13,23 @@ namespace Utg.LegalService.Common.Models.Report.Dtos
     
         [ExcelColumn("C", "Автор")]
         public string? AuthorFullName { get; set; }
+        
+        [ExcelColumn("E", "Родительская задача")]
+        public int? ParentTaskId { get; set; }
     
-        [ExcelColumn("E", "Тип задачи")]
+        [ExcelColumn("F", "Тип задачи")]
         public string? TaskType { get; set; }
         
-        [ExcelColumn("F", "Исполнитель")]
+        [ExcelColumn("G", "Исполнитель")]
         public string? PerformerFullName { get; set; }
         
-        [ExcelColumn("G", "Статус")]
+        [ExcelColumn("H", "Статус")]
         public string? Status { get; set; }
         
-        [ExcelColumn("H", "Срок")]
+        [ExcelColumn("I", "Срок")]
         public DateTime? Deadline { get; set; }
         
-        [ExcelColumn("I", "Дата последнего изменения")]
+        [ExcelColumn("J", "Дата последнего изменения")]
         public DateTime? LastChangeDateTime { get; set; }
     }
 }
