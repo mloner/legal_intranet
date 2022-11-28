@@ -121,6 +121,9 @@ namespace Utg.LegalService.Dal.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp without time zone");
 
@@ -129,6 +132,9 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.Property<string>("Text")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UserProfileId")
                         .HasColumnType("integer");

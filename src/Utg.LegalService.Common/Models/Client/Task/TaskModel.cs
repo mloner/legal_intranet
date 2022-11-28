@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Utg.Common.Packages.Domain.Helpers;
 using Utg.LegalService.Common.Models.Client.Attachment;
+using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Client.Enum;
 
 namespace Utg.LegalService.Common.Models.Client.Task

@@ -69,7 +69,7 @@ namespace Utg.LegalService.BL.Services
             _notificationService = notificationService;
         }
 
-        public async Task<PagedResult<TaskModel>> GetAll(TaskRequest request, AuthInfo authInfo)
+        public async Task<PagedResult<TaskModel>> GetAll(GetTaskPageRequest request, AuthInfo authInfo)
         {
             var query = taskRepository.Get()
                 .OrderByDescending(task => task.CreationDateTime)
@@ -79,15 +79,11 @@ namespace Utg.LegalService.BL.Services
             query = Filter(query, request);
             query = Search(query, request);
 
-            query = FilterByRoles(query, request, authInfo);
-            query = Filter(query, request);
-            query = Search(query, request);
-            
             var count = query.Count();
             query = SkipAndTake(query, request);
             
             var list = query.AsEnumerable();
-            list = FillAccessRights(list, authInfo);
+            list = GetTasksAccessRights(list, authInfo);
 
             return new PagedResult<TaskModel>()
             {
@@ -96,7 +92,7 @@ namespace Utg.LegalService.BL.Services
             };
         }
 
-        private IQueryable<TaskModel> FilterByRoles(IQueryable<TaskModel> query, TaskRequest request, AuthInfo authInfo)
+        private IQueryable<TaskModel> FilterByRoles(IQueryable<TaskModel> query, GetTaskPageRequest request, AuthInfo authInfo)
         {
             var predicate = PredicateBuilder.New<TaskModel>(true);
 
@@ -119,7 +115,7 @@ namespace Utg.LegalService.BL.Services
             return query;
         }
 
-        private IQueryable<TaskModel> Filter(IQueryable<TaskModel> query, TaskRequest request)
+        private IQueryable<TaskModel> Filter(IQueryable<TaskModel> query, GetTaskPageRequest request)
         {
             if (request.Statuses != null && request.Statuses.Any())
             {
@@ -138,7 +134,7 @@ namespace Utg.LegalService.BL.Services
             return query;
         }
 
-        private IQueryable<TaskModel> Search(IQueryable<TaskModel> query, TaskRequest request)
+        private IQueryable<TaskModel> Search(IQueryable<TaskModel> query, GetTaskPageRequest request)
         {
             if (!string.IsNullOrEmpty(request.Search))
             {
@@ -159,7 +155,7 @@ namespace Utg.LegalService.BL.Services
             return query;
         }
 
-        private IQueryable<TaskModel> SkipAndTake(IQueryable<TaskModel> query, TaskRequest request)
+        private IQueryable<TaskModel> SkipAndTake(IQueryable<TaskModel> query, GetTaskPageRequest request)
         {
             if (request.Skip.HasValue)
             {
@@ -172,7 +168,7 @@ namespace Utg.LegalService.BL.Services
 
             return query;
         }
-        private IEnumerable<TaskModel> FillAccessRights(IEnumerable<TaskModel> models, AuthInfo authInfo)
+        private IEnumerable<TaskModel> GetTasksAccessRights(IEnumerable<TaskModel> models, AuthInfo authInfo)
         {
 
             models = models.Select(x =>
@@ -702,9 +698,9 @@ namespace Utg.LegalService.BL.Services
             return userProfiles;
         }
 
-        public async Task<Stream> GetReport(TaskReportRequest request, AuthInfo authInfo)
+        public async Task<Stream> GetReport(GetTaskPageReportRequest request, AuthInfo authInfo)
         {
-            var data = await GetAll(new TaskRequest()
+            var data = await GetAll(new GetTaskPageRequest()
             {
                 Statuses = request.Statuses,
                 AuthorUserProfileIds = request.AuthorUserProfileIds

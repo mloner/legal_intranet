@@ -14,13 +14,13 @@ namespace Utg.LegalService.Common.Services
 {
     public interface ITaskService
     {
-        Task<PagedResult<TaskModel>> GetAll(TaskRequest request, AuthInfo authInfo);
+        Task<PagedResult<TaskModel>> GetAll(GetTaskPageRequest request, AuthInfo authInfo);
         Task<TaskModel> GetById(int id, AuthInfo authInfo);
         Task<TaskModel> CreateTask(TaskCreateRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTask(TaskUpdateRequest request, AuthInfo authInfo);
         Task DeleteTask(int id);
         Task<IEnumerable<UserProfileApiModel>> GetAuthorUserProfiles();
-        Task<Stream> GetReport(TaskReportRequest request, AuthInfo authInfo);
+        Task<Stream> GetReport(GetTaskPageReportRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToDone(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo);

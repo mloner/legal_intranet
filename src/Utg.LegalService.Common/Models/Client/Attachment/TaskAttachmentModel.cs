@@ -11,5 +11,6 @@ namespace Utg.LegalService.Common.Models.Client.Attachment
         public Stream Bytes { get; set; }
         public TaskModel Task { get; set; }
         public AttachmentAccessRights AccessRights { get; set; }
+        public string Url { get; set; }
     }
 }
