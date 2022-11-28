@@ -19,7 +19,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Utg.Common.MediatR" Version="0.1.5" />
-    <PackageReference Include="Utg.Common.Packages.FileStorage" Version="1.0.1" />
+    <PackageReference Include="Utg.Common.Packages.FileStorage" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,7 +7,7 @@ using Task = System.Threading.Tasks.Task;
 namespace Utg.LegalService.Dal.Repositories;
 
 public class AgregateRepository 
-    : BaseRepository<UserProfileAgregate>, IAgregateRepository
+    : BaseRepository<UtgContext, UserProfileAgregate>, IAgregateRepository
 {
     public AgregateRepository(UtgContext context) : base(context)
     {
