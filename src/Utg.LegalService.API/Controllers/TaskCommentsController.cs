@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client;
+using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Request.TaskComments;
 using Utg.LegalService.Common.Services;
 using Utg.Common.Packages.Domain.Enums;

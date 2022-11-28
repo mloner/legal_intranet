@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Utg.LegalService.Common.Models.Client
+namespace Utg.LegalService.Common.Models.Client.Comment
 {
     public class TaskCommentModel
     {

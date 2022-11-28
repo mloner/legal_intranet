@@ -18,6 +18,9 @@ public class UnitOfWork : UnitOfWorkBase<UtgContext>
     private readonly Lazy<ITaskAttachmentRepository> _taskAttachmentItems;
     public ITaskAttachmentRepository TaskAttachmentItems => _taskAttachmentItems.Value;
     
+    private readonly Lazy<ITaskCommentRepository> _taskCommentItems;
+    public ITaskCommentRepository TaskCommentItems => _taskCommentItems.Value;
+    
     public UnitOfWork(
         UtgContext dbContext,
         IMapper mapper) 
@@ -32,5 +35,8 @@ public class UnitOfWork : UnitOfWorkBase<UtgContext>
         _taskAttachmentItems = 
             new Lazy<ITaskAttachmentRepository>(() => 
                 new TaskAttachmentRepository(dbContext, mapper));
+        _taskCommentItems = 
+            new Lazy<ITaskCommentRepository>(() => 
+                new TaskCommentRepository(dbContext));
     }
 }

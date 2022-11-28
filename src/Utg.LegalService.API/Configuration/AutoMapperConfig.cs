@@ -12,6 +12,7 @@ using Utg.LegalService.BL.Features.Agregates.UpdatePosition;
 using Utg.LegalService.BL.Features.Agregates.UpdateUserProfile;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Attachment;
+using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.TaskComments;
@@ -121,6 +122,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.Bytes, opt => opt.Ignore())
                 .ForMember(dest => dest.AccessRights, opt => opt.Ignore())
                 .ForMember(dest => dest.UserProfileId, opt => opt.MapFrom(x => x.UserProfileId))
+                .ForMember(dest => dest.Url, opt => opt.Ignore())
                 ;
             
             config.CreateMap<TaskComment, TaskCommentModel>()
@@ -139,6 +141,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.DateTime, opt => opt.MapFrom(x => x.DateTime))
                 .ForMember(dest => dest.Text, opt => opt.MapFrom(x => x.Text))
                 .ForMember(dest => dest.Task, opt => opt.Ignore())
+                .ForAllMembers(x => x.Ignore())
                 ;
             
             config.CreateMap<TaskCommentCreateRequest, TaskComment>()
@@ -148,6 +151,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.DateTime, opt => opt.Ignore())
                 .ForMember(dest => dest.Text, opt => opt.MapFrom(x => x.Text))
                 .ForMember(dest => dest.Task, opt => opt.Ignore())
+                .ForAllMembers(x => x.Ignore())
                 ;
             
             #region agregates

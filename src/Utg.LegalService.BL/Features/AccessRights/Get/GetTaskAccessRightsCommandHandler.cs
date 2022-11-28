@@ -18,17 +18,11 @@ public class GetTaskAccessRightsCommandHandler
     : IRequestHandler<GetTaskAccessRightsCommand, Result<TaskAccessRights>>
 {
     private readonly ILogger<GetTaskAccessRightsCommandHandler> _logger;
-    private readonly IMediator _mediator;
-    private readonly UnitOfWork _uow;
 
     public GetTaskAccessRightsCommandHandler(
-        ILogger<GetTaskAccessRightsCommandHandler> logger,
-        UnitOfWork uow, 
-        IMediator mediator)
+        ILogger<GetTaskAccessRightsCommandHandler> logger)
     {
         _logger = logger;
-        _uow = uow;
-        _mediator = mediator;
     }
 
     public async System.Threading.Tasks.Task<Result<TaskAccessRights>> Handle(

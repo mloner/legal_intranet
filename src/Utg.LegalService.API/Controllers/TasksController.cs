@@ -12,6 +12,8 @@ using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.BL.Features.SubTask.Create;
+using Utg.LegalService.BL.Features.Task.Get;
+using Utg.LegalService.BL.Features.Task.GetPage;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Request.Tasks;
@@ -40,15 +42,23 @@ namespace Utg.LegalService.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<TaskModel>>> Get([FromQuery]TaskRequest request)
+        public async Task<ActionResult<PagedResult<TaskModel>>> Get(
+            [FromQuery]GetTaskPageRequest request)
         {
             if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var result = await _taskService.GetAll(request, authInfo);
-            return result;
+            var command = request.Adapt<GetTaskPageCommand>();
+            command.AuthInfo = authInfo;
+            var response = await _mediator.Send(command);
+            
+            return response.Success ? Ok(new PagedResult<TaskModel>()
+            {
+                Result = response.Data,
+                Total = response.Total
+            }) : StatusCode(response.StatusCode, response.Message);
         }
         
         [HttpGet("{id:int}")]
@@ -59,8 +69,13 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var result = await _taskService.GetById(id, authInfo);
-            return Ok(result);
+            var response = await _mediator.Send(new GetTaskCommand()
+            {
+                Id = id,
+                AuthInfo = authInfo
+            }, HttpContext.RequestAborted);
+
+            return response.Success ? Ok(response.Data) : StatusCode(response.StatusCode, response.Message);
         }
         
         [HttpPost]
@@ -153,7 +168,7 @@ namespace Utg.LegalService.API.Controllers
         
         [HttpGet("report")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<File>> GetReport([FromQuery]TaskReportRequest request)
+        public async Task<ActionResult<File>> GetReport([FromQuery]GetTaskPageReportRequest request)
         {
             if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
