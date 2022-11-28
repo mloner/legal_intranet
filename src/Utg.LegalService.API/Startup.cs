@@ -27,6 +27,8 @@ using Utg.LegalService.Jobs.UpdateJobs.UpdateCompanyHostedService;
 using Utg.LegalService.Jobs.UpdateJobs.UpdateDepartmentHostedService;
 using Utg.LegalService.Jobs.UpdateJobs.UpdatePositionHostedService;
 using Utg.LegalService.Jobs.UpdateJobs.UpdateUserProfileHostedService;
+using Utg.LegalService.Jobs;
+using Utg.LegalService.Jobs.NotifyExpiredSoonTasksJob;
 
 namespace Utg.LegalService.API
 {
@@ -151,6 +153,8 @@ namespace Utg.LegalService.API
                     options.DocumentPath = $"/{swaggerPath}/" + "v1" + "/swagger.json";
                 });
             }
+            
+            ConfigureJobs();
         }
 
         private bool DoValidation(IEnumerable<string> audiences, SecurityToken securityToken, TokenValidationParameters validationParameters)
@@ -164,6 +168,26 @@ namespace Utg.LegalService.API
             services.AddHostedService<UpdateDepartmentHostedService>();
             services.AddHostedService<UpdatePositionHostedService>();
             services.AddHostedService<UpdateUserProfileHostedService>();
+        
+            services.AddScoped<NotifyExpiredSoonTasksJob, NotifyExpiredSoonTasksJob>();
+        }
+        
+        private void ConfigureJobs()
+        {
+            ConfigureJob<NotifyExpiredSoonTasksJob>(configuration);
+        }
+        
+        private static void ConfigureJob<T>(
+            IConfiguration configuration,
+            string timeTable = "",
+            string queueName = "default")
+            where T : BaseJob
+        {
+            var timetable = configuration[$"Jobs:{nameof(T)}:Timetable"];
+            if (!string.IsNullOrWhiteSpace(timetable))
+            {
+                RecurringJob.AddOrUpdate<T>(nameof(T), x => x.Start(), timetable, queue: queueName);
+            }
         }
     }
 }

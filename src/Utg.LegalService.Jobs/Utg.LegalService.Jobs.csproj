@@ -6,11 +6,15 @@
         <LangVersion>10</LangVersion>
     </PropertyGroup>
     
-    
 
     <ItemGroup>
       <ProjectReference Include="..\Utg.LegalService.BL\Utg.LegalService.BL.csproj" />
       <ProjectReference Include="..\Utg.LegalService.Common\Utg.LegalService.Common.csproj" />
+    </ItemGroup>
+    
+
+    <ItemGroup>
+      <PackageReference Include="MediatR" Version="11.1.0" />
     </ItemGroup>
 
 </Project>

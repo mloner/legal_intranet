@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddTransient<ITaskService, TaskService>();
         services.AddTransient<ITaskCommentService, TaskCommentService>();
         services.AddTransient<INotificationService, NotificationService>();
+        services.AddTransient<IProductionCalendarService, ProductionCalendarService>();
 
         services.AddDataAccess(configuration, "UTGDatabase");
         services.AddUtgMediatr(typeof(DependencyInjection)); 

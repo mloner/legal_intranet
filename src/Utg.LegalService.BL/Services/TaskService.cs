@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Helpers;
 using Utg.Common.Packages.Domain.Models.Client;
+using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Models.Notification;
 using Utg.Common.Packages.Domain.Models.Push;
 using Utg.Common.Packages.ExcelReportBuilder;
