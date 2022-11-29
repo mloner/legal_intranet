@@ -10,8 +10,8 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.2.2" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.31" />
-    <PackageReference Include="Hangfire.Core" Version="1.7.31" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.32" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.32" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
     <PackageReference Include="Mapster" Version="7.3.0" />
     <PackageReference Include="MediatR" Version="11.1.0" />
@@ -26,13 +26,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.17.0" />
-    <PackageReference Include="Utg.Common.Packages.Queue" Version="1.1.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Utg.LegalService.BL\Utg.LegalService.BL.csproj" />
-    <ProjectReference Include="..\Utg.LegalService.Dal\Utg.LegalService.Dal.csproj" />
-    <ProjectReference Include="..\Utg.LegalService.Jobs\Utg.LegalService.Jobs.csproj" />
+    <PackageReference Include="Utg.Common.Packages.Queue" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +34,12 @@
       <Link>ReportTemplates\%(RecursiveDir)/%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Utg.LegalService.BL\Utg.LegalService.BL.csproj" />
+    <ProjectReference Include="..\Utg.LegalService.Dal\Utg.LegalService.Dal.csproj" />
+    <ProjectReference Include="..\Utg.LegalService.Jobs\Utg.LegalService.Jobs.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Utg.Common.EF.Repositories.Implementations;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Repositories;
@@ -9,7 +8,7 @@ using Utg.LegalService.Dal.SqlContext;
 namespace Utg.LegalService.Dal.Repositories
 {
     public class TaskCommentRepository 
-        : BaseRepositoryAdvanced<TaskComment>, ITaskCommentRepository
+        : BaseRepositoryAdvanced<UtgContext, TaskComment>, ITaskCommentRepository
     {
         private readonly UtgContext _context;
 

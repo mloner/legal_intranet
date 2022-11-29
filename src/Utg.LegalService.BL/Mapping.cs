@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Mapster;
 using Utg.Common.Extensions.Helpers;
-using Utg.Common.Models.PagedRequest;
+using Utg.Common.Models.PaginationRequest;
 using Utg.Common.Packages.Domain.Helpers;
 using Utg.LegalService.BL.Features.SubTask.Create;
 using Utg.LegalService.BL.Features.Task.GetPage;
-using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Client.Task;

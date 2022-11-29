@@ -1,27 +1,27 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using Mapster;
+﻿using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using Utg.Common.Extensions;
 using Utg.Common.Models;
-using Utg.LegalService.Common.Models.Client.Task;
-using Utg.LegalService.Dal;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.Attachments.GetInfo;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Enum;
+using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Repositories;
+using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL.Features.Task.GetPage;
 
 public class GetTaskPageCommandHandler 
-    : IRequestHandler<GetTaskPageCommand, PagedResult<TaskModel>>
+    : IRequestHandler<GetTaskPageCommand, PaginationResult<TaskModel>>
 {
     private readonly ILogger<GetTaskPageCommandHandler> _logger;
     private readonly UnitOfWork _uow;
@@ -40,7 +40,7 @@ public class GetTaskPageCommandHandler
         _agregateRepository = agregateRepository;
     }
 
-    public async System.Threading.Tasks.Task<PagedResult<TaskModel>> Handle(
+    public async System.Threading.Tasks.Task<PaginationResult<TaskModel>> Handle(
         GetTaskPageCommand command,
         CancellationToken cancellationToken)
     {
@@ -56,7 +56,7 @@ public class GetTaskPageCommandHandler
                 cancellationToken: cancellationToken,
                 x => x.TaskAttachments);
 
-            var taskModels = tasks.Adapt<PagedResult<TaskModel>>();
+            var taskModels = tasks.Adapt<PaginationResult<TaskModel>>();
             
             var getAttUrlResp = 
                 await _mediator.Send(new GetAttachmentsInfoCommand()
@@ -65,7 +65,7 @@ public class GetTaskPageCommandHandler
                 }, cancellationToken);
             if (!getAttUrlResp.Success)
             {
-                return PagedResult<TaskModel>.Failed(getAttUrlResp);
+                return PaginationResult<TaskModel>.Failed(getAttUrlResp);
             }
             taskModels.Data = getAttUrlResp.Data;
 
@@ -80,7 +80,7 @@ public class GetTaskPageCommandHandler
                     }, cancellationToken);
                 if (!getTaskAccRightsComResp.Success)
                 {
-                    return PagedResult<TaskModel>.Failed(getTaskAccRightsComResp);
+                    return PaginationResult<TaskModel>.Failed(getTaskAccRightsComResp);
                 }
 
                 taskModel.AccessRights = getTaskAccRightsComResp.Data;
@@ -96,7 +96,7 @@ public class GetTaskPageCommandHandler
             var failMsg = "Failed to get tasks.";
             _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
             
-            return PagedResult<TaskModel>.Internal(failMsg);
+            return PaginationResult<TaskModel>.Internal(failMsg);
         }
     }
 
