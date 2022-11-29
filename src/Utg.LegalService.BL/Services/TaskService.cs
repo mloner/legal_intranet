@@ -700,6 +700,10 @@ namespace Utg.LegalService.BL.Services
 
         public async Task<Stream> GetReport(GetTaskPageReportRequest request, AuthInfo authInfo)
         {
+            var offset = request.TimeZoneOffsetMinutes.HasValue 
+                ? new TimeSpan(0, request.TimeZoneOffsetMinutes.Value, 0) 
+                : TimeSpan.Zero;
+
             var data = await GetAll(new GetTaskPageRequest()
             {
                 Statuses = request.Statuses,
@@ -710,13 +714,13 @@ namespace Utg.LegalService.BL.Services
             {
                 RowNumber = x.Id,
                 ParentTaskId = x.ParentTaskId,
-                CreationDate = x.CreationDateTime,
+                CreationDate = x.CreationDateTime.Add(offset),
                 AuthorFullName = x.AuthorFullName,
                 PerformerFullName = x.PerformerFullName,
                 TaskType = x.TypeName,
                 Status = x.StatusName,
-                Deadline = x.DeadlineDateTime,
-                LastChangeDateTime = x.LastChangeDateTime
+                Deadline = x.DeadlineDateTime?.Add(offset),
+                LastChangeDateTime = x.LastChangeDateTime.Add(offset)
             });
 
             var reportStream = excelReportBuilder.BuildNewReport(builder =>
