@@ -6,11 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
 using Utg.Common.Packages.Domain.Enums;
-using Utg.LegalService.BL.Features.Task.Get;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Enum;
 using Utg.LegalService.Common.Models.Client.Task;
-using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL.Features.AccessRights.Get;
 
@@ -39,7 +37,8 @@ public class GetTaskAccessRightsCommandHandler
                 CanDelete = CanDelete(command.Task, command.AuthInfo),
                 CanMakeReport = CanMakeReport(command.Task, command.AuthInfo),
                 CanPerform = CanPerform(command.Task, command.AuthInfo),
-                CanReview = CanReview(command.Task, command.AuthInfo)
+                CanReview = CanReview(command.Task, command.AuthInfo),
+                CanSelfAssignTask = CanSelfAssignTask(command.Task, command.AuthInfo) 
             };
 
             return Result<TaskAccessRights>.Ok(ar);
@@ -52,7 +51,12 @@ public class GetTaskAccessRightsCommandHandler
             return Result<TaskAccessRights>.Internal(failMsg);
         }
     }
-    
+
+    private static bool CanSelfAssignTask(TaskModel task, AuthInfo authInfo)
+// если я - исполнитель И  у задачи нет исполнителя и она из тех трёх типов, исполнителя по которым назначаем сами
+        => authInfo.Roles.Contains((int)Role.LegalPerformer) 
+                && !task.PerformerUserProfileId.HasValue && StaticData.TypesToSelfAssign.Contains(task.Type);
+
     private static bool IsPerformerAvailable(AuthInfo authInfo)
     {
         return authInfo.Roles.Contains((int)Role.LegalHead);

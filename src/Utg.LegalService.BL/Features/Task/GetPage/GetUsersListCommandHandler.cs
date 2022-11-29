@@ -20,7 +20,7 @@ using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL.Features.Task.GetPage;
 
-public class GetTaskPageCommandHandler 
+public class GetTaskPageCommandHandler
     : IRequestHandler<GetTaskPageCommand, PaginationResult<TaskModel>>
 {
     private readonly ILogger<GetTaskPageCommandHandler> _logger;
@@ -30,7 +30,7 @@ public class GetTaskPageCommandHandler
 
     public GetTaskPageCommandHandler(
         ILogger<GetTaskPageCommandHandler> logger,
-        UnitOfWork uow, 
+        UnitOfWork uow,
         IMediator mediator,
         IAgregateRepository agregateRepository)
     {
@@ -57,8 +57,8 @@ public class GetTaskPageCommandHandler
                 x => x.TaskAttachments);
 
             var taskModels = tasks.Adapt<PaginationResult<TaskModel>>();
-            
-            var getAttUrlResp = 
+
+            var getAttUrlResp =
                 await _mediator.Send(new GetAttachmentsInfoCommand()
                 {
                     TaskModels = taskModels.Data
@@ -72,7 +72,7 @@ public class GetTaskPageCommandHandler
             var resultTaskModelsData = Enumerable.Empty<TaskModel>();
             foreach (var taskModel in taskModels.Data)
             {
-                var getTaskAccRightsComResp = 
+                var getTaskAccRightsComResp =
                     await _mediator.Send(new GetTaskAccessRightsCommand()
                     {
                         Task = taskModel,
@@ -88,14 +88,14 @@ public class GetTaskPageCommandHandler
             }
 
             taskModels.Data = resultTaskModelsData;
-            
+
             return taskModels;
         }
         catch (Exception e)
         {
             var failMsg = "Failed to get tasks.";
             _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
-            
+
             return PaginationResult<TaskModel>.Internal(failMsg);
         }
     }
@@ -111,24 +111,20 @@ public class GetTaskPageCommandHandler
         predicate = predicate.And(FilterByRoles(command.AuthInfo));
         predicate = predicate.And(Filter(filter));
         predicate = predicate.And(Search(filter));
-        
+
         return predicate;
     }
-    
+
     private static Expression<Func<Common.Models.Domain.Task, bool>> FilterByRoles(
         AuthInfo authInfo)
     {
-        Expression<Func<Common.Models.Domain.Task, bool>> predicate = q => true;
-        
-        if (authInfo.Roles.Contains((int)Role.IntranetUser))
-        {
-            predicate = model => model.AuthorUserProfileId == authInfo.UserProfileId;
-        }
+        Expression<Func<Common.Models.Domain.Task, bool>> predicate = model => model.AuthorUserProfileId == authInfo.UserProfileId;
+     
 
         if (authInfo.Roles.Contains((int)Role.LegalPerformer))
         {
-            predicate = 
-                predicate.Or(x => x.PerformerUserProfileId == authInfo.UserProfileId);
+            predicate = predicate.Or(
+                    model => model.PerformerUserProfileId == authInfo.UserProfileId || model.AuthorUserProfileId == authInfo.UserProfileId || (!model.PerformerUserProfileId.HasValue && StaticData.TypesToSelfAssign.Contains(model.Type)));
         }
 
         predicate = predicate.And(x =>
@@ -142,10 +138,10 @@ public class GetTaskPageCommandHandler
         GetTaskPageCommandFilter? filter)
     {
         Expression<Func<Common.Models.Domain.Task, bool>> predicate = q => true;
-        
+
         if (filter.Statuses?.Any() == true)
         {
-            predicate = predicate.And(x => filter.Statuses.Contains((int) x.Status));
+            predicate = predicate.And(x => filter.Statuses.Contains((int)x.Status));
         }
         else
         {
@@ -154,7 +150,7 @@ public class GetTaskPageCommandHandler
 
         if (filter.AuthorUserProfileIds?.Any() == true)
         {
-            predicate = 
+            predicate =
                 predicate.And(x => filter.AuthorUserProfileIds.Contains(x.AuthorUserProfileId));
         }
 
@@ -165,7 +161,7 @@ public class GetTaskPageCommandHandler
         GetTaskPageCommandFilter? filter)
     {
         Expression<Func<Common.Models.Domain.Task, bool>> predicate = q => true;
-        
+
         if (!string.IsNullOrEmpty(filter.Search))
         {
             var ftsQuery = Util.GetFullTextSearchQuery(filter.Search);
@@ -177,11 +173,11 @@ public class GetTaskPageCommandHandler
                     || EF.Functions.ToTsVector(Const.PgFtsConfig, x.FullName)
                         .Matches(EF.Functions.PlainToTsQuery(Const.PgFtsConfig, ftsQuery)))
                 .Select(x => x.UserProfileId);
-            
+
             predicate = predicate.And(x
-                => userProfileIds.Contains(x.AuthorUserProfileId) 
-                   || 
-                   EF.Functions.ILike(x.Description, ilikeQuery) 
+                => userProfileIds.Contains(x.AuthorUserProfileId)
+                   ||
+                   EF.Functions.ILike(x.Description, ilikeQuery)
                    || EF.Functions.ToTsVector(Const.PgFtsConfig, x.Description)
                        .Matches(EF.Functions.PlainToTsQuery(Const.PgFtsConfig, ftsQuery)));
         }

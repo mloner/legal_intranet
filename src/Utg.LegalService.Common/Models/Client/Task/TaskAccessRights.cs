@@ -9,5 +9,6 @@
         public bool CanMakeReport { get; set; }
         public bool CanPerform { get; set; }
         public bool CanReview { get; set; }
+        public bool CanSelfAssignTask { get; set; }
     }
 }
