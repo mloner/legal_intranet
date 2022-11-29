@@ -118,8 +118,11 @@ public class GetTaskPageCommandHandler
     private static Expression<Func<Common.Models.Domain.Task, bool>> FilterByRoles(
         AuthInfo authInfo)
     {
-        Expression<Func<Common.Models.Domain.Task, bool>> predicate = model => model.AuthorUserProfileId == authInfo.UserProfileId;
-     
+        Expression<Func<Common.Models.Domain.Task, bool>> predicate = q => true;
+
+        if (!authInfo.Roles.Contains((int)Role.LegalHead)) {
+            predicate = model => model.AuthorUserProfileId == authInfo.UserProfileId;
+        }
 
         if (authInfo.Roles.Contains((int)Role.LegalPerformer))
         {
