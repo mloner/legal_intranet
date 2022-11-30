@@ -29,6 +29,7 @@ using Utg.LegalService.Jobs.UpdateJobs.UpdatePositionHostedService;
 using Utg.LegalService.Jobs.UpdateJobs.UpdateUserProfileHostedService;
 using Utg.LegalService.Jobs;
 using Utg.LegalService.Jobs.NotifyExpiredSoonTasksJob;
+using Utg.Common.Packages.Domain.Filters;
 
 namespace Utg.LegalService.API
 {

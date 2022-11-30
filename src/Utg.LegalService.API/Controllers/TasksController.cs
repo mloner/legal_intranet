@@ -91,7 +91,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpPatch]
         public async Task<ActionResult<TaskModel>> Update([FromForm] TaskUpdateRequest request)
         {
-            if (!await CanGo(Role.LegalHead, Role.IntranetUser))
+            if (!await CanGo(Role.LegalHead, Role.IntranetUser, Role.LegalPerformer))
             {
                 return Forbid();
             }
