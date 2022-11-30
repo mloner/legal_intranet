@@ -151,7 +151,8 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.DateTime, opt => opt.Ignore())
                 .ForMember(dest => dest.Text, opt => opt.MapFrom(x => x.Text))
                 .ForMember(dest => dest.Task, opt => opt.Ignore())
-                .ForAllMembers(x => x.Ignore())
+                .ForMember(dest => dest.Created, src => src.Ignore())
+                .ForMember(dest => dest.Updated, src => src.Ignore())
                 ;
             
             #region agregates
