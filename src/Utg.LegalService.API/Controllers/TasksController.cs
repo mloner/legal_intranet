@@ -144,7 +144,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpPatch("done")]
         public async Task<ActionResult<TaskModel>> UpdateMoveToDone([FromForm] TaskUpdateMoveToDoneRequest request)
         {
-            if (!await CanGo(Role.LegalHead))
+            if (!await CanGo(Role.LegalHead, Role.LegalPerformer))
             {
                 return Forbid();
             }
