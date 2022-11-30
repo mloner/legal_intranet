@@ -34,7 +34,6 @@ namespace Utg.LegalService.API
 {
     public class Startup
     {
-
         private readonly IConfiguration configuration;
         private readonly ILogger<Startup> _logger;
         private readonly string _corsPolicy = "corsPolicy";
