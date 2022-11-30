@@ -8,6 +8,6 @@ namespace Utg.LegalService.Common.Models.Request.Tasks
         public int Id { get; set; }
         public TaskStatus Status { get; set; }
         public int PerformerUserProfileId { get; set; }
-        public DateTime DeadlineDateTime { get; set; }
+        public DateTime? DeadlineDateTime { get; set; }
     }
 }

@@ -467,7 +467,7 @@ namespace Utg.LegalService.BL.Services
                 Status = TaskStatus.InWork,
                 PerformerUserProfileId = request.PerformerUserProfileId,
                 PerformerFullName = performer?.FullName,
-                DeadlineDateTime = DateTime.SpecifyKind(request.DeadlineDateTime, DateTimeKind.Utc),
+                DeadlineDateTime = request.DeadlineDateTime.HasValue? DateTime.SpecifyKind(request.DeadlineDateTime.Value, DateTimeKind.Utc) : null,
                 LastChangeDateTime = DateTime.SpecifyKind(DateTimeOffset.UtcNow.DateTime,
                             DateTimeKind.Utc)
             };
