@@ -38,7 +38,7 @@ public class GetTaskAccessRightsCommandHandler
                 CanMakeReport = CanMakeReport(command.Task, command.AuthInfo),
                 CanPerform = CanPerform(command.Task, command.AuthInfo),
                 CanReview = CanReview(command.Task, command.AuthInfo),
-                CanSelfAssignTask = CanSelfAssignTask(command.Task, command.AuthInfo)
+                IsSelfAssignTask = IsSelfAssignTask(command.Task, command.AuthInfo)
             };
 
             return Result<TaskAccessRights>.Ok(ar);
@@ -52,7 +52,7 @@ public class GetTaskAccessRightsCommandHandler
         }
     }
 
-    private static bool CanSelfAssignTask(TaskModel task, AuthInfo authInfo)
+    private static bool IsSelfAssignTask(TaskModel task, AuthInfo authInfo)
         // если я - исполнитель И она из тех трёх типов, исполнителя по которым назначаем сами
         => authInfo.Roles.Contains((int)Role.LegalPerformer)
                && StaticData.TypesToSelfAssign.Contains(task.Type);
