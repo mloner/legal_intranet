@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.BL.Features.Agregates.Delete;
 using Utg.LegalService.BL.Features.Agregates.Fill;
-using Utg.LegalService.Common.Services;
 
 namespace Utg.LegalService.API.Controllers
 {

@@ -120,7 +120,7 @@ namespace Utg.LegalService.API.Controllers
         [HttpPatch("inwork")]
         public async Task<ActionResult<TaskModel>> UpdateMoveToInWork([FromForm] TaskUpdateMoveToInWorkRequest request)
         {
-            if (!await CanGo(Role.LegalHead))
+            if (!await CanGo(Role.LegalHead, Role.LegalPerformer))
             {
                 return Forbid();
             }
