@@ -53,9 +53,9 @@ public class GetTaskAccessRightsCommandHandler
     }
 
     private static bool CanSelfAssignTask(TaskModel task, AuthInfo authInfo)
-        // если я - исполнитель И  у задачи нет исполнителя и она из тех трёх типов, исполнителя по которым назначаем сами
+        // если я - исполнитель И она из тех трёх типов, исполнителя по которым назначаем сами
         => authInfo.Roles.Contains((int)Role.LegalPerformer)
-                && !task.PerformerUserProfileId.HasValue && StaticData.TypesToSelfAssign.Contains(task.Type);
+               && StaticData.TypesToSelfAssign.Contains(task.Type);
 
     private static bool IsPerformerAvailable(AuthInfo authInfo)
     {
