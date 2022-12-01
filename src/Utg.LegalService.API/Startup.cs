@@ -183,7 +183,7 @@ namespace Utg.LegalService.API
             string queueName = "default")
             where T : BaseJob
         {
-            var timetable = configuration[$"Jobs:{nameof(T)}:Timetable"];
+            var timetable = configuration[$"Jobs:{typeof(T).Name}:Timetable"];
             if (!string.IsNullOrWhiteSpace(timetable))
             {
                 RecurringJob.AddOrUpdate<T>(nameof(T), x => x.Start(), timetable, queue: queueName);
