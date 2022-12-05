@@ -72,7 +72,9 @@ public class GetTaskAccessRightsCommandHandler
     private static bool CanEdit(TaskModel model, AuthInfo authInfo)
         => (authInfo.Roles.Contains((int)Role.IntranetUser)
            && model.Status == TaskStatus.Draft && model.AuthorUserProfileId == authInfo.UserProfileId) 
-            || authInfo.Roles.Contains((int)Role.LegalHead) && model.Status == TaskStatus.New;
+            || authInfo.Roles.Contains((int)Role.LegalHead) && model.Status == TaskStatus.New 
+            || authInfo.Roles.Contains((int)Role.LegalPerformer) 
+                && model.Status == TaskStatus.New && StaticData.TypesToSelfAssign.Contains(model.Type);
 
     private static bool CanDelete(TaskModel model, AuthInfo authInfo)
     {
