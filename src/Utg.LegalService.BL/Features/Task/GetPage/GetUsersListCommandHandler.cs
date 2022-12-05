@@ -10,6 +10,7 @@ using Utg.Common.Extensions;
 using Utg.Common.Models;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Enums;
+using Utg.Common.Packages.Domain.Helpers;
 using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.Attachments.GetInfo;
 using Utg.LegalService.Common.Models.Client;
@@ -169,6 +170,13 @@ public class GetTaskPageCommandHandler
         {
             var ftsQuery = Util.GetFullTextSearchQuery(filter.Search);
             var ilikeQuery = $"%{filter.Search}%";
+            var searchNormalized = Util.Normalize(filter.Search);
+            var taskTypesNormalized = EnumExtensions.GetEnumValuesWithoutDefault<TaskType>()
+                .Select(x =>
+                {
+                    x.Text = Util.Normalize(x.Text);
+                    return x;
+                });
 
             var userProfileIds = _agregateRepository.Get()
                 .Where(x =>
@@ -177,8 +185,17 @@ public class GetTaskPageCommandHandler
                         .Matches(EF.Functions.PlainToTsQuery(Const.PgFtsConfig, ftsQuery)))
                 .Select(x => x.UserProfileId);
 
+            var neededTaskTypes = taskTypesNormalized
+                .Where(x => x.Text.Contains(searchNormalized))
+                .Select(x => (TaskType)x.Id);
+
             predicate = predicate.And(x
                 => userProfileIds.Contains(x.AuthorUserProfileId)
+                   || 
+                   x.PerformerUserProfileId.HasValue && 
+                   userProfileIds.Contains(x.PerformerUserProfileId.Value)
+                    ||
+                   neededTaskTypes.Contains(x.Type)
                    ||
                    EF.Functions.ILike(x.Description, ilikeQuery)
                    || EF.Functions.ToTsVector(Const.PgFtsConfig, x.Description)
