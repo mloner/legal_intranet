@@ -100,17 +100,17 @@ public class GetTaskCommandHandler
         };
         var getAgregatesCommandResponse = await _mediator.Send(getAgregatesCommand, cancellationToken);
         var userProfiles = getAgregatesCommandResponse.Data;
-        var models = comments.Select(x => x.Adapt<TaskCommentModel>());
-        
-        foreach (var model in models)
-        {
-            var userProfile = 
-                userProfiles.FirstOrDefault(x => x.UserProfileId == model.UserProfileId);
-            if (userProfile != null)
+        var models = comments.Select(x => x.Adapt<TaskCommentModel>())
+            .Select(model =>
             {
-                model.UserProfileFullName = userProfile.FullName;
-            }
-        }
+                var userProfile =
+                    userProfiles.FirstOrDefault(x => x.UserProfileId == model.UserProfileId);
+                if (userProfile != null)
+                {
+                    model.UserProfileFullName = userProfile.FullName;
+                }
+                return model;
+            });
 
         return models;
     }
