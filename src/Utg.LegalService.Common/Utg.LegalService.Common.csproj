@@ -10,13 +10,13 @@
     <PackageReference Include="AutoMapper" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Utg.Common.EF" Version="2.0.1" />
-    <PackageReference Include="Utg.Common.Extensions" Version="2.0.1" />
-    <PackageReference Include="Utg.Common.Models" Version="2.0.1" />
-    <PackageReference Include="Utg.Common.Packages.Domain" Version="2.0.1" />
-    <PackageReference Include="Utg.Common.Packages.ExcelReportBuilder" Version="2.0.1" />
-    <PackageReference Include="Utg.Common.Packages.Queue" Version="2.0.1" />
-    <PackageReference Include="Utg.Common.Packages.ServiceClientProxy" Version="2.0.1" />
+    <PackageReference Include="Utg.Common.EF" Version="2.0.5-utg2297q.0.1" />
+    <PackageReference Include="Utg.Common.Extensions" Version="2.0.5-utg2297q.0.1" />
+    <PackageReference Include="Utg.Common.Models" Version="2.0.5-utg2297q.0.1" />
+    <PackageReference Include="Utg.Common.Packages.Domain" Version="2.0.5-utg2297q.0.1" />
+    <PackageReference Include="Utg.Common.Packages.ExcelReportBuilder" Version="2.0.3" />
+    <PackageReference Include="Utg.Common.Packages.Queue" Version="2.0.3" />
+    <PackageReference Include="Utg.Common.Packages.ServiceClientProxy" Version="2.0.3" />
   </ItemGroup>
 
 </Project>
