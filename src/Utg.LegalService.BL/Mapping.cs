@@ -37,12 +37,13 @@ public class Mapping : IRegister
         config.NewConfig<GetTaskPageRequest, GetTaskPageCommand>()
             .AfterMapping((request, command) =>
             {
-                PageCalculateHelper.PageIndexAndSize(request, command);
+                command.Skip = request.Skip;
+                command.Take = request.Take;
                 command.Filter = new GetTaskPageCommandFilter()
                 {
                     Search = request.Search,
                     Statuses = request.Statuses,
-                    AuthorUserProfileIds = request.AuthorUserProfileIds
+                    AuthorUserProfileIds = request.AuthorUserProfileIds,
                 };
                 if (!string.IsNullOrEmpty(request.SortBy))
                 {

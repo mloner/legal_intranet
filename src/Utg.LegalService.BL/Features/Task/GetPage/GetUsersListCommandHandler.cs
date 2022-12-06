@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -48,13 +49,17 @@ public class GetTaskPageCommandHandler
         try
         {
             var predicate = GetPredicate(command.Filter, command);
+            
 
-            command.ListSort.Add(new SortDescriptor(nameof(Common.Models.Domain.Task.CreationDateTime), EnumSortDirection.Desc));
             var tasks = await _uow.TaskItems.GetPagedAsync(
                 predicate: predicate,
-                sortingDescriptors: command.ListSort,
-                pageSize: command.PageSize,
-                pageIndex: command.PageIndex,
+                orderByProperties: new List<OrderByPropertyDescriptor<Common.Models.Domain.Task>>()
+                {
+                    new OrderByPropertyDescriptor<Common.Models.Domain.Task>(task => task.CreationDateTime, 
+                        EnumSortDirection.Desc)
+                },
+                take: command.Take,
+                skip: command.Skip,
                 cancellationToken: cancellationToken,
                 x => x.TaskAttachments);
 
@@ -90,7 +95,7 @@ public class GetTaskPageCommandHandler
             }
 
             taskModels.Data = resultTaskModelsData;
-
+            
             return taskModels;
         }
         catch (Exception e)

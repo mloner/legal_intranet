@@ -7,7 +7,9 @@ using Utg.LegalService.Common.Models.Client.Task;
 namespace Utg.LegalService.BL.Features.Task.GetPage;
 
 public class GetTaskPageCommand 
-    : PageContext<GetTaskPageCommandFilter>, IRequest<PaginationResult<TaskModel>>
+    : PaginationContext<GetTaskPageCommandFilter>, IRequest<PaginationResult<TaskModel>>
 {
     public AuthInfo AuthInfo { get; set; }
+    public int? Skip { get; set; }
+    public int? Take { get; set; }
 }
