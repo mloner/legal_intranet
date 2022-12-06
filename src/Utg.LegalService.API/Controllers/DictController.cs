@@ -57,7 +57,8 @@ namespace Utg.LegalService.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<UserProfileApiModel>>> PerformerUserProfiles()
         {
-            var result = await taskService.GetPerformerUserProfiles();
+            var authInfo = await GetAuthInfo();
+            var result = await taskService.GetPerformerUserProfiles(authInfo);
             return Ok(result);
         }
     }

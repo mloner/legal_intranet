@@ -31,14 +31,13 @@ public class GetTaskAccessRightsCommandHandler
         {
             var ar = new TaskAccessRights
             {
-                IsPerformerAvailable = IsPerformerAvailable(command.AuthInfo),
                 CanShowDetails = CanShowDetails(command.Task, command.AuthInfo),
                 CanEdit = CanEdit(command.Task, command.AuthInfo),
                 CanDelete = CanDelete(command.Task, command.AuthInfo),
                 CanMakeReport = CanMakeReport(command.Task, command.AuthInfo),
                 CanPerform = CanPerform(command.Task, command.AuthInfo),
                 CanReview = CanReview(command.Task, command.AuthInfo),
-                IsSelfAssignTask = IsSelfAssignTask(command.Task, command.AuthInfo)
+                HasShortCycle = HasShortCycle(command.Task)
             };
 
             return Result<TaskAccessRights>.Ok(ar);
@@ -52,28 +51,22 @@ public class GetTaskAccessRightsCommandHandler
         }
     }
 
-    private static bool IsSelfAssignTask(TaskModel task, AuthInfo authInfo)
-        // если я - исполнитель И она из тех трёх типов, исполнителя по которым назначаем сами
-        => authInfo.Roles.Contains((int)Role.LegalPerformer)
-               && StaticData.TypesToSelfAssign.Contains(task.Type);
+    private static bool HasShortCycle(TaskModel task)
+            => StaticData.TypesToSelfAssign.Contains(task.Type) || task.ParentTaskId.HasValue;
 
-    private static bool IsPerformerAvailable(AuthInfo authInfo)
-    {
-        return authInfo.Roles.Contains((int)Role.LegalHead);
-    }
-
+   
     private static bool CanShowDetails(TaskModel model, AuthInfo authInfo)
     {
         return new int[] { (int)Role.LegalHead, (int)Role.LegalPerformer }
             .Intersect(authInfo.Roles)
             .Any() || authInfo.UserProfileId == model.AuthorUserProfileId;
     }
-    
+
     private static bool CanEdit(TaskModel model, AuthInfo authInfo)
         => (authInfo.Roles.Contains((int)Role.IntranetUser)
-           && model.Status == TaskStatus.Draft && model.AuthorUserProfileId == authInfo.UserProfileId) 
-            || authInfo.Roles.Contains((int)Role.LegalHead) && model.Status == TaskStatus.New 
-            || authInfo.Roles.Contains((int)Role.LegalPerformer) 
+           && model.Status == TaskStatus.Draft && model.AuthorUserProfileId == authInfo.UserProfileId)
+            || authInfo.Roles.Contains((int)Role.LegalHead) && model.Status == TaskStatus.New
+            || authInfo.Roles.Contains((int)Role.LegalPerformer)
                 && model.Status == TaskStatus.New && StaticData.TypesToSelfAssign.Contains(model.Type);
 
     private static bool CanDelete(TaskModel model, AuthInfo authInfo)
@@ -91,7 +84,7 @@ public class GetTaskAccessRightsCommandHandler
         => authInfo.Roles.Contains((int)Role.LegalPerformer) &&
            model.Status == TaskStatus.InWork &&
            model.PerformerUserProfileId == authInfo.UserProfileId;
-    
+
     private static bool CanReview(TaskModel model, AuthInfo authInfo)
         => authInfo.Roles.Contains((int)Role.LegalHead) &&
            model.Status == TaskStatus.UnderReview;

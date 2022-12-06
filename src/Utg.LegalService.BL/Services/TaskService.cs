@@ -184,26 +184,24 @@ namespace Utg.LegalService.BL.Services
             var result = new TaskAccessRights();
             if (authInfo != null)
             {
-                result.IsPerformerAvailable = IsPerformerAvailable(authInfo);
                 result.CanShowDetails = CanShowDetails(authInfo);
                 result.CanEdit = CanEdit(model, authInfo);
                 result.CanDelete = CanDelete(model, authInfo);
                 result.CanMakeReport = CanMakeReport(model, authInfo);
                 result.CanPerform = CanPerform(model, authInfo);
                 result.CanReview = CanReview(model, authInfo);
+                result.HasShortCycle = HasShortCycle(model);
             }
 
             return result;
         }
 
+        private static bool HasShortCycle(TaskModel task)
+             => StaticData.TypesToSelfAssign.Contains(task.Type) || task.ParentTaskId.HasValue;
+
         private static bool CanReview(TaskModel model, AuthInfo authInfo)
          => authInfo.Roles.Contains((int)Role.LegalHead) &&
                     model.Status == TaskStatus.UnderReview;
-
-        private static bool IsPerformerAvailable(AuthInfo authInfo)
-        {
-            return authInfo.Roles.Contains((int)Role.LegalHead);
-        }
 
         private static bool CanShowDetails(AuthInfo authInfo)
         {
@@ -211,6 +209,7 @@ namespace Utg.LegalService.BL.Services
                     .Intersect(authInfo.Roles)
                     .Any();
         }
+
         private static bool CanEdit(TaskModel model, AuthInfo authInfo)
            => authInfo.Roles.Contains((int)Role.IntranetUser)
                 && model.Status == TaskStatus.Draft ||
@@ -630,10 +629,12 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
-        public async Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles()
+        public async Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles(AuthInfo authInfo)
         {
-            var result = dataProxyClient.UserProfilesRoleAsync((int)Role.LegalPerformer);
-            return result.Result;
+            var result = await dataProxyClient.UserProfilesRoleAsync((int)Role.LegalPerformer);
+            if (!authInfo.Roles.Contains((int)Role.LegalHead))
+                result = result.Where(userProfile => userProfile.Id == authInfo.UserProfileId);
+            return result;
         }
 
         public async Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo)

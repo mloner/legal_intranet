@@ -24,7 +24,7 @@ namespace Utg.LegalService.Common.Services
         Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToDone(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo);
-        Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles();
+        Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles(AuthInfo authInfo);
         Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo);
         Task<TaskAttachmentModel> DownloadFile(int attachmentId);
         Task DeleteFile(int attachmentId);
