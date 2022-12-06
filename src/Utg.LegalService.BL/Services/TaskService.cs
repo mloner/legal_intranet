@@ -637,6 +637,12 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
+        public async Task<UserProfileApiModel> GetUserProfileById(int id)        
+        {
+            var result = await usersProxyClient.GetByIdsAsync(new List<string> { id.ToString()});
+            return result?.FirstOrDefault();
+        }
+
         public async Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo)
         {
             var attachments = Enumerable.Empty<TaskAttachmentModel>();

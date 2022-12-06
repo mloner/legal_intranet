@@ -28,5 +28,6 @@ namespace Utg.LegalService.Common.Services
         Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo);
         Task<TaskAttachmentModel> DownloadFile(int attachmentId);
         Task DeleteFile(int attachmentId);
+        Task<UserProfileApiModel> GetUserProfileById(int id);
     }
 }

@@ -61,5 +61,13 @@ namespace Utg.LegalService.API.Controllers
             var result = await taskService.GetPerformerUserProfiles(authInfo);
             return Ok(result);
         }
+
+        [HttpGet("performerUserProfiles/{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<UserProfileApiModel>>> PerformerUserProfileById(int id)
+        {
+            var result = await taskService.GetUserProfileById(id);
+            return Ok(result);
+        }
     }
 }
