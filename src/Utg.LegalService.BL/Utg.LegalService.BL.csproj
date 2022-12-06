@@ -18,9 +18,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Utg.Common.MediatR" Version="2.0.5-utg2297q.0.1" />
-    <PackageReference Include="Utg.Common.Packages.Domain" Version="2.0.5-utg2297q.0.1" />
-    <PackageReference Include="Utg.Common.Packages.FileStorage" Version="2.0.3" />
+    <PackageReference Include="Utg.Common.MediatR" Version="2.0.5" />
+    <PackageReference Include="Utg.Common.Packages.Domain" Version="2.0.5" />
+    <PackageReference Include="Utg.Common.Packages.FileStorage" Version="2.0.5" />
   </ItemGroup>
 
   <ItemGroup>
