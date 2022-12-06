@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using Utg.Common.Extensions;
 using Utg.Common.Models;
+using Utg.Common.Models.PaginationRequest;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.LegalService.BL.Features.AccessRights.Get;
@@ -48,6 +49,7 @@ public class GetTaskPageCommandHandler
         {
             var predicate = GetPredicate(command.Filter, command);
 
+            command.ListSort.Add(new SortDescriptor(nameof(Common.Models.Domain.Task.CreationDateTime), EnumSortDirection.Desc));
             var tasks = await _uow.TaskItems.GetPagedAsync(
                 predicate: predicate,
                 sortingDescriptors: command.ListSort,
@@ -119,16 +121,22 @@ public class GetTaskPageCommandHandler
         AuthInfo authInfo)
     {
         Expression<Func<Common.Models.Domain.Task, bool>> predicate = q => true;
-
-        if (!authInfo.Roles.Contains((int)Role.LegalHead)) {
+        
+        if (authInfo.Roles.Contains((int)Role.IntranetUser)) {
             predicate = model => model.AuthorUserProfileId == authInfo.UserProfileId;
         }
-
         if (authInfo.Roles.Contains((int)Role.LegalPerformer))
         {
-            predicate = predicate.Or(
-                    model => model.PerformerUserProfileId == authInfo.UserProfileId || model.AuthorUserProfileId == authInfo.UserProfileId || (!model.PerformerUserProfileId.HasValue && StaticData.TypesToSelfAssign.Contains(model.Type)));
+            predicate = model => model.PerformerUserProfileId == authInfo.UserProfileId 
+                         || model.AuthorUserProfileId == authInfo.UserProfileId 
+                         || (!model.PerformerUserProfileId.HasValue 
+                             && StaticData.TypesToSelfAssign.Contains(model.Type));
         }
+        if (authInfo.Roles.Contains((int)Role.LegalHead))
+        {
+            predicate = model => true;
+        }
+        
 
         predicate = predicate.And(x =>
             !(x.Status == TaskStatus.Draft &&
