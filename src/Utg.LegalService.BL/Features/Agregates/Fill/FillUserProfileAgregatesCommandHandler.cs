@@ -8,7 +8,6 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
-using Utg.LegalService.BL.Features.Agregates.Delete;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Dal;
 
@@ -39,7 +38,9 @@ public class FillUserProfileAgregatesCommandHandler
     {
         try
         {
-            var allUserProfiles = (await _dataProxyClient.AddressBookAsync()).Result;
+            var allUserProfiles = (await _dataProxyClient.AddressBookAsync(
+                includeExternal: true,
+                cancellationToken: cancellationToken)).Result;
             var allUserProfileIds = allUserProfiles.Select(x => x.Id);
             
             var existedUserProfileIds = _uow.AgregateItems
@@ -62,10 +63,10 @@ public class FillUserProfileAgregatesCommandHandler
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to add UserProfileAgregates. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
+            var failMsg = "Failed to add UserProfileAgregates.";
+            _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
             
-            return Result.Internal("Failed to add UserProfileAgregates.");
+            return Result.Internal(failMsg);
         }
     }
 }

@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
 using Utg.Common.Packages.Domain.Models.UpdateModels;
-using Utg.Common.Packages.ServiceClientProxy.Proxy;
-using Utg.LegalService.BL.Features.Agregates.Fill;
-using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL.Features.Agregates.UpdatePosition;
@@ -43,17 +36,17 @@ public class UpdateUserProfileAgregatePositionCommandHandler
                 {
                     upa.PositionName = data.Name;
                 }
-                await _uow.SaveChangesAsync();
+                await _uow.SaveChangesAsync(cancellationToken);
             }
             
             return Result.Ok();
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to update UserProfileAgregate positions. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
+            var failMsg = "Failed to update UserProfileAgregate positions.";
+            _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
             
-            return Result.Internal("Failed to update UserProfileAgregate positions.");
+            return Result.Internal(failMsg);
         }
     }
 }
