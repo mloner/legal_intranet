@@ -101,10 +101,10 @@ public class UpdateUserProfileAgregateCommandHandler
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to update UserProfileAgregates. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
+            var failMsg = "Failed to update UserProfileAgregates.";
+            _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
             
-            return Result.Internal("Failed to update UserProfileAgregates.");
+            return Result.Internal(failMsg);
         }
     }
 }

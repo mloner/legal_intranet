@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
 using Utg.Common.Packages.Domain.Models.UpdateModels;
@@ -44,10 +43,10 @@ public class UpdateUserProfileAgregateDepartmentCommandHandler
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to update UserProfileAgregate departments. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
+            var failMsg = "Failed to update UserProfileAgregate departments.";
+            _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
             
-            return Result.Internal("Failed to update UserProfileAgregate departments.");
+            return Result.Internal(failMsg);
         }
     }
 }
