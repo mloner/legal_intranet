@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqKit;
+using MediatR;
 using Newtonsoft.Json;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Helpers;
@@ -29,6 +30,8 @@ using Utg.LegalService.Common.Services;
 using NotificationTaskType = Utg.Common.Packages.Domain.Enums.NotificationTaskType;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
 using Utg.Common.Packages.Domain.Enums;
+using Utg.LegalService.BL.Features.TaskChangeHistory.Create;
+using Utg.LegalService.Common.Models.Client.Enum;
 
 namespace Utg.LegalService.BL.Services
 {
@@ -44,6 +47,7 @@ namespace Utg.LegalService.BL.Services
         private readonly IExcelReportBuilder excelReportBuilder;
         private readonly IDataProxyClient dataProxyClient;
         private readonly INotificationService _notificationService;
+        private readonly IMediator _mediator;
 
         public TaskService(
             ITaskRepository taskRepository,
@@ -55,7 +59,8 @@ namespace Utg.LegalService.BL.Services
             ITaskAttachmentRepository taskAttachmentRepository,
             ITaskCommentService taskCommentService,
             IAgregateRepository agregateRepository,
-            INotificationService notificationService)
+            INotificationService notificationService, 
+            IMediator mediator)
         {
             this.taskRepository = taskRepository;
             this.fileStorageService = fileStorageService;
@@ -67,6 +72,7 @@ namespace Utg.LegalService.BL.Services
             _taskCommentService = taskCommentService;
             _agregateRepository = agregateRepository;
             _notificationService = notificationService;
+            _mediator = mediator;
         }
 
         public async Task<PagedResult<TaskModel>> GetAll(GetTaskPageRequest request, AuthInfo authInfo)
@@ -297,6 +303,18 @@ namespace Utg.LegalService.BL.Services
                 var createdTaskEnriched = await GetById(createdTask.Id, authInfo);
 
                 await CreateTaskEmitEvents(createdTaskEnriched);
+                
+                var addHistoryComResp = 
+                    await _mediator.Send(new CreateTaskChangeHistoryCommand()
+                    {
+                        TaskId = createdTaskEnriched.Id,
+                        HistoryAction = HistoryAction.Created,
+                        UserProfileId = authInfo.UserProfileId
+                    });
+                if (!addHistoryComResp.Success)
+                {
+                    throw new Exception(addHistoryComResp.Message);
+                }
  
                 return createdTaskEnriched;
             }

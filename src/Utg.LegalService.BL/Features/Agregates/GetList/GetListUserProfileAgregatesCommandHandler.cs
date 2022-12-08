@@ -40,7 +40,7 @@ public class GetListUserProfileAgregatesCommandHandler
             var items = await _uow.AgregateItems
                 .GetQuery(x => command.UserProfileIds.Contains(x.UserProfileId), null)
                 .ProjectTo<UserProfileAgregateModel>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
             var existingUserProfileIds = items.Select(upa => upa.UserProfileId);
             var notExistingUserProfileIds = command.UserProfileIds.Except(existingUserProfileIds);
             if (notExistingUserProfileIds.Any())
