@@ -77,7 +77,7 @@ public class GetTaskCommandHandler
         }
         catch (Exception e)
         {
-            var failMsg = "Failed to get task.";
+            const string failMsg = "Failed to get task.";
             _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
             
             return Result<TaskModel>.Internal(failMsg);

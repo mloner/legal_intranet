@@ -5,10 +5,13 @@ using Utg.Common.Models.PaginationRequest;
 using Utg.Common.Packages.Domain.Helpers;
 using Utg.LegalService.BL.Features.SubTask.Create;
 using Utg.LegalService.BL.Features.Task.GetPage;
+using Utg.LegalService.BL.Features.TaskChangeHistory.GetPage;
 using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Client.Task;
+using Utg.LegalService.Common.Models.Client.TaskChangeHistory;
 using Utg.LegalService.Common.Models.Domain;
+using Utg.LegalService.Common.Models.Request.TaskChangeHistory;
 using Utg.LegalService.Common.Models.Request.Tasks;
 
 namespace Utg.LegalService.BL;
@@ -53,6 +56,20 @@ public class Mapping : IRegister
                             EnumExtensions.GetEnumValue<EnumSortDirection>(request.SortDirection))
                     };
                 }
+            })
+            .MaxDepth(2);
+        
+        config.NewConfig<TaskChangeHistory, TaskChangeHistoryModel>()
+            .MaxDepth(2);
+        
+        config.NewConfig<GetTaskChangeHistoryPageRequest, GetTaskChangeHistoryPageCommand>()
+            .AfterMapping((request, command) =>
+            {
+                PageCalculateHelper.PageIndexAndSize(request, command);
+                command.Filter = new GetTaskChangeHistoryPageCommandFilter()
+                {
+                    TaskId = request.TaskId
+                };
             })
             .MaxDepth(2);
     }

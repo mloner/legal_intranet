@@ -113,6 +113,39 @@ namespace Utg.LegalService.Dal.Migrations
                     b.ToTable("TaskAttachments", "public");
                 });
 
+            modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.TaskChangeHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("HistoryAction")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("TaskChangeHistories", "public");
+                });
+
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.TaskComment", b =>
                 {
                     b.Property<int>("Id")
@@ -226,6 +259,17 @@ namespace Utg.LegalService.Dal.Migrations
                 {
                     b.HasOne("Utg.LegalService.Common.Models.Domain.Task", "Task")
                         .WithMany("TaskAttachments")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.TaskChangeHistory", b =>
+                {
+                    b.HasOne("Utg.LegalService.Common.Models.Domain.Task", "Task")
+                        .WithMany()
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
