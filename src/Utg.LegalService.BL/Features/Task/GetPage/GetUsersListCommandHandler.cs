@@ -3,11 +3,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using Utg.Common.Extensions;
 using Utg.Common.Models;
+using Utg.Common.Models.PaginationRequest;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Helpers;
@@ -48,12 +50,17 @@ public class GetTaskPageCommandHandler
         try
         {
             var predicate = GetPredicate(command.Filter, command);
+            
 
             var tasks = await _uow.TaskItems.GetPagedAsync(
                 predicate: predicate,
-                sortingDescriptors: command.ListSort,
-                pageSize: command.PageSize,
-                pageIndex: command.PageIndex,
+                orderByProperties: new List<OrderByPropertyDescriptor<Common.Models.Domain.Task>>()
+                {
+                    new OrderByPropertyDescriptor<Common.Models.Domain.Task>(task => task.CreationDateTime, 
+                        EnumSortDirection.Desc)
+                },
+                take: command.Take,
+                skip: command.Skip,
                 cancellationToken: cancellationToken,
                 x => x.TaskAttachments);
 
@@ -89,7 +96,7 @@ public class GetTaskPageCommandHandler
             }
 
             taskModels.Data = resultTaskModelsData;
-
+            
             return taskModels;
         }
         catch (Exception e)
@@ -120,16 +127,22 @@ public class GetTaskPageCommandHandler
         AuthInfo authInfo)
     {
         Expression<Func<Common.Models.Domain.Task, bool>> predicate = q => true;
-
-        if (!authInfo.Roles.Contains((int)Role.LegalHead)) {
+        
+        if (authInfo.Roles.Contains((int)Role.IntranetUser)) {
             predicate = model => model.AuthorUserProfileId == authInfo.UserProfileId;
         }
-
         if (authInfo.Roles.Contains((int)Role.LegalPerformer))
         {
-            predicate = predicate.Or(
-                    model => model.PerformerUserProfileId == authInfo.UserProfileId || model.AuthorUserProfileId == authInfo.UserProfileId || (!model.PerformerUserProfileId.HasValue && StaticData.TypesToSelfAssign.Contains(model.Type)));
+            predicate = model => model.PerformerUserProfileId == authInfo.UserProfileId 
+                         || model.AuthorUserProfileId == authInfo.UserProfileId 
+                         || (!model.PerformerUserProfileId.HasValue 
+                             && StaticData.TypesToSelfAssign.Contains(model.Type));
         }
+        if (authInfo.Roles.Contains((int)Role.LegalHead))
+        {
+            predicate = model => true;
+        }
+        
 
         predicate = predicate.And(x =>
             !(x.Status == TaskStatus.Draft &&

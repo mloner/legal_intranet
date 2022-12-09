@@ -34,10 +34,10 @@ public class DeleteAllAgregatesCommandHandler : IRequestHandler<DeleteAllAgregat
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to remove UserProfileAgregates. {@Command}", command);
-            await _uow.RollbackTransactionAsync(cancellationToken);
+            var failMsg = "Failed to remove UserProfileAgregates.";
+            _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
             
-            return Result.Internal("Failed to remove UserProfileAgregates.");
+            return Result.Internal(failMsg);
         }
     }
 }

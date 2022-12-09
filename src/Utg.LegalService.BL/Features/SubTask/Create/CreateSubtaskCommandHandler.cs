@@ -10,7 +10,9 @@ using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.Attachments.Create;
 using Utg.LegalService.BL.Features.Attachments.Delete;
 using Utg.LegalService.BL.Features.SubTask.CreateEmitEvents;
+using Utg.LegalService.BL.Features.TaskChangeHistory.Create;
 using Utg.LegalService.Common.Models.Client.Attachment;
+using Utg.LegalService.Common.Models.Client.Enum;
 using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Dal;
 
@@ -107,6 +109,18 @@ public class CreateSubtaskCommandHandler
             if(!getTarsCommandResp.Success)
                 return Result<TaskModel>.Failed(getTarsCommandResp);
             taskModel.AccessRights = getTarsCommandResp.Data;
+            
+            var addHistoryComResp = 
+                await _mediator.Send(new CreateTaskChangeHistoryCommand()
+                {
+                    TaskId = task.Id,
+                    HistoryAction = HistoryAction.Created,
+                    UserProfileId = command.AuthInfo.UserProfileId
+                }, cancellationToken);
+            if (!addHistoryComResp.Success)
+            {
+                return Result<TaskModel>.Failed(addHistoryComResp);
+            }
             
             return Result<TaskModel>.Created(
                 resultTask.Adapt<TaskModel>());

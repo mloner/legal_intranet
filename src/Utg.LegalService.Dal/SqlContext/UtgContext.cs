@@ -14,6 +14,7 @@ namespace Utg.LegalService.Dal.SqlContext
         public DbSet<TaskAttachment> TaskAttachments { get; set; }
         public DbSet<TaskComment> TaskComments { get; set; }
         public DbSet<UserProfileAgregate> UserProfileAgregates { get; set; }
+        public DbSet<TaskChangeHistory> TaskChangeHistories { get; set; }
 
          protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

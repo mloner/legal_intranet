@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqKit;
+using MediatR;
 using Newtonsoft.Json;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Helpers;
@@ -29,6 +30,8 @@ using Utg.LegalService.Common.Services;
 using NotificationTaskType = Utg.Common.Packages.Domain.Enums.NotificationTaskType;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
 using Utg.Common.Packages.Domain.Enums;
+using Utg.LegalService.BL.Features.TaskChangeHistory.Create;
+using Utg.LegalService.Common.Models.Client.Enum;
 
 namespace Utg.LegalService.BL.Services
 {
@@ -44,6 +47,7 @@ namespace Utg.LegalService.BL.Services
         private readonly IExcelReportBuilder excelReportBuilder;
         private readonly IDataProxyClient dataProxyClient;
         private readonly INotificationService _notificationService;
+        private readonly IMediator _mediator;
 
         public TaskService(
             ITaskRepository taskRepository,
@@ -55,7 +59,8 @@ namespace Utg.LegalService.BL.Services
             ITaskAttachmentRepository taskAttachmentRepository,
             ITaskCommentService taskCommentService,
             IAgregateRepository agregateRepository,
-            INotificationService notificationService)
+            INotificationService notificationService, 
+            IMediator mediator)
         {
             this.taskRepository = taskRepository;
             this.fileStorageService = fileStorageService;
@@ -67,6 +72,7 @@ namespace Utg.LegalService.BL.Services
             _taskCommentService = taskCommentService;
             _agregateRepository = agregateRepository;
             _notificationService = notificationService;
+            _mediator = mediator;
         }
 
         public async Task<PagedResult<TaskModel>> GetAll(GetTaskPageRequest request, AuthInfo authInfo)
@@ -184,26 +190,24 @@ namespace Utg.LegalService.BL.Services
             var result = new TaskAccessRights();
             if (authInfo != null)
             {
-                result.IsPerformerAvailable = IsPerformerAvailable(authInfo);
                 result.CanShowDetails = CanShowDetails(authInfo);
                 result.CanEdit = CanEdit(model, authInfo);
                 result.CanDelete = CanDelete(model, authInfo);
                 result.CanMakeReport = CanMakeReport(model, authInfo);
                 result.CanPerform = CanPerform(model, authInfo);
                 result.CanReview = CanReview(model, authInfo);
+                result.HasShortCycle = HasShortCycle(model);
             }
 
             return result;
         }
 
+        private static bool HasShortCycle(TaskModel task)
+             => StaticData.TypesToSelfAssign.Contains(task.Type) || task.ParentTaskId.HasValue;
+
         private static bool CanReview(TaskModel model, AuthInfo authInfo)
          => authInfo.Roles.Contains((int)Role.LegalHead) &&
                     model.Status == TaskStatus.UnderReview;
-
-        private static bool IsPerformerAvailable(AuthInfo authInfo)
-        {
-            return authInfo.Roles.Contains((int)Role.LegalHead);
-        }
 
         private static bool CanShowDetails(AuthInfo authInfo)
         {
@@ -211,6 +215,7 @@ namespace Utg.LegalService.BL.Services
                     .Intersect(authInfo.Roles)
                     .Any();
         }
+
         private static bool CanEdit(TaskModel model, AuthInfo authInfo)
            => authInfo.Roles.Contains((int)Role.IntranetUser)
                 && model.Status == TaskStatus.Draft ||
@@ -298,6 +303,18 @@ namespace Utg.LegalService.BL.Services
                 var createdTaskEnriched = await GetById(createdTask.Id, authInfo);
 
                 await CreateTaskEmitEvents(createdTaskEnriched);
+                
+                var addHistoryComResp = 
+                    await _mediator.Send(new CreateTaskChangeHistoryCommand()
+                    {
+                        TaskId = createdTaskEnriched.Id,
+                        HistoryAction = HistoryAction.Created,
+                        UserProfileId = authInfo.UserProfileId
+                    });
+                if (!addHistoryComResp.Success)
+                {
+                    throw new Exception(addHistoryComResp.Message);
+                }
  
                 return createdTaskEnriched;
             }
@@ -630,10 +647,18 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
-        public async Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles()
+        public async Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles(AuthInfo authInfo)
         {
-            var result = dataProxyClient.UserProfilesRoleAsync((int)Role.LegalPerformer);
-            return result.Result;
+            var result = await dataProxyClient.UserProfilesRoleAsync((int)Role.LegalPerformer);
+            if (!authInfo.Roles.Contains((int)Role.LegalHead))
+                result = result.Where(userProfile => userProfile.Id == authInfo.UserProfileId);
+            return result;
+        }
+
+        public async Task<UserProfileApiModel> GetUserProfileById(int id)        
+        {
+            var result = await usersProxyClient.GetByIdsAsync(new List<string> { id.ToString()});
+            return result?.FirstOrDefault();
         }
 
         public async Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo)
