@@ -15,10 +15,10 @@ include:
   - project: 'templates/cicd-templates'
     ref: v1.0.0
     file:
-      - '.gitlab/ci_develop/deploy-to-prod.yml'
-      - '.gitlab/ci_develop/deploy-to-test.yml'
-      - '.gitlab/ci_develop/deploy-to-develop.yml'
-      - '.gitlab/ci_develop/release-image.yml'
+      - '.gitlab/ci_develop/deploy-to-prod_cloud.yml'
+      - '.gitlab/ci_develop/deploy-to-test_cloud.yml'
+      - '.gitlab/ci_develop/deploy-to-develop_cloud.yml'
+      - '.gitlab/ci_develop/release-image_cloud.yml'
 
 ############ -----------------------------------Begin compile-----------------------------------------------------
 # compile: # название job. для выполнения job необходимо добавить stage 
