@@ -19,7 +19,7 @@ services:
         - "traefik.enable=true"
         - "traefik.docker.network=proxy"
         - "traefik.http.routers.intranet-legal.entrypoints=websecure"
-        - "traefik.http.routers.intranet-legal.rule=Host(`intranet-cloud.test.utg.group`) && PathPrefix(`/legal/`)"        
+        - "traefik.http.routers.intranet-legal.rule=Host(`intranet.test.utg.group`) && PathPrefix(`/legal/`)"        
         - "traefik.http.routers.intranet-legal.service=intranet-legal_app"
         - "traefik.http.services.intranet-legal_app.loadbalancer.server.port=80"        
          
