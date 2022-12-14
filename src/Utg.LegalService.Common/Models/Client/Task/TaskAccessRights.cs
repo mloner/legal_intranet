@@ -9,5 +9,6 @@
         public bool CanPerform { get; set; }
         public bool CanReview { get; set; }
         public bool HasShortCycle { get; set; }
+        public bool CanMoveToDone { get; set; }
     }
 }

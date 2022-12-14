@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.LegalService.Common.Models.Client;
-using Utg.LegalService.Common.Models.Client.Enum;
 using Utg.LegalService.Common.Models.Client.Task;
+using Utg.LegalService.Dal;
+using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
 
 namespace Utg.LegalService.BL.Features.AccessRights.Get;
 
@@ -16,11 +18,13 @@ public class GetTaskAccessRightsCommandHandler
     : IRequestHandler<GetTaskAccessRightsCommand, Result<TaskAccessRights>>
 {
     private readonly ILogger<GetTaskAccessRightsCommandHandler> _logger;
+    private readonly UnitOfWork _uow;
 
     public GetTaskAccessRightsCommandHandler(
-        ILogger<GetTaskAccessRightsCommandHandler> logger)
+        ILogger<GetTaskAccessRightsCommandHandler> logger, UnitOfWork uow)
     {
         _logger = logger;
+        _uow = uow;
     }
 
     public async System.Threading.Tasks.Task<Result<TaskAccessRights>> Handle(
@@ -33,11 +37,12 @@ public class GetTaskAccessRightsCommandHandler
             {
                 CanShowDetails = CanShowDetails(command.Task, command.AuthInfo),
                 CanEdit = CanEdit(command.Task, command.AuthInfo),
-                CanDelete = CanDelete(command.Task, command.AuthInfo),
+                CanDelete = await CanDelete(command.Task, command.AuthInfo),
                 CanMakeReport = CanMakeReport(command.Task, command.AuthInfo),
                 CanPerform = CanPerform(command.Task, command.AuthInfo),
                 CanReview = CanReview(command.Task, command.AuthInfo),
-                HasShortCycle = HasShortCycle(command.Task)
+                HasShortCycle = HasShortCycle(command.Task),
+                CanMoveToDone = await CanMoveToDone(command.Task)
             };
 
             return Result<TaskAccessRights>.Ok(ar);
@@ -49,6 +54,15 @@ public class GetTaskAccessRightsCommandHandler
 
             return Result<TaskAccessRights>.Internal(failMsg);
         }
+    }
+
+    private async Task<bool> CanMoveToDone(TaskModel taskModel)
+    {
+        var hasUndoneChildTasks =
+            await _uow.TaskItems.AnyAsync(x =>
+                    x.ParentTaskId == taskModel.Id &&
+                    x.Status != TaskStatus.Done);
+        return !hasUndoneChildTasks;
     }
 
     private static bool HasShortCycle(TaskModel task)
@@ -69,10 +83,11 @@ public class GetTaskAccessRightsCommandHandler
             || authInfo.Roles.Contains((int)Role.LegalPerformer)
                 && model.Status == TaskStatus.New && StaticData.TypesToSelfAssign.Contains(model.Type);
 
-    private static bool CanDelete(TaskModel model, AuthInfo authInfo)
+    private async Task<bool> CanDelete(TaskModel model, AuthInfo authInfo)
     {
-        return authInfo.Roles.Contains((int)Role.IntranetUser) &&
-               model.Status == TaskStatus.Draft;
+        var hasChildTasks = await _uow.TaskItems.AnyAsync(x => x.ParentTaskId == model.Id);
+        return authInfo.UserProfileId == model.AuthorUserProfileId &&
+               !hasChildTasks;
     }
 
     private static bool CanMakeReport(TaskModel model, AuthInfo authInfo)

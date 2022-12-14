@@ -62,7 +62,7 @@ public class CreateSubtaskCommandHandler
                 PerformerFullName = parentTask.PerformerFullName,
                 CreationDateTime = now,
                 LastChangeDateTime = now,
-                DeadlineDateTime = command.DeadLine,
+                DeadlineDateTime = command.DeadlineDateTime,
                 ParentTaskId = command.ParentTaskId
             };
 
