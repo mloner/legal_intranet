@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -73,6 +74,8 @@ public class GetTaskCommandHandler
 
             taskModel.Attachments = await FillAttachmentRights(taskModel, command.AuthInfo);
 
+            taskModel.Subtasks = await GetSubtasks(taskModel, cancellationToken);
+
             return Result<TaskModel>.Ok(taskModel);
         }
         catch (Exception e)
@@ -82,6 +85,19 @@ public class GetTaskCommandHandler
             
             return Result<TaskModel>.Internal(failMsg);
         }
+    }
+
+    private async Task<IEnumerable<TaskModel>> GetSubtasks(TaskModel taskModel, 
+        CancellationToken cancellationToken = default)
+    {
+        var subtasks = await _uow.TaskItems.GetQuery(x => x.ParentTaskId == taskModel.Id, null)
+            .ToListAsync(cancellationToken);
+        var subtaskModels = subtasks.Select(x => new TaskModel()
+        {
+            Id = x.Id,
+            Description = x.Description
+        });
+        return subtaskModels;
     }
 
     private async System.Threading.Tasks.Task<IEnumerable<TaskCommentModel>> GetTaskComments(

@@ -45,6 +45,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.AccessRights, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskComments, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentTaskId, opt => opt.Ignore())
+                .ForMember(dest => dest.Subtasks, opt => opt.Ignore())
                 ;
             
             config.CreateMap<Task, TaskModel>()
@@ -62,6 +63,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.Attachments, opt => opt.MapFrom(x => x.TaskAttachments))
                 .ForMember(dest => dest.AccessRights, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskComments, opt => opt.Ignore())
+                .ForMember(dest => dest.Subtasks, opt => opt.Ignore())
                 ;
             
             config.CreateMap<TaskModel, Task>()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Utg.Common.Models;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Enum;
@@ -16,7 +17,7 @@ public class CreateSubtaskCommand :  IRequest<Result<TaskModel>>
     public TaskStatus Status { get; set; }
     public TaskType Type { get; set; }
     public string Description { get; set; }
-    public DateTime? DeadLine { get; set; }
+    public DateTime? DeadlineDateTime { get; set; }
         
     public IEnumerable<IFormFile> Attachments { get; set; }
     
