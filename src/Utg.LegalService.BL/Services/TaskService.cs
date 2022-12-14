@@ -30,6 +30,7 @@ using Utg.LegalService.Common.Services;
 using NotificationTaskType = Utg.Common.Packages.Domain.Enums.NotificationTaskType;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
 using Utg.Common.Packages.Domain.Enums;
+using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.TaskChangeHistory.Create;
 using Utg.LegalService.Common.Models.Client.Enum;
 
@@ -89,7 +90,7 @@ namespace Utg.LegalService.BL.Services
             query = SkipAndTake(query, request);
             
             var list = query.AsEnumerable();
-            list = GetTasksAccessRights(list, authInfo);
+            list = await GetTasksAccessRightsAsync(list, authInfo);
 
             return new PagedResult<TaskModel>()
             {
@@ -174,76 +175,36 @@ namespace Utg.LegalService.BL.Services
 
             return query;
         }
-        private IEnumerable<TaskModel> GetTasksAccessRights(IEnumerable<TaskModel> models, AuthInfo authInfo)
+        private async Task<IEnumerable<TaskModel>> GetTasksAccessRightsAsync(IEnumerable<TaskModel> models,
+            AuthInfo authInfo)
         {
 
-            models = models.Select(x =>
+            var modelsTasks = models.Select(async x =>
             {
-                x.AccessRights = GetTaskAccessRights(x, authInfo);
+                var getTaskAccRightsComResp = 
+                    await _mediator.Send(new GetTaskAccessRightsCommand()
+                    {
+                        Task = x,
+                        AuthInfo = authInfo
+                    });
+                x.AccessRights = getTaskAccRightsComResp.Data;
                 return x;
             });
+            models = await System.Threading.Tasks.Task.WhenAll(modelsTasks);
 
             return models;
         }
-        private static TaskAccessRights GetTaskAccessRights(TaskModel model, AuthInfo authInfo)
-        {
-            var result = new TaskAccessRights();
-            if (authInfo != null)
-            {
-                result.CanShowDetails = CanShowDetails(authInfo);
-                result.CanEdit = CanEdit(model, authInfo);
-                result.CanDelete = CanDelete(model, authInfo);
-                result.CanMakeReport = CanMakeReport(model, authInfo);
-                result.CanPerform = CanPerform(model, authInfo);
-                result.CanReview = CanReview(model, authInfo);
-                result.HasShortCycle = HasShortCycle(model);
-            }
-
-            return result;
-        }
-
-        private static bool HasShortCycle(TaskModel task)
-             => StaticData.TypesToSelfAssign.Contains(task.Type) || task.ParentTaskId.HasValue;
-
-        private static bool CanReview(TaskModel model, AuthInfo authInfo)
-         => authInfo.Roles.Contains((int)Role.LegalHead) &&
-                    model.Status == TaskStatus.UnderReview;
-
-        private static bool CanShowDetails(AuthInfo authInfo)
-        {
-            return new int[] { (int)Role.LegalHead, (int)Role.IntranetUser, (int)Role.LegalPerformer }
-                    .Intersect(authInfo.Roles)
-                    .Any();
-        }
-
-        private static bool CanEdit(TaskModel model, AuthInfo authInfo)
-           => authInfo.Roles.Contains((int)Role.IntranetUser)
-                && model.Status == TaskStatus.Draft ||
-            authInfo.Roles.Contains((int)Role.LegalHead)
-                && model.Status == TaskStatus.New;
-
-
-        private static bool CanDelete(TaskModel model, AuthInfo authInfo)
-        {
-            return authInfo.Roles.Contains((int)Role.IntranetUser) &&
-                   model.Status == TaskStatus.Draft;
-        }
-
-        private static bool CanMakeReport(TaskModel model, AuthInfo authInfo)
-        {
-            return authInfo.Roles.Contains((int)Role.LegalHead);
-        }
-
-        private static bool CanPerform(TaskModel model, AuthInfo authInfo)
-                => authInfo.Roles.Contains((int)Role.LegalPerformer) &&
-                    model.Status == TaskStatus.InWork &&
-                    model.PerformerUserProfileId == authInfo.UserProfileId;
-
 
         public async Task<TaskModel> GetById(int id, AuthInfo authInfo = null)
         {
             var task = await taskRepository.GetById(id);
-            task.AccessRights = GetTaskAccessRights(task, authInfo);
+            var getTaskAccRightsComResp = 
+                await _mediator.Send(new GetTaskAccessRightsCommand()
+                {
+                    Task = task,
+                    AuthInfo = authInfo
+                });
+            task.AccessRights = getTaskAccRightsComResp.Data;
             task.TaskComments = await _taskCommentService.GetByTaskId(task.Id);
             var attachmentsTasks = task.Attachments.Select(async attachment => 
             {
