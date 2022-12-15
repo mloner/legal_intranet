@@ -164,12 +164,13 @@ namespace Utg.LegalService.API
         
         private void AddJobs(IServiceCollection services)
         {
+#if !DEBUG
             services.AddHostedService<UpdateCompanyHostedService>();
             services.AddHostedService<UpdateDepartmentHostedService>();
             services.AddHostedService<UpdatePositionHostedService>();
             services.AddHostedService<UpdateUserProfileHostedService>();
-        
-            services.AddScoped<NotifyExpiredSoonTasksJob, NotifyExpiredSoonTasksJob>();
+            services.AddScoped<NotifyExpiredSoonTasksJob, NotifyExpiredSoonTasksJob>();      
+#endif
         }
         
         private void ConfigureJobs()

@@ -133,6 +133,9 @@ namespace Utg.LegalService.Dal.Migrations
                     b.Property<int>("TaskId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TaskStatus")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("timestamp without time zone");
 

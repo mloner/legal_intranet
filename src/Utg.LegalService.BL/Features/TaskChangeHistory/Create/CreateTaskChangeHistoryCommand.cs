@@ -11,4 +11,5 @@ public class CreateTaskChangeHistoryCommand
     public int TaskId { get; set; }
     public int UserProfileId { get; set; }
     public HistoryAction HistoryAction { get; set; }
+    public TaskStatus TaskStatus { get; set; }
 }

@@ -38,7 +38,17 @@ public class FillUserProfileAgregatesCommandHandler
     {
         try
         {
+            var statuses = new UserStatus[]
+            {
+                UserStatus.Activated,
+                UserStatus.Archived,
+                UserStatus.Blocked,
+                UserStatus.Draft,
+                UserStatus.None,
+                UserStatus.InActivated
+            }; 
             var allUserProfiles = (await _dataProxyClient.AddressBookAsync(
+                availableStatuses: statuses.Select(x => (int)x),
                 includeExternal: true,
                 cancellationToken: cancellationToken)).Result;
             var allUserProfileIds = allUserProfiles.Select(x => x.Id);

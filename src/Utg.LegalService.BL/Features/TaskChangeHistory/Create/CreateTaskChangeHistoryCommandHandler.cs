@@ -35,6 +35,7 @@ public class CreateTaskChangeHistoryCommandHandler
                 DateTime = DateTime.UtcNow,
                 UserProfileId = command.UserProfileId,
                 HistoryAction = command.HistoryAction,
+                TaskStatus = command.TaskStatus
             };
             await _uow.TaskChangeHistoryItems.AddAsync(history, cancellationToken);
             

@@ -115,7 +115,8 @@ public class CreateSubtaskCommandHandler
                 {
                     TaskId = task.Id,
                     HistoryAction = HistoryAction.Created,
-                    UserProfileId = command.AuthInfo.UserProfileId
+                    UserProfileId = command.AuthInfo.UserProfileId,
+                    TaskStatus = task.Status
                 }, cancellationToken);
             if (!addHistoryComResp.Success)
             {

@@ -13,6 +13,7 @@ public class TaskChangeHistory : BaseEntity
     public DateTime DateTime { get; set; }
     public int UserProfileId { get; set; }
     public HistoryAction HistoryAction { get; set; }
+    public TaskStatus TaskStatus { get; set; }
 
     public virtual Task Task { get; set; }
 }
