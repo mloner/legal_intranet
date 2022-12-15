@@ -270,7 +270,8 @@ namespace Utg.LegalService.BL.Services
                     {
                         TaskId = createdTaskEnriched.Id,
                         HistoryAction = HistoryAction.Created,
-                        UserProfileId = authInfo.UserProfileId
+                        UserProfileId = authInfo.UserProfileId,
+                        TaskStatus = createdTaskEnriched.Status
                     });
                 if (!addHistoryComResp.Success)
                 {
@@ -369,7 +370,7 @@ namespace Utg.LegalService.BL.Services
 
             try
             {
-                var newTask = new TaskModel
+                var updatedTask = new TaskModel
                 {
                     Id = request.Id,
                     Status = request.Status ?? oldTask.Status,
@@ -379,9 +380,8 @@ namespace Utg.LegalService.BL.Services
                     DeadlineDateTime = request.DeadlineDateTime ?? oldTask.DeadlineDateTime,
                     LastChangeDateTime = DateTime.SpecifyKind(DateTimeOffset.UtcNow.DateTime,
                             DateTimeKind.Utc)
-                ,
                 };
-                await taskRepository.UpdateTask(newTask);
+                await taskRepository.UpdateTask(updatedTask);
 
                 if (request.AddedAttachments?.Any() == true)
                 {
@@ -414,6 +414,25 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
+        private async Task FillPerformersToChildTasks(TaskModel oldTask, TaskModel updatedTask)
+        {
+            if (oldTask.PerformerUserProfileId != updatedTask.PerformerUserProfileId
+                && updatedTask.PerformerUserProfileId != null)
+            {
+                var childTasksWithoutPerformer = await taskRepository.Get()
+                    .Where(x => x.ParentTaskId == updatedTask.Id &&
+                                !x.PerformerUserProfileId.HasValue)
+                    .ToListAsync();
+                foreach (var childTask in childTasksWithoutPerformer)
+                {
+                    childTask.PerformerUserProfileId = updatedTask.PerformerUserProfileId;
+                    childTask.PerformerFullName = updatedTask.PerformerFullName;
+                }
+
+                await taskRepository.UpdateTaskRange(childTasksWithoutPerformer);
+            }
+        }
+        
         public async Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
         {
             TaskModel changedTask;
@@ -427,6 +446,7 @@ namespace Utg.LegalService.BL.Services
                     break;
             }
 
+            await FillPerformersToChildTasks(oldTask, changedTask);
             await UpdateTaskMoveToInWorkEmitEvents(oldTask, changedTask);
             
             return changedTask;

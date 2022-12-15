@@ -69,13 +69,14 @@ public class GetTaskChangeHistoryPageCommandhandler
                 return PaginationResult<TaskChangeHistoryModel>.Failed(getAgregatesCommandResponse);
             }
             var upas = getAgregatesCommandResponse.Data;
-            
-            foreach (var taskChangeHistoryModel in taskModels.Data)
+
+            taskModels.Data = taskModels.Data.Select(x =>
             {
-                var upa = upas.FirstOrDefault(
-                    x => x.UserProfileId == taskChangeHistoryModel.UserProfileId);
-                taskChangeHistoryModel.UserProfileFullName = upa?.FullName;
-            }
+                var upa = upas.FirstOrDefault(y => y.UserProfileId == x.UserProfileId);
+                x.UserProfileFullName = upa?.FullName;
+                
+                return x;
+            });
 
             return taskModels;
         }

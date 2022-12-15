@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -86,6 +87,13 @@ namespace Utg.LegalService.Dal.Repositories
             _context.Entry(entity).Property(x => x.LastChangeDateTime).IsModified = true;
 
             await _context.SaveChangesAsync();
+        }
+
+        public System.Threading.Tasks.Task UpdateTaskRange(IEnumerable<Task> entites,
+            CancellationToken cancellationToken = default)
+        {
+            _context.UpdateRange(entites);
+            return _context.SaveChangesAsync(cancellationToken);
         }
 
         public async System.Threading.Tasks.Task DeleteTask(int taskId)

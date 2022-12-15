@@ -13,4 +13,6 @@ public class TaskChangeHistoryModel
     public string UserProfileFullName { get; set; }
     public HistoryAction HistoryAction { get; set; }
     public string HistoryActionName => HistoryAction.GetDisplayName();
+    public TaskStatus TaskStatus { get; set; }
+    public string TaskStatusName => TaskStatus.GetDisplayName();
 }
