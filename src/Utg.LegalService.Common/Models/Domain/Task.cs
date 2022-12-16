@@ -27,5 +27,6 @@ namespace Utg.LegalService.Common.Models.Domain
         public virtual Task ParentTask { get; set; }
         
         public virtual ICollection<TaskAttachment> TaskAttachments { get; set; }
+        public virtual ICollection<TaskChangeHistory> TaskChangeHistories { get; set; }
     }
 }

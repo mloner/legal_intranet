@@ -59,6 +59,28 @@ public class Mapping : IRegister
             })
             .MaxDepth(2);
         
+        config.NewConfig<GetTaskPageReportRequest, GetTaskPageCommand>()
+            .AfterMapping((request, command) =>
+            {
+                command.Skip = request.Skip;
+                command.Take = request.Take;
+                command.Filter = new GetTaskPageCommandFilter()
+                {
+                    Search = request.Search,
+                    Statuses = request.Statuses,
+                    AuthorUserProfileIds = request.AuthorUserProfileIds,
+                };
+                if (!string.IsNullOrEmpty(request.SortBy))
+                {
+                    command.ListSort = new List<SortDescriptor>()
+                    {
+                        new(request.SortBy, 
+                            EnumExtensions.GetEnumValue<EnumSortDirection>(request.SortDirection))
+                    };
+                }
+            })
+            .MaxDepth(2);
+        
         config.NewConfig<TaskChangeHistory, TaskChangeHistoryModel>()
             .MaxDepth(2);
         

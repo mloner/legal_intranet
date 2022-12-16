@@ -14,7 +14,6 @@ namespace Utg.LegalService.Common.Services
 {
     public interface ITaskService
     {
-        Task<PagedResult<TaskModel>> GetAll(GetTaskPageRequest request, AuthInfo authInfo);
         Task<TaskModel> GetById(int id, AuthInfo authInfo);
         Task<TaskModel> CreateTask(TaskCreateRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTask(TaskUpdateRequest request, AuthInfo authInfo);

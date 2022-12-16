@@ -83,6 +83,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.ParentTask, opt => opt.Ignore())
                 .ForMember(dest => dest.Created, opt => opt.Ignore())
                 .ForMember(dest => dest.Updated, opt => opt.Ignore())
+                .ForMember(dest => dest.TaskChangeHistories, opt => opt.Ignore())
                 ;
             
             config.CreateMap<TaskCreateRequest, Task>()
@@ -102,6 +103,7 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.ParentTask, opt => opt.Ignore())
                 .ForMember(dest => dest.Created, opt => opt.Ignore())
                 .ForMember(dest => dest.Updated, opt => opt.Ignore())
+                .ForMember(dest => dest.TaskChangeHistories, opt => opt.Ignore())
                 ;
 
             config.CreateMap<TaskAttachmentModel, TaskAttachment>()
