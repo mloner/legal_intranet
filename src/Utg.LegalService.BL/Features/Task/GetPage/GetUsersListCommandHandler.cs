@@ -51,7 +51,6 @@ public class GetTaskPageCommandHandler
         {
             var predicate = GetPredicate(command.Filter, command);
             
-
             var tasks = await _uow.TaskItems.GetPagedAsync(
                 predicate: predicate,
                 orderByProperties: new List<OrderByPropertyDescriptor<Common.Models.Domain.Task>>()
@@ -62,7 +61,8 @@ public class GetTaskPageCommandHandler
                 take: command.Take,
                 skip: command.Skip,
                 cancellationToken: cancellationToken,
-                x => x.TaskAttachments);
+                x => x.TaskAttachments,
+                x => x.TaskChangeHistories);
 
             var taskModels = tasks.Adapt<PaginationResult<TaskModel>>();
 
@@ -101,7 +101,7 @@ public class GetTaskPageCommandHandler
         }
         catch (Exception e)
         {
-            var failMsg = "Failed to get tasks.";
+            const string failMsg = "Failed to get tasks.";
             _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
 
             return PaginationResult<TaskModel>.Internal(failMsg);
@@ -169,6 +169,28 @@ public class GetTaskPageCommandHandler
         {
             predicate =
                 predicate.And(x => filter.AuthorUserProfileIds.Contains(x.AuthorUserProfileId));
+        }
+
+        if (filter.MoveToWorkDateTimeFrom.HasValue)
+        {
+            predicate = predicate.And(
+                x => x.TaskChangeHistories
+                         .OrderByDescending(his => his.DateTime)
+                         .FirstOrDefault(
+                             his => 
+                                 his.TaskStatus == TaskStatus.InWork &&
+                                 his.DateTime >= filter.MoveToWorkDateTimeFrom.Value) != null);
+        }
+        
+        if (filter.MoveToWorkDateTimeTo.HasValue)
+        {
+            predicate = predicate.And(
+                x => x.TaskChangeHistories
+                         .OrderByDescending(his => his.DateTime)
+                         .FirstOrDefault(
+                             his => 
+                                 his.TaskStatus == TaskStatus.InWork &&
+                                 his.DateTime <= filter.MoveToWorkDateTimeTo.Value) != null);
         }
 
         return predicate;

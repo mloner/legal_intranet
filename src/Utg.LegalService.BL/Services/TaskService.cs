@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,12 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using LinqKit;
+using Mapster;
 using MediatR;
 using Newtonsoft.Json;
-using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Helpers;
-using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Models.Notification;
 using Utg.Common.Packages.Domain.Models.Push;
@@ -29,8 +26,8 @@ using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Common.Services;
 using NotificationTaskType = Utg.Common.Packages.Domain.Enums.NotificationTaskType;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
-using Utg.Common.Packages.Domain.Enums;
 using Utg.LegalService.BL.Features.AccessRights.Get;
+using Utg.LegalService.BL.Features.Task.GetPage;
 using Utg.LegalService.BL.Features.TaskChangeHistory.Create;
 using Utg.LegalService.Common.Models.Client.Enum;
 
@@ -75,126 +72,7 @@ namespace Utg.LegalService.BL.Services
             _notificationService = notificationService;
             _mediator = mediator;
         }
-
-        public async Task<PagedResult<TaskModel>> GetAll(GetTaskPageRequest request, AuthInfo authInfo)
-        {
-            var query = taskRepository.Get()
-                .OrderByDescending(task => task.CreationDateTime)
-                .ProjectTo<TaskModel>(_mapper.ConfigurationProvider);
-
-            query = FilterByRoles(query, request, authInfo);
-            query = Filter(query, request);
-            query = Search(query, request);
-
-            var count = query.Count();
-            query = SkipAndTake(query, request);
-            
-            var list = query.AsEnumerable();
-            list = await GetTasksAccessRightsAsync(list, authInfo);
-
-            return new PagedResult<TaskModel>()
-            {
-                Result = list,
-                Total = count
-            };
-        }
-
-        private IQueryable<TaskModel> FilterByRoles(IQueryable<TaskModel> query, GetTaskPageRequest request, AuthInfo authInfo)
-        {
-            var predicate = PredicateBuilder.New<TaskModel>(true);
-
-            if (authInfo.Roles.Contains((int)Role.IntranetUser))
-            {
-                predicate = PredicateBuilder.New<TaskModel>(
-                    model => model.AuthorUserProfileId == authInfo.UserProfileId);
-            }
-
-            if (authInfo.Roles.Contains((int)Role.LegalPerformer))
-            {
-                predicate = predicate.Or(
-                    model => model.PerformerUserProfileId == authInfo.UserProfileId);
-            }
-
-            query = query.Where(predicate).AsQueryable();
-            
-            query = query.Where(x => !(x.Status == TaskStatus.Draft && x.AuthorUserProfileId != authInfo.UserProfileId));
-
-            return query;
-        }
-
-        private IQueryable<TaskModel> Filter(IQueryable<TaskModel> query, GetTaskPageRequest request)
-        {
-            if (request.Statuses != null && request.Statuses.Any())
-            {
-                query = query.Where(x => request.Statuses.Contains((int)x.Status));
-            }
-            else
-            {
-                query = query.Where(x => x.Status != TaskStatus.Done);
-            }
-
-            if (request.AuthorUserProfileIds != null && request.AuthorUserProfileIds.Any())
-            {
-                query = query.Where(x => request.AuthorUserProfileIds.Contains(x.AuthorUserProfileId));
-            }
-
-            return query;
-        }
-
-        private IQueryable<TaskModel> Search(IQueryable<TaskModel> query, GetTaskPageRequest request)
-        {
-            if (!string.IsNullOrEmpty(request.Search))
-            {
-                var ftsQuery = Util.GetFullTextSearchQuery(request.Search);
-                var ilikeQuery = $"%{request.Search}%";
-
-                query = query.Where(x
-                        => EF.Functions.ILike(x.AuthorFullName, ilikeQuery) 
-                           || EF.Functions.ToTsVector(Const.PgFtsConfig, x.AuthorFullName)
-                               .Matches(EF.Functions.PlainToTsQuery(Const.PgFtsConfig, ftsQuery))
-                           
-                           || EF.Functions.ILike(x.Description, ilikeQuery) 
-                           || EF.Functions.ToTsVector(Const.PgFtsConfig, x.Description)
-                               .Matches(EF.Functions.PlainToTsQuery(Const.PgFtsConfig, ftsQuery))
-                           );
-            }
-
-            return query;
-        }
-
-        private IQueryable<TaskModel> SkipAndTake(IQueryable<TaskModel> query, GetTaskPageRequest request)
-        {
-            if (request.Skip.HasValue)
-            {
-                query = query.Skip(request.Skip.Value);
-            }
-            if (request.Take.HasValue)
-            {
-                query = query.Take(request.Take.Value);
-            }
-
-            return query;
-        }
-        private async Task<IEnumerable<TaskModel>> GetTasksAccessRightsAsync(IEnumerable<TaskModel> models,
-            AuthInfo authInfo)
-        {
-
-            var modelsTasks = models.Select(async x =>
-            {
-                var getTaskAccRightsComResp = 
-                    await _mediator.Send(new GetTaskAccessRightsCommand()
-                    {
-                        Task = x,
-                        AuthInfo = authInfo
-                    });
-                x.AccessRights = getTaskAccRightsComResp.Data;
-                return x;
-            });
-            models = await System.Threading.Tasks.Task.WhenAll(modelsTasks);
-
-            return models;
-        }
-
+        
         public async Task<TaskModel> GetById(int id, AuthInfo authInfo = null)
         {
             var task = await taskRepository.GetById(id);
@@ -264,20 +142,23 @@ namespace Utg.LegalService.BL.Services
                 var createdTaskEnriched = await GetById(createdTask.Id, authInfo);
 
                 await CreateTaskEmitEvents(createdTaskEnriched);
-                
-                var addHistoryComResp = 
-                    await _mediator.Send(new CreateTaskChangeHistoryCommand()
-                    {
-                        TaskId = createdTaskEnriched.Id,
-                        HistoryAction = HistoryAction.Created,
-                        UserProfileId = authInfo.UserProfileId,
-                        TaskStatus = createdTaskEnriched.Status
-                    });
-                if (!addHistoryComResp.Success)
+
+                if (createdTaskEnriched.Status != TaskStatus.Draft)
                 {
-                    throw new Exception(addHistoryComResp.Message);
+                    var addHistoryComResp = 
+                        await _mediator.Send(new CreateTaskChangeHistoryCommand()
+                        {
+                            TaskId = createdTaskEnriched.Id,
+                            HistoryAction = HistoryAction.Created,
+                            UserProfileId = authInfo.UserProfileId,
+                            TaskStatus = createdTaskEnriched.Status
+                        });
+                    if (!addHistoryComResp.Success)
+                    {
+                        throw new Exception(addHistoryComResp.Message);
+                    }   
                 }
- 
+
                 return createdTaskEnriched;
             }
             catch (Exception e)
@@ -392,6 +273,21 @@ namespace Utg.LegalService.BL.Services
                 {
                     await _taskAttachmentRepository.RemoveAttachments(taskId, request.RemovedAttachmentIds);
                 }
+                
+                var addHistoryComResp = 
+                    await _mediator.Send(new CreateTaskChangeHistoryCommand()
+                    {
+                        TaskId = updatedTask.Id,
+                        HistoryAction = oldTask.Status == TaskStatus.Draft 
+                            ? HistoryAction.Created 
+                            : HistoryAction.Changed,
+                        UserProfileId = authInfo.UserProfileId,
+                        TaskStatus = updatedTask.Status
+                    });
+                if (!addHistoryComResp.Success)
+                {
+                    throw new Exception(addHistoryComResp.Message);
+                }
             }
             catch (Exception e)
             {
@@ -445,9 +341,22 @@ namespace Utg.LegalService.BL.Services
                     changedTask = await UpdateTaskMoveToInWorkCommon(request, authInfo);
                     break;
             }
+            
+            var addHistoryComResp = 
+                await _mediator.Send(new CreateTaskChangeHistoryCommand()
+                {
+                    TaskId = changedTask.Id,
+                    HistoryAction = HistoryAction.StatusChanged,
+                    UserProfileId = authInfo.UserProfileId,
+                    TaskStatus = changedTask.Status
+                });
+            if (!addHistoryComResp.Success)
+            {
+                throw new Exception(addHistoryComResp.Message);
+            }
 
             await FillPerformersToChildTasks(oldTask, changedTask);
-            await UpdateTaskMoveToInWorkEmitEvents(oldTask, changedTask);
+            await TasksMoveToInWorkEmitEvents(oldTask, changedTask);
             
             return changedTask;
         }
@@ -471,10 +380,11 @@ namespace Utg.LegalService.BL.Services
             };
             await taskRepository.UpdateTaskMoveToInWork(newTask);
             var result = await GetById(taskId, authInfo);
+            
             return result;
         }
 
-        private async Task UpdateTaskMoveToInWorkEmitEvents(TaskModel oldTask,
+        private async Task TasksMoveToInWorkEmitEvents(TaskModel oldTask,
             TaskModel changedTask)
         {
             var now = DateTime.UtcNow;
@@ -522,6 +432,19 @@ namespace Utg.LegalService.BL.Services
                 default:
                     changedTask = await UpdateTaskMoveToUnderReviewCommon(request, authInfo);
                     break;
+            }
+            
+            var addHistoryComResp = 
+                await _mediator.Send(new CreateTaskChangeHistoryCommand()
+                {
+                    TaskId = changedTask.Id,
+                    HistoryAction = HistoryAction.StatusChanged,
+                    UserProfileId = authInfo.UserProfileId,
+                    TaskStatus = changedTask.Status
+                });
+            if (!addHistoryComResp.Success)
+            {
+                throw new Exception(addHistoryComResp.Message);
             }
             
             await UpdateTaskMoveToUnderReviewEmitEvents(oldTask, changedTask);
@@ -583,6 +506,19 @@ namespace Utg.LegalService.BL.Services
                     break;
             }
 
+            var addHistoryComResp = 
+                await _mediator.Send(new CreateTaskChangeHistoryCommand()
+                {
+                    TaskId = changedTask.Id,
+                    HistoryAction = HistoryAction.StatusChanged,
+                    UserProfileId = authInfo.UserProfileId,
+                    TaskStatus = changedTask.Status
+                });
+            if (!addHistoryComResp.Success)
+            {
+                throw new Exception(addHistoryComResp.Message);
+            }
+            
             await UpdateTaskMoveToDoneEmitEvents(oldTask, changedTask);
             
             return changedTask;
@@ -710,13 +646,12 @@ namespace Utg.LegalService.BL.Services
                 ? new TimeSpan(0, request.TimeZoneOffsetMinutes.Value, 0) 
                 : TimeSpan.Zero;
 
-            var data = await GetAll(new GetTaskPageRequest()
-            {
-                Statuses = request.Statuses,
-                AuthorUserProfileIds = request.AuthorUserProfileIds
-            }, authInfo);
 
-            var reportData = data.Result.Select((x, index) => new TaskReportDto()
+            var cmd = request.Adapt<GetTaskPageCommand>();
+            cmd.AuthInfo = authInfo;
+            var data = await _mediator.Send(cmd);
+
+            var reportData = data.Data.Select((x, index) => new TaskReportDto()
             {
                 RowNumber = x.Id,
                 ParentTaskId = x.ParentTaskId,
