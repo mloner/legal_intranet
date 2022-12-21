@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client;
@@ -19,7 +21,7 @@ namespace Utg.LegalService.Common.Services
         Task<TaskModel> UpdateTask(TaskUpdateRequest request, AuthInfo authInfo);
         Task DeleteTask(int id);
         Task<IEnumerable<UserProfileApiModel>> GetAuthorUserProfiles();
-        Task<Stream> GetReport(GetTaskPageReportRequest request, AuthInfo authInfo);
+        Task<Stream> GetReport(GetTaskPageReportRequest request, AuthInfo authInfo, HttpContext httpContext);
         Task<TaskModel> UpdateTaskMoveToInWork(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToUnderReview(TaskUpdateMoveToUnderReviewRequest request, AuthInfo authInfo);
         Task<TaskModel> UpdateTaskMoveToDone(TaskUpdateMoveToDoneRequest request, AuthInfo authInfo);
