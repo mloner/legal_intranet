@@ -173,7 +173,7 @@ namespace Utg.LegalService.API.Controllers
                 return Forbid();
             }
             var authInfo = await GetAuthInfo();
-            var stream = await _taskService.GetReport(request, authInfo);
+            var stream = await _taskService.GetReport(request, authInfo, HttpContext);
             return this.File(stream, MediaTypeNames.Application.Octet, "Отчет о задачах.xlsx");
         }
     }

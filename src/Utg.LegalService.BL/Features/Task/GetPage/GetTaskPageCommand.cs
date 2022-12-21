@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Collections.Generic;
+using MediatR;
 using Utg.Common.Models;
 using Utg.Common.Models.PaginationRequest;
 using Utg.LegalService.Common.Models.Client;
@@ -12,4 +13,6 @@ public class GetTaskPageCommand
     public AuthInfo AuthInfo { get; set; }
     public int? Skip { get; set; }
     public int? Take { get; set; }
+    public string SortBy { get; set; }
+    public string SortDirection { get; set; }
 }

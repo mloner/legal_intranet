@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Mapster;
 using MediatR;
@@ -640,12 +641,18 @@ namespace Utg.LegalService.BL.Services
             return userProfiles;
         }
 
-        public async Task<Stream> GetReport(GetTaskPageReportRequest request, AuthInfo authInfo)
+        public async Task<Stream> GetReport(GetTaskPageReportRequest request, AuthInfo authInfo,
+            HttpContext httpContext)
         {
-            var offset = request.TimeZoneOffsetMinutes.HasValue 
-                ? new TimeSpan(0, request.TimeZoneOffsetMinutes.Value, 0) 
-                : TimeSpan.Zero;
-
+            TimeSpan offset = TimeSpan.Zero;
+            if (httpContext.Request.Headers.TryGetValue("TimeZoneOffsetMinutes",
+                    out var values))
+            {
+                if (int.TryParse(values.First(), out var value))
+                {
+                    offset = new TimeSpan(0, value, 0);
+                }
+            }
 
             var cmd = request.Adapt<GetTaskPageCommand>();
             cmd.AuthInfo = authInfo;

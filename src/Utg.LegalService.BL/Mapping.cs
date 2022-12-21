@@ -47,37 +47,27 @@ public class Mapping : IRegister
                     Search = request.Search,
                     Statuses = request.Statuses,
                     AuthorUserProfileIds = request.AuthorUserProfileIds,
+                    MoveToWorkDateTimeFrom = request.MoveToWorkDateTimeFrom,
+                    MoveToWorkDateTimeTo = request.MoveToWorkDateTimeTo
                 };
-                if (!string.IsNullOrEmpty(request.SortBy))
-                {
-                    command.ListSort = new List<SortDescriptor>()
-                    {
-                        new(request.SortBy, 
-                            EnumExtensions.GetEnumValue<EnumSortDirection>(request.SortDirection))
-                    };
-                }
+                command.SortBy = request.SortBy;
+                command.SortDirection = request.SortDirection;
             })
             .MaxDepth(2);
         
         config.NewConfig<GetTaskPageReportRequest, GetTaskPageCommand>()
             .AfterMapping((request, command) =>
             {
-                command.Skip = request.Skip;
-                command.Take = request.Take;
                 command.Filter = new GetTaskPageCommandFilter()
                 {
                     Search = request.Search,
                     Statuses = request.Statuses,
                     AuthorUserProfileIds = request.AuthorUserProfileIds,
+                    MoveToWorkDateTimeFrom = request.MoveToWorkDateTimeFrom,
+                    MoveToWorkDateTimeTo = request.MoveToWorkDateTimeTo
                 };
-                if (!string.IsNullOrEmpty(request.SortBy))
-                {
-                    command.ListSort = new List<SortDescriptor>()
-                    {
-                        new(request.SortBy, 
-                            EnumExtensions.GetEnumValue<EnumSortDirection>(request.SortDirection))
-                    };
-                }
+                command.SortBy = request.SortBy;
+                command.SortDirection = request.SortDirection;
             })
             .MaxDepth(2);
         
