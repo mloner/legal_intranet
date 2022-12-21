@@ -13,12 +13,12 @@ public class DeleteAttachmentFilesCommandHandler
     : IRequestHandler<DeleteAttachmentFilesCommand, Result>
 {
     private readonly ILogger<DeleteAttachmentFilesCommandHandler> _logger;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
     private readonly IFileStorageService _fileStorageService;
 
     public DeleteAttachmentFilesCommandHandler(
         ILogger<DeleteAttachmentFilesCommandHandler> logger,
-        UnitOfWork uow, 
+        IUnitOfWork uow, 
         IFileStorageService fileStorageService)
     {
         _logger = logger;

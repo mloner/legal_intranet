@@ -44,6 +44,7 @@ services:
       Minio__Region: "$S3_REGION"
       Minio__UseSsl: "true"
       Minio__Bucket: "$S3_BUCKET"
+      grpc__main: "http://intranet-users_app:8090"
 
     #### Logiging ####
     logging:

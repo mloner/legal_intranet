@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
+using Mapster;
 using MediatR;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Utg.Common.Packages.Domain.Models.UpdateModels;
-using Utg.Common.Packages.Domain.Models.UpdateModels.CompanyUpdate;
 using Utg.Common.Packages.Queue;
 using Utg.Common.Packages.Queue.Configuration;
-using Utg.LegalService.BL.Features.Agregates.UpdateCompany;
+using Utg.LegalService.BL.Features.UserProfileAggregates.UpdateCompany;
+using Utg.LegalService.Common.Models.UpdateModels;
+using Utg.LegalService.Common.Models.UpdateModels.CompanyUpdate;
 
 namespace Utg.LegalService.Jobs.UpdateJobs.UpdateCompanyHostedService
 {
@@ -19,24 +19,19 @@ namespace Utg.LegalService.Jobs.UpdateJobs.UpdateCompanyHostedService
 		private readonly ILogger<UpdateCompanyHostedService> _logger;
 		private readonly IQueueSubscriberService _queueSubscriberService;
 		private readonly RabbitMqSettings _rabbitMqSettings;
-		private readonly IConfiguration _configuration;
-		private readonly IMapper _mapper;
-		private readonly IMediator _mediator;
+		private readonly IServiceProvider _serviceProvider;
 
 		public UpdateCompanyHostedService(
 			ILogger<UpdateCompanyHostedService> logger,
 			IQueueSubscriberService queueSubscriberService,
 			RabbitMqSettings rabbitMqSettings,
-			IConfiguration configuration, 
-			IMapper mapper, 
-			IMediator mediator)
+			IMediator mediator, 
+			IServiceProvider serviceProvider)
 		{
 			_logger = logger;
 			_queueSubscriberService = queueSubscriberService;
 			_rabbitMqSettings = rabbitMqSettings;
-			_configuration = configuration;
-			_mapper = mapper;
-			_mediator = mediator;
+			_serviceProvider = serviceProvider;
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
@@ -64,8 +59,14 @@ namespace Utg.LegalService.Jobs.UpdateJobs.UpdateCompanyHostedService
 
 		private async Task MessageReciever(UpdateEvent<CompanyUpdateEventModel> updateEventModel)
 		{
-			var command = _mapper.Map<UpdateUserProfileAgregateCompanyCommand>(updateEventModel);
-			await _mediator.Send(command);
+			_logger.LogInformation($"[{nameof(UpdateCompanyHostedService)}] start");
+			using (var scope = _serviceProvider.CreateScope())
+			{
+				var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+				var command = updateEventModel.Adapt<UpdateUserProfileAgregateCompanyCommand>();
+				await mediator.Send(command);
+			}
+			_logger.LogInformation($"[{nameof(UpdateCompanyHostedService)}] end");
 		}
 	}
 }

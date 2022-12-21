@@ -1,4 +1,4 @@
-﻿namespace Utg.LegalService.Common.Models.Client
+﻿namespace Utg.LegalService.Common.Models.Client.Task
 {
     public class TaskAccessRights
     {

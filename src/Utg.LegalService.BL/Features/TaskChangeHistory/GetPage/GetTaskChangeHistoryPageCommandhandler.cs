@@ -4,21 +4,10 @@ using System.Linq.Expressions;
 using System.Threading;
 using Mapster;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Extensions;
 using Utg.Common.Models;
-using Utg.Common.Packages.Domain;
-using Utg.Common.Packages.Domain.Enums;
-using Utg.LegalService.BL.Features.AccessRights.Get;
-using Utg.LegalService.BL.Features.Agregates.GetList;
-using Utg.LegalService.BL.Features.Attachments.GetInfo;
-using Utg.LegalService.BL.Features.Task.GetPage;
-using Utg.LegalService.Common.Models.Client;
-using Utg.LegalService.Common.Models.Client.Enum;
-using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Client.TaskChangeHistory;
-using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL.Features.TaskChangeHistory.GetPage;
@@ -28,12 +17,12 @@ public class GetTaskChangeHistoryPageCommandhandler
         PaginationResult<TaskChangeHistoryModel>>
 {
     private readonly ILogger<GetTaskChangeHistoryPageCommandhandler> _logger;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
     private readonly IMediator _mediator;
 
     public GetTaskChangeHistoryPageCommandhandler(
         ILogger<GetTaskChangeHistoryPageCommandhandler> logger,
-        UnitOfWork uow,
+        IUnitOfWork uow, 
         IMediator mediator)
     {
         _logger = logger;
@@ -49,7 +38,7 @@ public class GetTaskChangeHistoryPageCommandhandler
         {
             var predicate = GetPredicate(command.Filter);
 
-            var historyItems = await _uow.TaskChangeHistoryItems.GetPagedAsync(
+            var historyItems = await _uow.TaskChangeHistoryRepository.GetPagedAsync(
                 predicate: predicate,
                 pageSize: command.PageSize,
                 pageIndex: command.PageIndex,
@@ -58,17 +47,8 @@ public class GetTaskChangeHistoryPageCommandhandler
             var taskModels = historyItems.Adapt<PaginationResult<TaskChangeHistoryModel>>();
             
             var userProfileIds = taskModels.Data.Select(x => x.UserProfileId);
-            var getAgregatesCommand = new GetListUserProfileAgregatesCommand()
-            {
-                UserProfileIds = userProfileIds
-            };
-            var getAgregatesCommandResponse = 
-                await _mediator.Send(getAgregatesCommand, cancellationToken);
-            if (!getAgregatesCommandResponse.Success)
-            {
-                return PaginationResult<TaskChangeHistoryModel>.Failed(getAgregatesCommandResponse);
-            }
-            var upas = getAgregatesCommandResponse.Data;
+            var upas = _uow.UserProfileAgregatesRepository
+                .GetQuery(x => userProfileIds.Contains(x.UserProfileId), null);
 
             taskModels.Data = taskModels.Data.Select(x =>
             {

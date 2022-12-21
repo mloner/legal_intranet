@@ -9,6 +9,7 @@ using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Request.TaskComments;
 using Utg.LegalService.Common.Services;
+using Role = Utg.Common.Packages.Domain.Enums.Role;
 
 namespace Utg.LegalService.API.Controllers
 {

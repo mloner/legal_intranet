@@ -13,11 +13,11 @@ public class CreateTaskChangeHistoryCommandHandler
     : IRequestHandler<CreateTaskChangeHistoryCommand, Result<TaskChangeHistoryModel>>
 {
     private readonly ILogger<CreateTaskChangeHistoryCommandHandler> _logger;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
 
     public CreateTaskChangeHistoryCommandHandler(
         ILogger<CreateTaskChangeHistoryCommandHandler> logger,
-        UnitOfWork uow)
+        IUnitOfWork uow)
     {
         _logger = logger;
         _uow = uow;
@@ -37,7 +37,7 @@ public class CreateTaskChangeHistoryCommandHandler
                 HistoryAction = command.HistoryAction,
                 TaskStatus = command.TaskStatus
             };
-            await _uow.TaskChangeHistoryItems.AddAsync(history, cancellationToken);
+            await _uow.TaskChangeHistoryRepository.AddAsync(history, cancellationToken);
             
             return Result<TaskChangeHistoryModel>.Created(
                 history.Adapt<TaskChangeHistoryModel>());

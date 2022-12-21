@@ -1,15 +1,10 @@
 ﻿using System;
 using AutoMapper;
-using Utg.Common.Packages.Domain.Models.UpdateModels;
-using Utg.Common.Packages.Domain.Models.UpdateModels.CompanyUpdate;
-using Utg.Common.Packages.Domain.Models.UpdateModels.DepartmentUpdate;
-using Utg.Common.Packages.Domain.Models.UpdateModels.PositionUpdate;
-using Utg.Common.Packages.Domain.Models.UpdateModels.UserProfileUpdate;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
-using Utg.LegalService.BL.Features.Agregates.UpdateCompany;
-using Utg.LegalService.BL.Features.Agregates.UpdateDepartment;
-using Utg.LegalService.BL.Features.Agregates.UpdatePosition;
-using Utg.LegalService.BL.Features.Agregates.UpdateUserProfile;
+using Utg.LegalService.BL.Features.UserProfileAggregates.UpdateCompany;
+using Utg.LegalService.BL.Features.UserProfileAggregates.UpdateDepartment;
+using Utg.LegalService.BL.Features.UserProfileAggregates.UpdatePosition;
+using Utg.LegalService.BL.Features.UserProfileAggregates.UpdateUserProfile;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Client.Comment;
@@ -17,6 +12,11 @@ using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.TaskComments;
 using Utg.LegalService.Common.Models.Request.Tasks;
+using Utg.LegalService.Common.Models.UpdateModels;
+using Utg.LegalService.Common.Models.UpdateModels.CompanyUpdate;
+using Utg.LegalService.Common.Models.UpdateModels.DepartmentUpdate;
+using Utg.LegalService.Common.Models.UpdateModels.PositionUpdate;
+using Utg.LegalService.Common.Models.UpdateModels.UserProfileUpdate;
 
 namespace Utg.LegalService.API.Configuration
 {
@@ -54,10 +54,10 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(x => x.Type))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(x => x.Description))
                 .ForMember(dest => dest.AuthorUserProfileId, opt => opt.MapFrom(x => x.AuthorUserProfileId))
-                .ForMember(dest => dest.AuthorFullName, opt => opt.MapFrom(x => x.AuthorFullName))
+                .ForMember(dest => dest.AuthorFullName, opt => opt.Ignore())
                 .ForMember(dest => dest.CreationDateTime, opt => opt.MapFrom(x => x.CreationDateTime))
                 .ForMember(dest => dest.PerformerUserProfileId, opt => opt.MapFrom(x => x.PerformerUserProfileId))
-                .ForMember(dest => dest.PerformerFullName, opt => opt.MapFrom(x => x.PerformerFullName))
+                .ForMember(dest => dest.PerformerFullName, opt => opt.Ignore())
                 .ForMember(dest => dest.DeadlineDateTime, opt => opt.MapFrom(x => x.DeadlineDateTime))
                 .ForMember(dest => dest.LastChangeDateTime, opt => opt.MapFrom(x => x.LastChangeDateTime))
                 .ForMember(dest => dest.Attachments, opt => opt.MapFrom(x => x.TaskAttachments))
@@ -72,10 +72,8 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(x => x.Type))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(x => x.Description))
                 .ForMember(dest => dest.AuthorUserProfileId, opt => opt.MapFrom(x => x.AuthorUserProfileId))
-                .ForMember(dest => dest.AuthorFullName, opt => opt.MapFrom(x => x.AuthorFullName))
                 .ForMember(dest => dest.CreationDateTime, opt => opt.MapFrom(x => x.CreationDateTime))
                 .ForMember(dest => dest.PerformerUserProfileId, opt => opt.MapFrom(x => x.PerformerUserProfileId))
-                .ForMember(dest => dest.PerformerFullName, opt => opt.MapFrom(x => x.PerformerFullName))
                 .ForMember(dest => dest.DeadlineDateTime, opt => opt.MapFrom(x => x.DeadlineDateTime))
                 .ForMember(dest => dest.LastChangeDateTime, opt => opt.MapFrom(x => x.LastChangeDateTime))
                 .ForMember(dest => dest.TaskAttachments, opt => opt.Ignore())
@@ -92,10 +90,8 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(x => x.Type))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(x => x.Description))
                 .ForMember(dest => dest.AuthorUserProfileId, opt => opt.Ignore())
-                .ForMember(dest => dest.AuthorFullName, opt => opt.Ignore())
                 .ForMember(dest => dest.CreationDateTime, opt => opt.Ignore())
                 .ForMember(dest => dest.PerformerUserProfileId, opt => opt.Ignore())
-                .ForMember(dest => dest.PerformerFullName, opt => opt.Ignore())
                 .ForMember(dest => dest.DeadlineDateTime, opt => opt.Ignore())
                 .ForMember(dest => dest.LastChangeDateTime, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskAttachments, opt => opt.Ignore())
@@ -176,7 +172,6 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dst => dst.PositionName, src => src.MapFrom(x => x.PositionName))
                 .ForMember(dst => dst.FullName, src => src.MapFrom(x => x.FullName))
                 .ForMember(dst => dst.IsRemoved, src => src.MapFrom(x => x.IsRemoved))
-                .ForMember(dst => dst.HeadUserProfileId, src => src.MapFrom(x => x.HeadUserProfileId))
                 .ForMember(dst => dst.DismissalDate, src => src.MapFrom(x => x.DismissalDate != null ?  x.DismissalDate.Value.UtcDateTime : (DateTime?)null))
                 .ForMember(dst => dst.Created, src => src.Ignore())
                 .ForMember(dst => dst.Updated, src => src.Ignore())
@@ -198,7 +193,6 @@ namespace Utg.LegalService.API.Configuration
                 .ForMember(dst => dst.FullName, src => src.MapFrom(x => x.FullName))
                 .ForMember(dst => dst.IsRemoved, src => src.MapFrom(x => x.IsRemoved))
                 .ForMember(dst => dst.DismissalDate, src => src.MapFrom(x => x.DismissalDate))
-                .ForMember(dst => dst.HeadUserProfileId, src => src.MapFrom(x => x.HeadUserProfileId))
                 ;
             
             config.CreateMap<UpdateEvent<PositionUpdateEventModel>, UpdateUserProfileAgregatePositionCommand>()

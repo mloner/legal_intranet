@@ -31,6 +31,7 @@ using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.Task.GetPage;
 using Utg.LegalService.BL.Features.TaskChangeHistory.Create;
 using Utg.LegalService.Common.Models.Client.Enum;
+using Role = Utg.Common.Packages.Domain.Enums.Role;
 
 namespace Utg.LegalService.BL.Services
 {
@@ -42,7 +43,7 @@ namespace Utg.LegalService.BL.Services
         private readonly IFileStorageService fileStorageService;
         private readonly IMapper _mapper;
         private readonly IUsersProxyClient usersProxyClient;
-        private readonly IAgregateRepository _agregateRepository;
+        private readonly IUserProfileAgregateRepository _userProfileAgregateRepository;
         private readonly IExcelReportBuilder excelReportBuilder;
         private readonly IDataProxyClient dataProxyClient;
         private readonly INotificationService _notificationService;
@@ -57,7 +58,7 @@ namespace Utg.LegalService.BL.Services
             IDataProxyClient dataProxyClient,
             ITaskAttachmentRepository taskAttachmentRepository,
             ITaskCommentService taskCommentService,
-            IAgregateRepository agregateRepository,
+            IUserProfileAgregateRepository userProfileAgregateRepository,
             INotificationService notificationService, 
             IMediator mediator)
         {
@@ -69,7 +70,7 @@ namespace Utg.LegalService.BL.Services
             this.dataProxyClient = dataProxyClient;
             _taskAttachmentRepository = taskAttachmentRepository;
             _taskCommentService = taskCommentService;
-            _agregateRepository = agregateRepository;
+            _userProfileAgregateRepository = userProfileAgregateRepository;
             _notificationService = notificationService;
             _mediator = mediator;
         }
@@ -122,7 +123,7 @@ namespace Utg.LegalService.BL.Services
             var isFileOwn = attachment.UserProfileId.Value == authInfo.UserProfileId;
             return isFileOwn ||
                    authInfo.Roles.Contains((int)Role.LegalHead) &&
-                   attachmentAuthorUserProfile.Roles.Contains((int)Role.LegalPerformer);
+                   attachmentAuthorUserProfile.Roles.Contains((Utg.Common.Packages.ServiceClientProxy.Proxy.Role)(int)Role.LegalPerformer);
         }
 
         public async Task<TaskModel> CreateTask(TaskCreateRequest request, AuthInfo authInfo)
@@ -176,7 +177,7 @@ namespace Utg.LegalService.BL.Services
             if (taskModel.Status == TaskStatus.New)
             {
                 var legalHeadUserProfiles =
-                    await dataProxyClient.UserProfilesRoleAsync((int)Role.LegalHead);
+                    await dataProxyClient.UserProfilesRoleAsync((Utg.Common.Packages.ServiceClientProxy.Proxy.Role)(int)Role.LegalHead);
                 foreach (var legalHeadUserProfile in legalHeadUserProfiles)
                 {
                     notifications = notifications.Append(new NotificationModel
@@ -323,7 +324,6 @@ namespace Utg.LegalService.BL.Services
                 foreach (var childTask in childTasksWithoutPerformer)
                 {
                     childTask.PerformerUserProfileId = updatedTask.PerformerUserProfileId;
-                    childTask.PerformerFullName = updatedTask.PerformerFullName;
                 }
 
                 await taskRepository.UpdateTaskRange(childTasksWithoutPerformer);
@@ -365,7 +365,7 @@ namespace Utg.LegalService.BL.Services
         private async Task<TaskModel> UpdateTaskMoveToInWorkCommon(TaskUpdateMoveToInWorkRequest request, AuthInfo authInfo)
         {
             var taskId = request.Id;
-            var performer = await _agregateRepository
+            var performer = await _userProfileAgregateRepository
                 .GetQuery(x => true, null)
                 .FirstOrDefaultAsync(
                     userProfile => userProfile.UserProfileId == request.PerformerUserProfileId);
@@ -459,7 +459,7 @@ namespace Utg.LegalService.BL.Services
             var now = DateTime.UtcNow;
             var notifications = Enumerable.Empty<NotificationModel>();
             var legalHeadUserProfiles = 
-                await dataProxyClient.UserProfilesRoleAsync((int)Role.LegalHead);
+                await dataProxyClient.UserProfilesRoleAsync((Utg.Common.Packages.ServiceClientProxy.Proxy.Role)(int)Role.LegalHead);
             foreach (var legalHeadUserProfile in legalHeadUserProfiles)
             {
                 notifications = notifications.Append(new NotificationModel
@@ -567,7 +567,7 @@ namespace Utg.LegalService.BL.Services
 
         public async Task<IEnumerable<UserProfileApiModel>> GetPerformerUserProfiles(AuthInfo authInfo)
         {
-            var result = await dataProxyClient.UserProfilesRoleAsync((int)Role.LegalPerformer);
+            var result = await dataProxyClient.UserProfilesRoleAsync((Utg.Common.Packages.ServiceClientProxy.Proxy.Role)(int)Role.LegalPerformer);
             if (!authInfo.Roles.Contains((int)Role.LegalHead))
                 result = result.Where(userProfile => userProfile.Id == authInfo.UserProfileId);
             return result;

@@ -79,10 +79,8 @@ namespace Utg.LegalService.Dal.Repositories
             _context.Entry(entity).Property(x => x.Type).IsModified = true;
             _context.Entry(entity).Property(x => x.Description).IsModified = true;
             _context.Entry(entity).Property(x => x.AuthorUserProfileId).IsModified = false;
-            _context.Entry(entity).Property(x => x.AuthorFullName).IsModified = false;
             _context.Entry(entity).Property(x => x.CreationDateTime).IsModified = false;
             _context.Entry(entity).Property(x => x.PerformerUserProfileId).IsModified = true;
-            _context.Entry(entity).Property(x => x.PerformerFullName).IsModified = true;
             _context.Entry(entity).Property(x => x.DeadlineDateTime).IsModified = true;
             _context.Entry(entity).Property(x => x.LastChangeDateTime).IsModified = true;
 
@@ -111,10 +109,8 @@ namespace Utg.LegalService.Dal.Repositories
             _context.Entry(entity).Property(x => x.Type).IsModified = false;
             _context.Entry(entity).Property(x => x.Description).IsModified = false;
             _context.Entry(entity).Property(x => x.AuthorUserProfileId).IsModified = false;
-            _context.Entry(entity).Property(x => x.AuthorFullName).IsModified = false;
             _context.Entry(entity).Property(x => x.CreationDateTime).IsModified = false;
             _context.Entry(entity).Property(x => x.PerformerUserProfileId).IsModified = true;
-            _context.Entry(entity).Property(x => x.PerformerFullName).IsModified = true;
             _context.Entry(entity).Property(x => x.DeadlineDateTime).IsModified = true;
             _context.Entry(entity).Property(x => x.LastChangeDateTime).IsModified = true;
 
@@ -129,10 +125,8 @@ namespace Utg.LegalService.Dal.Repositories
             _context.Entry(entity).Property(x => x.Type).IsModified = false;
             _context.Entry(entity).Property(x => x.Description).IsModified = false;
             _context.Entry(entity).Property(x => x.AuthorUserProfileId).IsModified = false;
-            _context.Entry(entity).Property(x => x.AuthorFullName).IsModified = false;
             _context.Entry(entity).Property(x => x.CreationDateTime).IsModified = false;
             _context.Entry(entity).Property(x => x.PerformerUserProfileId).IsModified = false;
-            _context.Entry(entity).Property(x => x.PerformerFullName).IsModified = false;
             _context.Entry(entity).Property(x => x.DeadlineDateTime).IsModified = false;
             _context.Entry(entity).Property(x => x.LastChangeDateTime).IsModified = true;
 
@@ -147,10 +141,8 @@ namespace Utg.LegalService.Dal.Repositories
             _context.Entry(entity).Property(x => x.Type).IsModified = false;
             _context.Entry(entity).Property(x => x.Description).IsModified = false;
             _context.Entry(entity).Property(x => x.AuthorUserProfileId).IsModified = false;
-            _context.Entry(entity).Property(x => x.AuthorFullName).IsModified = false;
             _context.Entry(entity).Property(x => x.CreationDateTime).IsModified = false;
             _context.Entry(entity).Property(x => x.PerformerUserProfileId).IsModified = false;
-            _context.Entry(entity).Property(x => x.PerformerFullName).IsModified = false;
             _context.Entry(entity).Property(x => x.DeadlineDateTime).IsModified = false;
             _context.Entry(entity).Property(x => x.LastChangeDateTime).IsModified = true;
 

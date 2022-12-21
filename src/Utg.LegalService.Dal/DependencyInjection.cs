@@ -43,11 +43,12 @@ public static class DependencyInjection
     
     private static void AddDependenciesToContainer(IServiceCollection services)
     {
-        services.AddTransient<ITaskRepository, TaskRepository>();
-        services.AddTransient<ITaskAttachmentRepository, TaskAttachmentRepository>();
-        services.AddTransient<ITaskCommentRepository, TaskCommentRepository>();
-        services.AddTransient<IAgregateRepository, AgregateRepository>();
-        services.AddScoped<UnitOfWork>();
+        services.AddScoped<ITaskRepository, TaskRepository>();
+        services.AddScoped<ITaskAttachmentRepository, TaskAttachmentRepository>();
+        services.AddScoped<ITaskCommentRepository, TaskCommentRepository>();
+        services.AddScoped<ITaskChangeHistoryRepository, TaskChangeHistoryRepository>();
+        services.AddScoped<IUserProfileAgregateRepository, UserProfileAgregateRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }
 

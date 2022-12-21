@@ -22,13 +22,13 @@ public class NotifyExpiredSoonTasksCommandHandler
 {
     private readonly ILogger<NotifyExpiredSoonTasksCommandHandler> _logger;
     private readonly IMediator _mediator;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
     private readonly IProductionCalendarService _productionCalendarService;
     private readonly INotificationService _notificationService;
 
     public NotifyExpiredSoonTasksCommandHandler(
         ILogger<NotifyExpiredSoonTasksCommandHandler> logger,
-        UnitOfWork uow, 
+        IUnitOfWork uow, 
         IMediator mediator, 
         IProductionCalendarService productionCalendarService, 
         INotificationService notificationService)
@@ -52,22 +52,30 @@ public class NotifyExpiredSoonTasksCommandHandler
                 businessDaysBeforeEvent,
                 _productionCalendarService);
 
-            var neededTasks = await _uow.TaskItems
+            var neededTasks = await _uow.TaskRepository
                 .GetQuery(x => x.DeadlineDateTime.HasValue &&
                                x.DeadlineDateTime.Value.Date == lastDay.Date &&
                                (x.Status == TaskStatus.InWork ||
                                 x.Status == TaskStatus.UnderReview),
                     null)
                 .ToListAsync(cancellationToken);
+            var userProfileIds = neededTasks.Select(x => x.AuthorUserProfileId)
+                .Union(neededTasks.Where(x => x.PerformerUserProfileId.HasValue)
+                    .Select(x => x.PerformerUserProfileId.Value))
+                .Distinct();
+            var upas = await _uow.UserProfileAgregatesRepository
+                .GetQuery(x => userProfileIds.Contains(x.UserProfileId), null)
+                .ToListAsync(cancellationToken);
 
             var notifications = new List<NotificationModel>();
             foreach (var task in neededTasks)
             {
+                var authorUpa = upas.FirstOrDefault(x => x.UserProfileId == task.AuthorUserProfileId);
                 notifications.Add(new NotificationModel
                 {
                     NotificationType = NotificationTaskType.LegalTaskTaskExpiresSoon,
                     ToUserProfileId = task.AuthorUserProfileId,
-                    ToUserProfileFullName = task.AuthorFullName,
+                    ToUserProfileFullName = authorUpa?.FullName,
                     Date = command.DateTime,
                     Data = JsonConvert.SerializeObject(new BaseMessage()
                     {
@@ -77,11 +85,12 @@ public class NotifyExpiredSoonTasksCommandHandler
                 });
                 if (task.PerformerUserProfileId.HasValue)
                 {
+                    var performerUpa = upas.FirstOrDefault(x => x.UserProfileId == task.PerformerUserProfileId.Value);
                     notifications.Add(new NotificationModel
                     {
                         NotificationType = NotificationTaskType.LegalTaskTaskExpiresSoon,
                         ToUserProfileId = task.PerformerUserProfileId.Value,
-                        ToUserProfileFullName = task.PerformerFullName,
+                        ToUserProfileFullName = performerUpa?.FullName,
                         Date = command.DateTime,
                         Data = JsonConvert.SerializeObject(new BaseMessage()
                         {

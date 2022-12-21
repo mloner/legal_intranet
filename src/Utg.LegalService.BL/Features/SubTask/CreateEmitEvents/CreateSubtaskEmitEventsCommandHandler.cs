@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Utg.Common.Models;
@@ -18,12 +19,12 @@ public class CreateSubtaskEmitEventsCommandHandler
 {
     private readonly ILogger<CreateSubtaskEmitEventsCommandHandler> _logger;
     private readonly IMediator _mediator;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
     private readonly INotificationService _notificationService;
 
     public CreateSubtaskEmitEventsCommandHandler(
         ILogger<CreateSubtaskEmitEventsCommandHandler> logger,
-        UnitOfWork uow, 
+        IUnitOfWork uow, 
         IMediator mediator, 
         INotificationService notificationService)
     {
@@ -43,11 +44,14 @@ public class CreateSubtaskEmitEventsCommandHandler
             if (command.AuthInfo.Roles.Contains((int) Role.LegalHead) &&
                 command.Task.PerformerUserProfileId.HasValue)
             {
+                var performerUpa = await _uow.UserProfileAgregatesRepository
+                    .GetQuery(x => x.UserProfileId == command.Task.PerformerUserProfileId, null)
+                    .FirstOrDefaultAsync(cancellationToken);
                 var notification = new NotificationModel
                 {
                     NotificationType = NotificationTaskType.LegalTaskCreated,
                     ToUserProfileId = command.Task.PerformerUserProfileId.Value,
-                    ToUserProfileFullName = command.Task.PerformerFullName,
+                    ToUserProfileFullName = performerUpa?.FullName,
                     Date = now,
                     Data = JsonConvert.SerializeObject(
                         new BaseMessage

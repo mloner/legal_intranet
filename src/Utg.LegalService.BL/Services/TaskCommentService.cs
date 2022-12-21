@@ -10,13 +10,13 @@ using Newtonsoft.Json;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Models.Notification;
 using Utg.Common.Packages.Domain.Models.Push;
-using Utg.LegalService.BL.Features.Agregates.GetList;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.TaskComments;
 using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Common.Services;
+using Utg.LegalService.Dal;
 using Task = System.Threading.Tasks.Task;
 
 namespace Utg.LegalService.BL.Services
@@ -27,17 +27,20 @@ namespace Utg.LegalService.BL.Services
         private readonly IMapper _mapper;
         private readonly INotificationService _notificationService;
         private readonly IMediator _mediator;
+        private readonly IUnitOfWork _uow;
 
         public TaskCommentService(
             IMapper mapper,
             ITaskCommentRepository taskCommentRepository,
             INotificationService notificationService,
-            IMediator mediator)
+            IMediator mediator, 
+            IUnitOfWork uow)
         {
             _mapper = mapper;
             _taskCommentRepository = taskCommentRepository;
             _notificationService = notificationService;
             _mediator = mediator;
+            _uow = uow;
         }
 
         public async Task<List<TaskCommentModel>> GetByTaskId(int taskId)
@@ -50,15 +53,11 @@ namespace Utg.LegalService.BL.Services
                 .ToListAsync();
 
             var userProfileIds = models.Select(x => x.UserProfileId);
-            var getAgregatesCommand = new GetListUserProfileAgregatesCommand()
-            {
-                UserProfileIds = userProfileIds
-            };
-            var getAgregatesCommandResponse = await _mediator.Send(getAgregatesCommand);
-            var userProfiles = getAgregatesCommandResponse.Data;
+            var upas = _uow.UserProfileAgregatesRepository
+                .GetQuery(x => userProfileIds.Contains(x.UserProfileId), null);
             models = models.Select(m =>
             {
-                var userProfile = userProfiles.FirstOrDefault(x => x.UserProfileId == m.UserProfileId);
+                var userProfile = upas.FirstOrDefault(x => x.UserProfileId == m.UserProfileId);
                 if (userProfile != null)
                 {
                     m.UserProfileFullName = userProfile.FullName;
@@ -92,11 +91,15 @@ namespace Utg.LegalService.BL.Services
 
             if (authInfo.UserProfileId != task.AuthorUserProfileId)
             {
+                var authorUpa =
+                    await _uow.UserProfileAgregatesRepository
+                        .GetQuery(x => x.UserProfileId == task.AuthorUserProfileId, null)
+                        .FirstOrDefaultAsync();
                 notifications = notifications.Append(new NotificationModel
                 {
                     NotificationType = NotificationTaskType.LegalTaskCommentCreated,
                     ToUserProfileId = task.AuthorUserProfileId,
-                    ToUserProfileFullName = task.AuthorFullName,
+                    ToUserProfileFullName = authorUpa?.FullName,
                     Date = now,
                     Data = JsonConvert.SerializeObject(
                         new BaseMessage
@@ -109,11 +112,15 @@ namespace Utg.LegalService.BL.Services
             if (task.PerformerUserProfileId.HasValue &&
                 authInfo.UserProfileId != task.PerformerUserProfileId)
             {
+                var performerUpa =
+                    await _uow.UserProfileAgregatesRepository
+                        .GetQuery(x => x.UserProfileId == task.PerformerUserProfileId.Value, null)
+                        .FirstOrDefaultAsync();
                 notifications = notifications.Append(new NotificationModel
                 {
                     NotificationType = NotificationTaskType.LegalTaskCommentCreated,
                     ToUserProfileId = task.PerformerUserProfileId.Value,
-                    ToUserProfileFullName = task.PerformerFullName,
+                    ToUserProfileFullName = performerUpa?.FullName,
                     Date = now,
                     Data = JsonConvert.SerializeObject(
                         new BaseMessage

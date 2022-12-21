@@ -23,11 +23,11 @@ public class CreateSubtaskCommandHandler
 {
     private readonly ILogger<CreateSubtaskCommandHandler> _logger;
     private readonly IMediator _mediator;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
 
     public CreateSubtaskCommandHandler(
         ILogger<CreateSubtaskCommandHandler> logger,
-        UnitOfWork uow, 
+        IUnitOfWork uow, 
         IMediator mediator)
     {
         _logger = logger;
@@ -42,7 +42,7 @@ public class CreateSubtaskCommandHandler
         var attachments = Enumerable.Empty<TaskAttachmentModel>();
         try
         {
-            var parentTask = await _uow.TaskItems.GetQuery(
+            var parentTask = await _uow.TaskRepository.GetQuery(
                 x => x.Id == command.ParentTaskId,
                 null
                 ).FirstOrDefaultAsync(cancellationToken);
@@ -57,16 +57,14 @@ public class CreateSubtaskCommandHandler
                 Type = command.Type,
                 Description = command.Description,
                 AuthorUserProfileId = command.AuthInfo.UserProfileId,
-                AuthorFullName = command.AuthInfo.FullName,
                 PerformerUserProfileId = parentTask.PerformerUserProfileId,
-                PerformerFullName = parentTask.PerformerFullName,
                 CreationDateTime = now,
                 LastChangeDateTime = now,
                 DeadlineDateTime = command.DeadlineDateTime,
                 ParentTaskId = command.ParentTaskId
             };
 
-            await _uow.TaskItems.AddAsync(task, cancellationToken);
+            await _uow.TaskRepository.AddAsync(task, cancellationToken);
             
             var createAttachmentsComResp = 
                 await _mediator.Send(new CreateAttachmentsCommand()
@@ -92,7 +90,7 @@ public class CreateSubtaskCommandHandler
                 return Result<TaskModel>.Failed(emitEventsResp);
             }
 
-            var resultTask = await _uow.TaskItems.GetQuery(
+            var resultTask = await _uow.TaskRepository.GetQuery(
                 x => x.Id == task.Id,
                 null).
                 Include(x => x.TaskAttachments)

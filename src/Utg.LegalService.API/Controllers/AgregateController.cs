@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Utg.Common.Models.Mvc.Core.Response;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
-using Utg.LegalService.BL.Features.Agregates.Delete;
-using Utg.LegalService.BL.Features.Agregates.Fill;
+using Utg.LegalService.BL.Features.UserProfileAggregates.Delete;
+using Utg.LegalService.BL.Features.UserProfileAggregates.Fill;
 
 namespace Utg.LegalService.API.Controllers
 {
@@ -32,7 +33,7 @@ namespace Utg.LegalService.API.Controllers
         public async Task<ActionResult> FillUserProfiles(FillUserProfileAgregatesCommand command)
         {
             var response = await _mediator.Send(command, HttpContext.RequestAborted);
-            return response.Success ? Ok(response) : StatusCode(response.StatusCode, response.Message);
+            return response.HttpResponse();
         }
         
         [HttpDelete("deleteAll")]
@@ -41,7 +42,7 @@ namespace Utg.LegalService.API.Controllers
         public async Task<ActionResult> DeleteAll(DeleteAllAgregatesCommand command)
         {
             var response = await _mediator.Send(command, HttpContext.RequestAborted);
-            return response.Success ? Ok(response) : StatusCode(response.StatusCode, response.Message);
+            return response.HttpResponse();
         }
     }
 }

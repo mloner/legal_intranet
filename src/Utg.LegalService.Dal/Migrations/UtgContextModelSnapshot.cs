@@ -31,9 +31,6 @@ namespace Utg.LegalService.Dal.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AuthorFullName")
-                        .HasColumnType("text");
-
                     b.Property<int>("AuthorUserProfileId")
                         .HasColumnType("integer");
 
@@ -54,9 +51,6 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.Property<int?>("ParentTaskId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("PerformerFullName")
-                        .HasColumnType("text");
 
                     b.Property<int?>("PerformerUserProfileId")
                         .HasColumnType("integer");
@@ -211,14 +205,8 @@ namespace Utg.LegalService.Dal.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("text");
 
-                    b.Property<int?>("HeadUserProfileId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsRemoved")
                         .HasColumnType("boolean");
-
-                    b.Property<int?>("ManagerPositionId")
-                        .HasColumnType("integer");
 
                     b.Property<int?>("PositionId")
                         .HasColumnType("integer");
@@ -246,6 +234,8 @@ namespace Utg.LegalService.Dal.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserProfileId");
+
                     b.ToTable("UserProfileAgregates", "public");
                 });
 
@@ -272,7 +262,7 @@ namespace Utg.LegalService.Dal.Migrations
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.TaskChangeHistory", b =>
                 {
                     b.HasOne("Utg.LegalService.Common.Models.Domain.Task", "Task")
-                        .WithMany()
+                        .WithMany("TaskChangeHistories")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -294,6 +284,8 @@ namespace Utg.LegalService.Dal.Migrations
             modelBuilder.Entity("Utg.LegalService.Common.Models.Domain.Task", b =>
                 {
                     b.Navigation("TaskAttachments");
+
+                    b.Navigation("TaskChangeHistories");
                 });
 #pragma warning restore 612, 618
         }
