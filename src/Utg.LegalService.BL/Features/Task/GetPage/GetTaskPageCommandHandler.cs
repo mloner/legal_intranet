@@ -15,6 +15,7 @@ using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Helpers;
 using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.Attachments.GetInfo;
+using Utg.LegalService.BL.Features.TaskChangeHistory.GetPage;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Enum;
 using Utg.LegalService.Common.Models.Client.Task;
@@ -49,20 +50,15 @@ public class GetTaskPageCommandHandler
     {
         try
         {
-            var predicate = GetPredicate(command.Filter, command);
-            
+            var predicate = GetPredicate(command.Filter, command); 
+            // TODO: add skip, take, sorting after migration with userprofile agrgates foreign key
             var tasks = await _uow.TaskItems.GetPagedAsync(
-                predicate: predicate,
-                orderByProperties: new List<OrderByPropertyDescriptor<Common.Models.Domain.Task>>()
-                {
-                    new OrderByPropertyDescriptor<Common.Models.Domain.Task>(task => task.CreationDateTime, 
-                        EnumSortDirection.Desc)
-                },
-                take: command.Take,
-                skip: command.Skip,
+                predicate,
+                orderByProperties: default,
+                take: default,
+                skip: default,
                 cancellationToken: cancellationToken,
-                x => x.TaskAttachments,
-                x => x.TaskChangeHistories);
+                q => q.TaskAttachments, q => q.TaskChangeHistories);
 
             var taskModels = tasks.Adapt<PaginationResult<TaskModel>>();
 
@@ -96,6 +92,25 @@ public class GetTaskPageCommandHandler
             }
 
             taskModels.Data = resultTaskModelsData;
+
+            #region sorting
+            
+            taskModels.Data = taskModels.Data.Sort(command);
+
+            #endregion
+
+            #region skipAndTake
+
+            if (command.Skip.HasValue)
+            {
+                taskModels.Data = taskModels.Data.Skip(command.Skip.Value);
+            }
+            if (command.Take.HasValue)
+            {
+                taskModels.Data = taskModels.Data.Take(command.Take.Value);
+            }
+
+            #endregion
             
             return taskModels;
         }
