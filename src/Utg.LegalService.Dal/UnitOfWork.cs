@@ -7,31 +7,32 @@ using Utg.LegalService.Dal.SqlContext;
 
 namespace Utg.LegalService.Dal;
 
-public class UnitOfWork : UnitOfWorkBase<UtgContext>
+public class UnitOfWork : UnitOfWorkBase<UtgContext>, IUnitOfWork
 {
-    private readonly Lazy<IAgregateRepository> _agregateItems;
-    public IAgregateRepository AgregateItems => _agregateItems.Value;
+    private readonly Lazy<IUserProfileAgregateRepository> _userProfileAgregateItems;
+    public IUserProfileAgregateRepository UserProfileAgregatesRepository => _userProfileAgregateItems.Value;
 
     private readonly Lazy<ITaskRepository> _taskItems;
-    public ITaskRepository TaskItems => _taskItems.Value;
+    public ITaskRepository TaskRepository => _taskItems.Value;
     
     private readonly Lazy<ITaskAttachmentRepository> _taskAttachmentItems;
-    public ITaskAttachmentRepository TaskAttachmentItems => _taskAttachmentItems.Value;
+    public ITaskAttachmentRepository TaskAttachmentRepository => _taskAttachmentItems.Value;
     
     private readonly Lazy<ITaskCommentRepository> _taskCommentItems;
-    public ITaskCommentRepository TaskCommentItems => _taskCommentItems.Value;
+    public ITaskCommentRepository TaskCommentRepository => _taskCommentItems.Value;
     
     private readonly Lazy<ITaskChangeHistoryRepository> _taskChangeHistoryItems;
-    public ITaskChangeHistoryRepository TaskChangeHistoryItems => _taskChangeHistoryItems.Value;
+    public ITaskChangeHistoryRepository TaskChangeHistoryRepository => _taskChangeHistoryItems.Value;
     
     public UnitOfWork(
         UtgContext dbContext,
         IMapper mapper) 
         : base(dbContext)
     {
-        _agregateItems = new Lazy<IAgregateRepository>(() => new AgregateRepository(dbContext));
+        _userProfileAgregateItems = 
+            new Lazy<IUserProfileAgregateRepository>(() => 
+                new UserProfileAgregateRepository(dbContext));
 
-        
         _taskItems = 
             new Lazy<ITaskRepository>(() =>
                 new TaskRepository(dbContext, mapper));

@@ -16,6 +16,7 @@ using Utg.LegalService.BL.Features.Task.GetPage;
 using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Services;
+using Role = Utg.Common.Packages.Domain.Enums.Role;
 
 namespace Utg.LegalService.API.Controllers
 {

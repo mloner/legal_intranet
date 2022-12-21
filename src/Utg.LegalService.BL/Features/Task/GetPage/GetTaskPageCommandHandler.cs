@@ -28,20 +28,20 @@ public class GetTaskPageCommandHandler
     : IRequestHandler<GetTaskPageCommand, PaginationResult<TaskModel>>
 {
     private readonly ILogger<GetTaskPageCommandHandler> _logger;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
     private readonly IMediator _mediator;
-    private readonly IAgregateRepository _agregateRepository;
+    private readonly IUserProfileAgregateRepository _userProfileAgregateRepository;
 
     public GetTaskPageCommandHandler(
         ILogger<GetTaskPageCommandHandler> logger,
-        UnitOfWork uow,
+        IUnitOfWork uow, 
         IMediator mediator,
-        IAgregateRepository agregateRepository)
+        IUserProfileAgregateRepository userProfileAgregateRepository)
     {
         _logger = logger;
         _uow = uow;
         _mediator = mediator;
-        _agregateRepository = agregateRepository;
+        _userProfileAgregateRepository = userProfileAgregateRepository;
     }
 
     public async System.Threading.Tasks.Task<PaginationResult<TaskModel>> Handle(
@@ -52,7 +52,7 @@ public class GetTaskPageCommandHandler
         {
             var predicate = GetPredicate(command.Filter, command); 
             // TODO: add skip, take, sorting after migration with userprofile agrgates foreign key
-            var tasks = await _uow.TaskItems.GetPagedAsync(
+            var tasks = await _uow.TaskRepository.GetPagedAsync(
                 predicate,
                 orderByProperties: default,
                 take: default,
@@ -61,6 +61,29 @@ public class GetTaskPageCommandHandler
                 q => q.TaskAttachments, q => q.TaskChangeHistories);
 
             var taskModels = tasks.Adapt<PaginationResult<TaskModel>>();
+
+            #region fullnames
+
+            var userProfileIds = taskModels.Data.Select(x => x.AuthorUserProfileId)
+                .Union(taskModels.Data
+                    .Where(x => x.PerformerUserProfileId.HasValue)
+                    .Select(x => x.PerformerUserProfileId.Value))
+                .Distinct();
+            var upas = await _uow.UserProfileAgregatesRepository
+                .GetQuery(x => userProfileIds.Contains(x.UserProfileId), null)
+                .ToListAsync(cancellationToken);
+            taskModels.Data = taskModels.Data.Select(x =>
+            {
+                var authorUpa = upas.FirstOrDefault(y => y.UserProfileId == x.AuthorUserProfileId);
+                x.AuthorFullName = authorUpa?.FullName;
+                var performerUpa = upas.FirstOrDefault(y => y.UserProfileId == x.PerformerUserProfileId);
+                x.PerformerFullName = performerUpa?.FullName;
+                return x;
+            });
+
+            #endregion
+
+            #region urls
 
             var getAttUrlResp =
                 await _mediator.Send(new GetAttachmentsInfoCommand()
@@ -72,6 +95,10 @@ public class GetTaskPageCommandHandler
                 return PaginationResult<TaskModel>.Failed(getAttUrlResp);
             }
             taskModels.Data = getAttUrlResp.Data;
+
+            #endregion
+
+            #region access rights
 
             var resultTaskModelsData = Enumerable.Empty<TaskModel>();
             foreach (var taskModel in taskModels.Data)
@@ -92,6 +119,8 @@ public class GetTaskPageCommandHandler
             }
 
             taskModels.Data = resultTaskModelsData;
+
+            #endregion
 
             #region sorting
             
@@ -228,7 +257,7 @@ public class GetTaskPageCommandHandler
                     return x;
                 });
 
-            var userProfileIds = _agregateRepository.Get()
+            var userProfileIds = _userProfileAgregateRepository.Get()
                 .Where(x =>
                     EF.Functions.ILike(x.FullName, ilikeQuery)
                     || EF.Functions.ToTsVector(Const.PgFtsConfig, x.FullName)

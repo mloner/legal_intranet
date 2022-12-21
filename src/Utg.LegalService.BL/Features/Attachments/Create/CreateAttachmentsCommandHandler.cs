@@ -18,12 +18,12 @@ public class CreateAttachmentsCommandHandler
     : IRequestHandler<CreateAttachmentsCommand, Result<IEnumerable<TaskAttachmentModel>>>
 {
     private readonly ILogger<CreateAttachmentsCommandHandler> _logger;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
     private readonly IFileStorageService _fileStorageService;
 
     public CreateAttachmentsCommandHandler(
         ILogger<CreateAttachmentsCommandHandler> logger,
-        UnitOfWork uow, 
+        IUnitOfWork uow, 
         IFileStorageService fileStorageService)
     {
         _logger = logger;
@@ -63,7 +63,8 @@ public class CreateAttachmentsCommandHandler
                     });
             }
 
-            await _uow.TaskAttachmentItems.AddRange(customAttachments, cancellationToken);
+            await _uow.TaskAttachmentRepository
+                .AddRange(customAttachments, cancellationToken);
             
             return Result<IEnumerable<TaskAttachmentModel>>.Ok(
                 customAttachments.Adapt<IEnumerable<TaskAttachmentModel>>());

@@ -56,6 +56,7 @@ internal static class TaskSortingHelper
                     : models.OrderBy(x => x.DeadlineDateTime);
                 break;
             case null:
+                models = models.OrderByDescending(x => x.CreationDateTime);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(command.SortBy));

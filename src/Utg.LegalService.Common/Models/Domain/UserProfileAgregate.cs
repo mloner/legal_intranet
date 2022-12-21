@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Utg.Common.Models.Domain;
 
 namespace Utg.LegalService.Common.Models.Domain
 {
+	[Index(nameof(UserProfileId))]
 	public class UserProfileAgregate : BaseEntity
 	{
 		[Key]
@@ -21,8 +23,6 @@ namespace Utg.LegalService.Common.Models.Domain
 		public int? PositionId { get; set; }
 		public string PositionName { get; set; }
 		public string FullName { get; set; }
-		public int? ManagerPositionId { get; set; }
 		public bool IsRemoved { get; set; }
-		public int? HeadUserProfileId { get; set; }
 	}
 }

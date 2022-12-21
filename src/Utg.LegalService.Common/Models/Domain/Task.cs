@@ -15,10 +15,8 @@ namespace Utg.LegalService.Common.Models.Domain
         public TaskType Type { get; set; }
         public string Description { get; set; }
         public int AuthorUserProfileId { get; set; }
-        public string AuthorFullName { get; set; }
         public DateTime CreationDateTime { get; set; }
         public int? PerformerUserProfileId { get; set; }
-        public string PerformerFullName { get; set; }
         public DateTime? DeadlineDateTime { get; set; }
         public DateTime LastChangeDateTime { get; set; }
         

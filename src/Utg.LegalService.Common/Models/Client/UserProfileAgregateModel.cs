@@ -18,7 +18,5 @@ public class UserProfileAgregateModel
     public int? PositionId { get; set; }
     public string PositionName { get; set; }
     public string FullName { get; set; }
-    public int? ManagerPositionId { get; set; }
     public bool IsRemoved { get; set; }
-    public int? HeadUserProfileId { get; set; }
 }

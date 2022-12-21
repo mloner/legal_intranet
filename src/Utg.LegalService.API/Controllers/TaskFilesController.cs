@@ -8,6 +8,7 @@ using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Services;
+using Role = Utg.Common.Packages.Domain.Enums.Role;
 
 namespace Utg.LegalService.API.Controllers
 {

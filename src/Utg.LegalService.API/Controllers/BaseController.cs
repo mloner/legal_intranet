@@ -8,6 +8,7 @@ using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client;
 using ProblemDetails = Microsoft.AspNetCore.Mvc.ProblemDetails;
+using Role = Utg.Common.Packages.Domain.Enums.Role;
 
 namespace Utg.LegalService.API.Controllers
 {
@@ -61,7 +62,7 @@ namespace Utg.LegalService.API.Controllers
         protected async Task<IEnumerable<int>> GetCurrentUserRoles()
         {
             var userprofile = await this.GetUserProfile();
-            return userprofile?.Roles ?? Enumerable.Empty<int>();
+            return userprofile?.Roles.Select(x => (int)x) ?? Enumerable.Empty<int>();
         }
 
         protected async Task<AuthInfo> GetAuthInfo()
@@ -74,7 +75,7 @@ namespace Utg.LegalService.API.Controllers
                 UserId = userprofile.UserId,
                 UserProfileId = userprofile.Id,
                 AuthToken = auth,
-                Roles = userprofile.Roles,
+                Roles = userprofile.Roles.Select(x => (int)x),
                 FullNameInitials = userprofile.FullNameInitials,
                 Name = userprofile.Name,
                 Surname = userprofile.Surname,

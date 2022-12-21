@@ -18,10 +18,10 @@ public class GetTaskAccessRightsCommandHandler
     : IRequestHandler<GetTaskAccessRightsCommand, Result<TaskAccessRights>>
 {
     private readonly ILogger<GetTaskAccessRightsCommandHandler> _logger;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
 
     public GetTaskAccessRightsCommandHandler(
-        ILogger<GetTaskAccessRightsCommandHandler> logger, UnitOfWork uow)
+        ILogger<GetTaskAccessRightsCommandHandler> logger, IUnitOfWork uow)
     {
         _logger = logger;
         _uow = uow;
@@ -59,7 +59,7 @@ public class GetTaskAccessRightsCommandHandler
     private async Task<bool> CanMoveToDone(TaskModel taskModel)
     {
         var hasUndoneChildTasks =
-            await _uow.TaskItems.AnyAsync(x =>
+            await _uow.TaskRepository.AnyAsync(x =>
                     x.ParentTaskId == taskModel.Id &&
                     x.Status != TaskStatus.Done);
         return !hasUndoneChildTasks;
@@ -85,7 +85,7 @@ public class GetTaskAccessRightsCommandHandler
 
     private async Task<bool> CanDelete(TaskModel model, AuthInfo authInfo)
     {
-        var hasChildTasks = await _uow.TaskItems.AnyAsync(x => x.ParentTaskId == model.Id);
+        var hasChildTasks = await _uow.TaskRepository.AnyAsync(x => x.ParentTaskId == model.Id);
         return authInfo.UserProfileId == model.AuthorUserProfileId &&
                !hasChildTasks;
     }

@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Utg.Api.CurrentUserService.Client;
 using Utg.Common.MediatR;
 using Utg.LegalService.BL.Services;
 using Utg.LegalService.Common.Services;
@@ -16,13 +17,15 @@ public static class DependencyInjection
     {
         TypeAdapterConfig.GlobalSettings.Scan(typeof(DependencyInjection).Assembly);
         
-        services.AddTransient<ITaskService, TaskService>();
-        services.AddTransient<ITaskCommentService, TaskCommentService>();
-        services.AddTransient<INotificationService, NotificationService>();
-        services.AddTransient<IProductionCalendarService, ProductionCalendarService>();
+        services.AddScoped<ITaskService, TaskService>();
+        services.AddScoped<ITaskCommentService, TaskCommentService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IProductionCalendarService, ProductionCalendarService>();
 
         services.AddDataAccess(configuration, "UTGDatabase");
         services.AddUtgMediatr(typeof(DependencyInjection)); 
+        services.AddUtgCurrentUserServiceClient(configuration);
+        services.AddUserProfilesService(configuration);
         
         return services;
     }

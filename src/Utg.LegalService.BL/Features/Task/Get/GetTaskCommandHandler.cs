@@ -11,12 +11,12 @@ using Utg.Common.Models;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.BL.Features.AccessRights.Get;
-using Utg.LegalService.BL.Features.Agregates.GetList;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Dal;
+using Role = Utg.Common.Packages.Domain.Enums.Role;
 
 namespace Utg.LegalService.BL.Features.Task.Get;
 
@@ -25,12 +25,12 @@ public class GetTaskCommandHandler
 {
     private readonly ILogger<GetTaskCommandHandler> _logger;
     private readonly IMediator _mediator;
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
     private readonly IUsersProxyClient _usersProxyClient;
 
     public GetTaskCommandHandler(
         ILogger<GetTaskCommandHandler> logger,
-        UnitOfWork uow, 
+        IUnitOfWork uow, 
         IMediator mediator,
         IUsersProxyClient usersProxyClient)
     {
@@ -46,7 +46,7 @@ public class GetTaskCommandHandler
     {
         try
         {
-            var task = await _uow.TaskItems.GetQuery(
+            var task = await _uow.TaskRepository.GetQuery(
                     x => x.Id == command.Id,
                     null)
                 .Include(x => x.TaskAttachments)
@@ -90,7 +90,7 @@ public class GetTaskCommandHandler
     private async Task<IEnumerable<TaskModel>> GetSubtasks(TaskModel taskModel, 
         CancellationToken cancellationToken = default)
     {
-        var subtasks = await _uow.TaskItems.GetQuery(x => x.ParentTaskId == taskModel.Id, null)
+        var subtasks = await _uow.TaskRepository.GetQuery(x => x.ParentTaskId == taskModel.Id, null)
             .ToListAsync(cancellationToken);
         var subtaskModels = subtasks.Select(x => new TaskModel()
         {
@@ -104,23 +104,19 @@ public class GetTaskCommandHandler
         GetTaskCommand command,
         CancellationToken cancellationToken = default)
     {
-        var comments = await _uow.TaskCommentItems
+        var comments = await _uow.TaskCommentRepository
             .GetQuery(x => x.TaskId == command.Id,
                 null)
             .ToListAsync(cancellationToken);
             
         var userProfileIds = comments.Select(x => x.UserProfileId);
-        var getAgregatesCommand = new GetListUserProfileAgregatesCommand()
-        {
-            UserProfileIds = userProfileIds
-        };
-        var getAgregatesCommandResponse = await _mediator.Send(getAgregatesCommand, cancellationToken);
-        var userProfiles = getAgregatesCommandResponse.Data;
+        var upas = _uow.UserProfileAgregatesRepository
+            .GetQuery(x => userProfileIds.Contains(x.UserProfileId), null);
         var models = comments.Select(x => x.Adapt<TaskCommentModel>())
             .Select(model =>
             {
                 var userProfile =
-                    userProfiles.FirstOrDefault(x => x.UserProfileId == model.UserProfileId);
+                    upas.FirstOrDefault(x => x.UserProfileId == model.UserProfileId);
                 if (userProfile != null)
                 {
                     model.UserProfileFullName = userProfile.FullName;
@@ -175,6 +171,6 @@ public class GetTaskCommandHandler
         var isFileOwn = attachment.UserProfileId.Value == authInfo.UserProfileId;
         return isFileOwn ||
                authInfo.Roles.Contains((int)Role.LegalHead) &&
-               attachmentAuthorUserProfile.Roles.Contains((int)Role.LegalPerformer);
+               attachmentAuthorUserProfile.Roles.Contains((Utg.Common.Packages.ServiceClientProxy.Proxy.Role)(int)Role.LegalPerformer);
     }
 }

@@ -11,6 +11,7 @@ using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.BL.Features.TaskChangeHistory.GetPage;
 using Utg.LegalService.Common.Models.Request.TaskChangeHistory;
+using Role = Utg.Common.Packages.Domain.Enums.Role;
 
 namespace Utg.LegalService.API.Controllers
 {
