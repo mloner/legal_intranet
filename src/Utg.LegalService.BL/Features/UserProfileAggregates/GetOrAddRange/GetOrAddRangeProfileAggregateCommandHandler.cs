@@ -218,10 +218,21 @@ public class GetOrAddRangeProfileAggregateCommandHandler :
             }, cancellationToken);
 
         if (!profilesResponse.Success)
-            return ResultList<UserProfileAgregate>.Failed(profilesResponse);
+        {
+            if (profilesResponse.StatusCode != (int) HttpStatusCode.NotFound)
+            {
+                return ResultList<UserProfileAgregate>.Failed(profilesResponse);
+            }
+            else
+            {
+                _logger.LogWarning($"Can't find userprofiles " +
+                                   $"{string.Join(", ", diff)}");
+                return ResultList<UserProfileAgregate>.Ok(aggregates);
+            }
+        }
 
-        var incomingProfiles = profilesResponse.Data;
         
+        var incomingProfiles = profilesResponse.Data;
         var incomingProfileIds = incomingProfiles.Select(x => x.Id).ToList();
         var profStatusesResp = await _userProfilesGrpcService.GetUserProfileStatusesAsync(
             new UserProfileStatusRequestContract()
