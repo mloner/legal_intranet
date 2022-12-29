@@ -62,7 +62,7 @@ public class GetTaskPageCommandHandler
 
             var taskModels = tasks.Adapt<PaginationResult<TaskModel>>();
 
-            #region fullnames
+            #region enrich models
 
             var userProfileIds = taskModels.Data.Select(x => x.AuthorUserProfileId)
                 .Union(taskModels.Data
@@ -177,8 +177,9 @@ public class GetTaskPageCommandHandler
         }
         if (authInfo.Roles.Contains((int)Role.LegalPerformer))
         {
-            predicate = model => model.PerformerUserProfileId == authInfo.UserProfileId 
-                         || model.AuthorUserProfileId == authInfo.UserProfileId 
+            predicate = model => model.PerformerUserProfileId == authInfo.UserProfileId
+                                 || model.ParentTask.AuthorUserProfileId == authInfo.UserProfileId
+                                 || model.AuthorUserProfileId == authInfo.UserProfileId 
                          || (!model.PerformerUserProfileId.HasValue 
                              && StaticData.TypesToSelfAssign.Contains(model.Type));
         }
