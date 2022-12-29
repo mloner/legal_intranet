@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Mapster;
 using MediatR;
-using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.BL.Features.TaskChangeHistory.GetPage;

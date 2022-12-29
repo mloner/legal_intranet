@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Utg.Api.Common.Models.Contracts.UserProfile;
 using Utg.Api.Common.Models.Contracts.UserProfileStatus;

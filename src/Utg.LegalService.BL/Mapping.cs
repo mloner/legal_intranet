@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
-using Mapster;
+﻿using Mapster;
 using Utg.Api.Common.Models.Contracts.UserProfile;
 using Utg.Api.Common.Models.Contracts.UserProfileStatus;
+using Utg.Api.Common.Models.UpdateModels;
+using Utg.Api.Common.Models.UpdateModels.CompanyUpdate;
+using Utg.Api.Common.Models.UpdateModels.DepartmentUpdate;
+using Utg.Api.Common.Models.UpdateModels.PositionUpdate;
+using Utg.Api.Common.Models.UpdateModels.UserProfileUpdate;
 using Utg.Common.Extensions.Helpers;
-using Utg.Common.Models.PaginationRequest;
-using Utg.Common.Packages.Domain.Helpers;
 using Utg.LegalService.BL.Features.SubTask.Create;
 using Utg.LegalService.BL.Features.Task.GetPage;
 using Utg.LegalService.BL.Features.TaskChangeHistory.GetPage;
@@ -20,11 +22,6 @@ using Utg.LegalService.Common.Models.Client.TaskChangeHistory;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.TaskChangeHistory;
 using Utg.LegalService.Common.Models.Request.Tasks;
-using Utg.LegalService.Common.Models.UpdateModels;
-using Utg.LegalService.Common.Models.UpdateModels.CompanyUpdate;
-using Utg.LegalService.Common.Models.UpdateModels.DepartmentUpdate;
-using Utg.LegalService.Common.Models.UpdateModels.PositionUpdate;
-using Utg.LegalService.Common.Models.UpdateModels.UserProfileUpdate;
 
 namespace Utg.LegalService.BL;
 

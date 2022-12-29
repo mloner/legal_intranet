@@ -1,7 +1,7 @@
 ﻿using MediatR;
+using Utg.Api.Common.Models.UpdateModels;
+using Utg.Api.Common.Models.UpdateModels.UserProfileUpdate;
 using Utg.Common.Models;
-using Utg.LegalService.Common.Models.UpdateModels;
-using Utg.LegalService.Common.Models.UpdateModels.UserProfileUpdate;
 
 namespace Utg.LegalService.BL.Features.UserProfileAggregates.UpdateUserProfile;
 

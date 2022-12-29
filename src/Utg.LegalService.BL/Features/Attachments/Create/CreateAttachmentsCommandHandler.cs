@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using Mapster;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Utg.Common.Models;
 using Utg.Common.Packages.FileStorage;

@@ -3,8 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Utg.Api.Common.Models.UpdateModels;
 using Utg.Common.Models;
-using Utg.LegalService.Common.Models.UpdateModels;
 using Utg.LegalService.Dal;
 
 namespace Utg.LegalService.BL.Features.UserProfileAggregates.UpdateDepartment;

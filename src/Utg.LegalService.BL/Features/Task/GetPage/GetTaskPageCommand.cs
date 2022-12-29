@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using MediatR;
+﻿using MediatR;
 using Utg.Common.Models;
 using Utg.Common.Models.PaginationRequest;
 using Utg.LegalService.Common.Models.Client;
