@@ -6,11 +6,11 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Utg.Api.Common.Models.UpdateModels;
+using Utg.Api.Common.Models.UpdateModels.DepartmentUpdate;
 using Utg.Common.Packages.Queue;
 using Utg.Common.Packages.Queue.Configuration;
 using Utg.LegalService.BL.Features.UserProfileAggregates.UpdateDepartment;
-using Utg.LegalService.Common.Models.UpdateModels;
-using Utg.LegalService.Common.Models.UpdateModels.DepartmentUpdate;
 
 namespace Utg.LegalService.Jobs.UpdateJobs.UpdateDepartmentHostedService
 {

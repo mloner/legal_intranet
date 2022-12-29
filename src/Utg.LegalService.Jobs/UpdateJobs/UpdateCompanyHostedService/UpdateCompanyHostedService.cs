@@ -6,11 +6,11 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Utg.Api.Common.Models.UpdateModels;
+using Utg.Api.Common.Models.UpdateModels.CompanyUpdate;
 using Utg.Common.Packages.Queue;
 using Utg.Common.Packages.Queue.Configuration;
 using Utg.LegalService.BL.Features.UserProfileAggregates.UpdateCompany;
-using Utg.LegalService.Common.Models.UpdateModels;
-using Utg.LegalService.Common.Models.UpdateModels.CompanyUpdate;
 
 namespace Utg.LegalService.Jobs.UpdateJobs.UpdateCompanyHostedService
 {

@@ -9,13 +9,11 @@ using System.Linq.Expressions;
 using System.Threading;
 using Utg.Common.Extensions;
 using Utg.Common.Models;
-using Utg.Common.Models.PaginationRequest;
 using Utg.Common.Packages.Domain;
 using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Helpers;
 using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.Attachments.GetInfo;
-using Utg.LegalService.BL.Features.TaskChangeHistory.GetPage;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Enum;
 using Utg.LegalService.Common.Models.Client.Task;
@@ -201,6 +199,39 @@ public class GetTaskPageCommandHandler
     {
         Expression<Func<Common.Models.Domain.Task, bool>> predicate = q => true;
 
+        if (filter.MoveToWorkDateTimeFrom.HasValue)
+        {
+            predicate = predicate.And(
+                x => x.TaskChangeHistories
+                    .OrderByDescending(his => his.DateTime)
+                    .FirstOrDefault(
+                        his => 
+                            his.TaskStatus == TaskStatus.Done &&
+                            his.DateTime >= filter.MoveToWorkDateTimeFrom.Value) != null);
+            filter.Statuses = filter.Statuses == null 
+                ? new []{(int)TaskStatus.Done} 
+                : filter.Statuses.Contains((int) TaskStatus.Done)
+                    ? filter.Statuses
+                    : filter.Statuses.Append((int) TaskStatus.Done);
+        }
+        
+        if (filter.MoveToWorkDateTimeTo.HasValue)
+        {
+            predicate = predicate.And(
+                x => x.TaskChangeHistories
+                    .OrderByDescending(his => his.DateTime)
+                    .FirstOrDefault(
+                        his => 
+                            his.TaskStatus == TaskStatus.Done &&
+                            his.DateTime <= filter.MoveToWorkDateTimeTo.Value) != null);
+            
+            filter.Statuses = filter.Statuses == null 
+                ? new []{(int)TaskStatus.Done} 
+                : filter.Statuses.Contains((int) TaskStatus.Done)
+                    ? filter.Statuses
+                    : filter.Statuses.Append((int) TaskStatus.Done);
+        }
+        
         if (filter.Statuses?.Any() == true)
         {
             predicate = predicate.And(x => filter.Statuses.Contains((int)x.Status));
@@ -214,28 +245,6 @@ public class GetTaskPageCommandHandler
         {
             predicate =
                 predicate.And(x => filter.AuthorUserProfileIds.Contains(x.AuthorUserProfileId));
-        }
-
-        if (filter.MoveToWorkDateTimeFrom.HasValue)
-        {
-            predicate = predicate.And(
-                x => x.TaskChangeHistories
-                         .OrderByDescending(his => his.DateTime)
-                         .FirstOrDefault(
-                             his => 
-                                 his.TaskStatus == TaskStatus.InWork &&
-                                 his.DateTime >= filter.MoveToWorkDateTimeFrom.Value) != null);
-        }
-        
-        if (filter.MoveToWorkDateTimeTo.HasValue)
-        {
-            predicate = predicate.And(
-                x => x.TaskChangeHistories
-                         .OrderByDescending(his => his.DateTime)
-                         .FirstOrDefault(
-                             his => 
-                                 his.TaskStatus == TaskStatus.InWork &&
-                                 his.DateTime <= filter.MoveToWorkDateTimeTo.Value) != null);
         }
 
         return predicate;

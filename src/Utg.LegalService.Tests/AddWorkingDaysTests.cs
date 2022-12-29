@@ -1,13 +1,6 @@
-using AutoMapper;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moq;
 using Utg.LegalService.BL.Features.Task.NotifyExpiredSoonTasks;
 using Utg.LegalService.BL.Services;
 using Utg.LegalService.Common.Services;
-using Utg.LegalService.Dal;
-using Utg.LegalService.Dal.SqlContext;
 using Xunit;
 
 namespace Utg.LegalService.Tests;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Utg.Common.Models;
 using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Enum;

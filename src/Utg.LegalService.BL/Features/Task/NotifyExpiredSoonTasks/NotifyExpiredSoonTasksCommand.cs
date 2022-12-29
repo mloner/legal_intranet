@@ -1,7 +1,6 @@
 ﻿using System;
 using MediatR;
 using Utg.Common.Models;
-using Utg.LegalService.Common.Models.Client.Task;
 
 namespace Utg.LegalService.BL.Features.Task.NotifyExpiredSoonTasks;
 

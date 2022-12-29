@@ -1,5 +1,10 @@
 ﻿using System;
 using AutoMapper;
+using Utg.Api.Common.Models.UpdateModels;
+using Utg.Api.Common.Models.UpdateModels.CompanyUpdate;
+using Utg.Api.Common.Models.UpdateModels.DepartmentUpdate;
+using Utg.Api.Common.Models.UpdateModels.PositionUpdate;
+using Utg.Api.Common.Models.UpdateModels.UserProfileUpdate;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.BL.Features.UserProfileAggregates.UpdateCompany;
 using Utg.LegalService.BL.Features.UserProfileAggregates.UpdateDepartment;
@@ -12,11 +17,6 @@ using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Models.Request.TaskComments;
 using Utg.LegalService.Common.Models.Request.Tasks;
-using Utg.LegalService.Common.Models.UpdateModels;
-using Utg.LegalService.Common.Models.UpdateModels.CompanyUpdate;
-using Utg.LegalService.Common.Models.UpdateModels.DepartmentUpdate;
-using Utg.LegalService.Common.Models.UpdateModels.PositionUpdate;
-using Utg.LegalService.Common.Models.UpdateModels.UserProfileUpdate;
 
 namespace Utg.LegalService.API.Configuration
 {

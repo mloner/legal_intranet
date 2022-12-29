@@ -1,7 +1,7 @@
 ﻿using MediatR;
+using Utg.Api.Common.Models.UpdateModels;
+using Utg.Api.Common.Models.UpdateModels.PositionUpdate;
 using Utg.Common.Models;
-using Utg.LegalService.Common.Models.UpdateModels;
-using Utg.LegalService.Common.Models.UpdateModels.PositionUpdate;
 
 namespace Utg.LegalService.BL.Features.UserProfileAggregates.UpdatePosition;
 

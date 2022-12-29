@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Utg.Common.EF.Repositories.Implementations;
-using Utg.LegalService.Common.Models.Client;
 using Utg.LegalService.Common.Models.Client.Attachment;
 using Utg.LegalService.Common.Models.Domain;
 using Utg.LegalService.Common.Repositories;
