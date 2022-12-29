@@ -43,7 +43,7 @@ public class GetTaskAccessRightsCommandHandler
                 CanReview = CanReview(command.Task, command.AuthInfo),
                 HasShortCycle = HasShortCycle(command.Task),
                 CanMoveToDone = await CanMoveToDone(command.Task),
-                CanCreateSubtask = await CanCreateSubtask(command.Task)
+                CanCreateSubtask = await CanCreateSubtask(command.Task,command.AuthInfo)
             };
 
             return Result<TaskAccessRights>.Ok(ar);
@@ -57,9 +57,15 @@ public class GetTaskAccessRightsCommandHandler
         }
     }
 
-    private static async Task<bool?> CanCreateSubtask(TaskModel commandTask)
+    private static async Task<bool?> CanCreateSubtask(TaskModel taskModel,
+        AuthInfo authInfo)
     {
-        return !commandTask.ParentTaskId.HasValue;
+        return !taskModel.ParentTaskId.HasValue
+            && taskModel.Status != TaskStatus.Draft
+            && new[] {
+                (int)Role.LegalHead, 
+                (int)Role.LegalPerformer
+            }.Intersect(authInfo.Roles).Any();
     }
 
     private async Task<bool> CanMoveToDone(TaskModel taskModel)
