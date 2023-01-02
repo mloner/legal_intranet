@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation.AspNetCore;
@@ -11,9 +12,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using Utg.Common.Packages.Domain.MiddleWares;
 using Utg.Common.Packages.ExcelReportBuilder.Configuration;
 using Utg.Common.Packages.FileStorage.Configuration;
@@ -36,17 +37,16 @@ namespace Utg.LegalService.API
     public class Startup
     {
         private readonly IConfiguration configuration;
-        private readonly ILogger<Startup> _logger;
         private readonly string _corsPolicy = "corsPolicy";
-        public Startup(IConfiguration configuration,
-            ILogger<Startup> logger)
+        public Startup(IConfiguration configuration)
         {
             this.configuration = configuration;
-            _logger = logger;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            AddLogging(configuration);
+            
             services
                 .AddControllers()
                 .AddFluentValidation()
@@ -187,6 +187,16 @@ namespace Utg.LegalService.API
             {
                 RecurringJob.AddOrUpdate<T>(nameof(T), x => x.Start(), timetable, queue: queueName);
             }
+        }
+        
+        public static void AddLogging(IConfiguration configuration)
+        {
+            Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .Enrich.FromLogContext()
+                .CreateLogger();
         }
     }
 }
