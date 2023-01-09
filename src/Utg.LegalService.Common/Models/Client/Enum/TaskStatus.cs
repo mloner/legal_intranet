@@ -20,6 +20,9 @@ namespace Utg.LegalService.Common.Models.Client.Enum
         UnderReview = 4,
         
         [Display(Name = "Выполнено")]
-        Done = 5
+        Done = 5,
+        
+        [Display(Name = "Отклонено")]
+        Rejected = 6
     }
 }

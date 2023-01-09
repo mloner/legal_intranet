@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Utg.Common.Models.Mvc.Core.Response;
+using Utg.Common.Packages.Domain.Enums;
 using Utg.Common.Packages.Domain.Models.Client;
 using Utg.Common.Packages.ServiceClientProxy.Proxy;
 using Utg.LegalService.BL.Features.SubTask.Create;
 using Utg.LegalService.BL.Features.Task.Get;
 using Utg.LegalService.BL.Features.Task.GetPage;
+using Utg.LegalService.BL.Features.Task.Reject;
 using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Common.Models.Request.Tasks;
 using Utg.LegalService.Common.Services;
@@ -151,6 +154,20 @@ namespace Utg.LegalService.API.Controllers
             var authInfo = await GetAuthInfo();
             var result = await _taskService.UpdateTaskMoveToDone(request, authInfo);
             return Ok(result);
+        }
+        
+        [HttpPatch("reject")]
+        public async Task<ActionResult<TaskModel>> Reject([FromForm] RejectTaskCommand command)
+        {
+            if (!await CanGo(Role.LegalHead, Role.LegalPerformer))
+            {
+                return Forbid();
+            }
+            var authInfo = await GetAuthInfo();
+            command.AuthInfo = authInfo;
+            var response = await _mediator.Send(command, HttpContext.RequestAborted);
+            
+            return response.HttpResponse();
         }
         
         [HttpDelete("{id:int}")]

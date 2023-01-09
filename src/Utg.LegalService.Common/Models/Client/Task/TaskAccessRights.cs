@@ -11,5 +11,6 @@
         public bool? HasShortCycle { get; set; }
         public bool? CanMoveToDone { get; set; }
         public bool? CanCreateSubtask { get; set; }
+        public bool? CanReject { get; set; }
     }
 }

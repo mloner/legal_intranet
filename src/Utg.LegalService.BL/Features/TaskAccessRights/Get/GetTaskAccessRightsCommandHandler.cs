@@ -11,10 +11,10 @@ using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Dal;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
 
-namespace Utg.LegalService.BL.Features.AccessRights.Get;
+namespace Utg.LegalService.BL.Features.TaskAccessRights.Get;
 
 public class GetTaskAccessRightsCommandHandler
-    : IRequestHandler<GetTaskAccessRightsCommand, Result<TaskAccessRights>>
+    : IRequestHandler<GetTaskAccessRightsCommand, Result<Common.Models.Client.Task.TaskAccessRights>>
 {
     private readonly ILogger<GetTaskAccessRightsCommandHandler> _logger;
     private readonly IUnitOfWork _uow;
@@ -26,13 +26,13 @@ public class GetTaskAccessRightsCommandHandler
         _uow = uow;
     }
 
-    public async System.Threading.Tasks.Task<Result<TaskAccessRights>> Handle(
+    public async System.Threading.Tasks.Task<Result<Common.Models.Client.Task.TaskAccessRights>> Handle(
         GetTaskAccessRightsCommand command,
         CancellationToken cancellationToken)
     {
         try
         {
-            var ar = new TaskAccessRights
+            var ar = new Common.Models.Client.Task.TaskAccessRights
             {
                 CanShowDetails = CanShowDetails(command.Task, command.AuthInfo),
                 CanEdit = CanEdit(command.Task, command.AuthInfo),
@@ -42,18 +42,32 @@ public class GetTaskAccessRightsCommandHandler
                 CanReview = CanReview(command.Task, command.AuthInfo),
                 HasShortCycle = HasShortCycle(command.Task),
                 CanMoveToDone = await CanMoveToDone(command.Task),
+                CanReject = await CanReject(command.Task, command.AuthInfo),
                 CanCreateSubtask = await CanCreateSubtask(command.Task,command.AuthInfo)
             };
 
-            return Result<TaskAccessRights>.Ok(ar);
+            return Result<Common.Models.Client.Task.TaskAccessRights>.Ok(ar);
         }
         catch (Exception e)
         {
-            var failMsg = "Failed to get task access rights.";
+            const string failMsg = "Failed to get task access rights.";
             _logger.LogError(e, "{@Msg} {@Command}", failMsg, command);
 
-            return Result<TaskAccessRights>.Internal(failMsg);
+            return Result<Common.Models.Client.Task.TaskAccessRights>.Internal(failMsg);
         }
+    }
+
+    private async Task<bool> CanReject(TaskModel taskModel, AuthInfo authInfo)
+    {
+        var hasAnyDoneTask = await _uow.TaskRepository
+            .AnyAsync(x => x.ParentTaskId == taskModel.Id
+                           && x.Status == TaskStatus.Done);
+        return (authInfo.Roles.Contains((int) Role.LegalHead)
+                || authInfo.Roles.Contains((int) Role.LegalPerformer))
+               && taskModel.Status != TaskStatus.Draft
+               && taskModel.Status != TaskStatus.Done
+               && taskModel.Status != TaskStatus.Rejected
+               && !hasAnyDoneTask;
     }
 
     private static async Task<bool?> CanCreateSubtask(TaskModel taskModel,

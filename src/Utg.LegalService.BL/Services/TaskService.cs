@@ -25,8 +25,8 @@ using Utg.LegalService.Common.Repositories;
 using Utg.LegalService.Common.Services;
 using NotificationTaskType = Utg.Common.Packages.Domain.Enums.NotificationTaskType;
 using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
-using Utg.LegalService.BL.Features.AccessRights.Get;
 using Utg.LegalService.BL.Features.Task.GetPage;
+using Utg.LegalService.BL.Features.TaskAccessRights.Get;
 using Utg.LegalService.BL.Features.TaskChangeHistory.Create;
 using Utg.LegalService.Common.Models.Client.Enum;
 using Role = Utg.Common.Packages.Domain.Enums.Role;
@@ -571,12 +571,12 @@ namespace Utg.LegalService.BL.Services
             return result;
         }
 
-        public async Task<UserProfileApiModel> GetUserProfileById(int id)        
+        public async Task<UserProfileApiModel> GetUserProfileById(int id)
         {
             var result = await usersProxyClient.GetByIdsAsync(new List<string> { id.ToString()});
             return result?.FirstOrDefault();
         }
-
+        
         public async Task UploadFile(TaskUploadFileRequest request, AuthInfo authInfo)
         {
             var attachments = Enumerable.Empty<TaskAttachmentModel>();
