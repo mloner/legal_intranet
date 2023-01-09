@@ -199,7 +199,7 @@ public class GetTaskPageCommandHandler
     {
         Expression<Func<Common.Models.Domain.Task, bool>> predicate = q => true;
 
-        if (filter.MoveToWorkDateTimeFrom.HasValue)
+        if (filter.MoveToDoneDateTimeFrom.HasValue)
         {
             predicate = predicate.And(
                 x => x.TaskChangeHistories
@@ -207,7 +207,7 @@ public class GetTaskPageCommandHandler
                     .FirstOrDefault(
                         his => 
                             his.TaskStatus == TaskStatus.Done &&
-                            his.DateTime >= filter.MoveToWorkDateTimeFrom.Value) != null);
+                            his.DateTime >= filter.MoveToDoneDateTimeFrom.Value) != null);
             filter.Statuses = filter.Statuses == null 
                 ? new []{(int)TaskStatus.Done} 
                 : filter.Statuses.Contains((int) TaskStatus.Done)
@@ -215,7 +215,7 @@ public class GetTaskPageCommandHandler
                     : filter.Statuses.Append((int) TaskStatus.Done);
         }
         
-        if (filter.MoveToWorkDateTimeTo.HasValue)
+        if (filter.MoveToDoneDateTimeTo.HasValue)
         {
             predicate = predicate.And(
                 x => x.TaskChangeHistories
@@ -223,7 +223,7 @@ public class GetTaskPageCommandHandler
                     .FirstOrDefault(
                         his => 
                             his.TaskStatus == TaskStatus.Done &&
-                            his.DateTime <= filter.MoveToWorkDateTimeTo.Value) != null);
+                            his.DateTime <= filter.MoveToDoneDateTimeTo.Value) != null);
             
             filter.Statuses = filter.Statuses == null 
                 ? new []{(int)TaskStatus.Done} 

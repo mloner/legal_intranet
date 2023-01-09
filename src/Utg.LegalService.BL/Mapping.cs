@@ -56,8 +56,8 @@ public class Mapping : IRegister
                     Search = request.Search,
                     Statuses = request.Statuses,
                     AuthorUserProfileIds = request.AuthorUserProfileIds,
-                    MoveToWorkDateTimeFrom = request.MoveToWorkDateTimeFrom,
-                    MoveToWorkDateTimeTo = request.MoveToWorkDateTimeTo
+                    MoveToDoneDateTimeFrom = request.MoveToDoneDateTimeFrom,
+                    MoveToDoneDateTimeTo = request.MoveToDoneDateTimeTo
                 };
                 command.SortBy = request.SortBy;
                 command.SortDirection = request.SortDirection;
@@ -72,8 +72,8 @@ public class Mapping : IRegister
                     Search = request.Search,
                     Statuses = request.Statuses,
                     AuthorUserProfileIds = request.AuthorUserProfileIds,
-                    MoveToWorkDateTimeFrom = request.MoveToWorkDateTimeFrom,
-                    MoveToWorkDateTimeTo = request.MoveToWorkDateTimeTo
+                    MoveToDoneDateTimeFrom = request.MoveToDoneDateTimeFrom,
+                    MoveToDoneDateTimeTo = request.MoveToDoneDateTimeTo
                 };
                 command.SortBy = request.SortBy;
                 command.SortDirection = request.SortDirection;
