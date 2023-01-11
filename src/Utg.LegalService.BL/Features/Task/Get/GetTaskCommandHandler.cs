@@ -17,6 +17,7 @@ using Utg.LegalService.Common.Models.Client.Comment;
 using Utg.LegalService.Common.Models.Client.Task;
 using Utg.LegalService.Dal;
 using Role = Utg.Common.Packages.Domain.Enums.Role;
+using TaskStatus = Utg.LegalService.Common.Models.Client.Enum.TaskStatus;
 
 namespace Utg.LegalService.BL.Features.Task.Get;
 
@@ -169,8 +170,11 @@ public class GetTaskCommandHandler
         }
 
         var isFileOwn = attachment.UserProfileId.Value == authInfo.UserProfileId;
-        return isFileOwn ||
-               authInfo.Roles.Contains((int)Role.LegalHead) &&
-               attachmentAuthorUserProfile.Roles.Contains((Utg.Common.Packages.ServiceClientProxy.Proxy.Role)(int)Role.LegalPerformer);
+        return task.Status != TaskStatus.Done &&
+               (
+                   isFileOwn ||
+                   authInfo.Roles.Contains((int) Role.LegalHead) && 
+                   attachmentAuthorUserProfile.Roles.Contains((Utg.Common.Packages.ServiceClientProxy.Proxy.Role) (int) Role.LegalPerformer)
+                );
     }
 }
