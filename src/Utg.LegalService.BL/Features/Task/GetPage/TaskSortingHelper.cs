@@ -15,6 +15,11 @@ internal static class TaskSortingHelper
         var sortDirEnum = EnumExtensions.GetEnumValue<EnumSortDirection>(command.SortDirection);
         switch (command.SortBy)
         {
+            case nameof(TaskModel.Id):
+                models = sortDirEnum == EnumSortDirection.Desc
+                    ? models.OrderByDescending(x => x.Id)
+                    : models.OrderBy(x => x.Id);
+                break;
             case nameof(TaskModel.ParentTaskId):
                 models = sortDirEnum == EnumSortDirection.Desc
                     ? models.OrderByDescending(x => x.ParentTaskId)
