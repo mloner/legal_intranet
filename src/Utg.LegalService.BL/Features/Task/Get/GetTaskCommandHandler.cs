@@ -91,11 +91,7 @@ public class GetTaskCommandHandler
     {
         var subtasks = await _uow.TaskRepository.GetQuery(x => x.ParentTaskId == taskModel.Id, null)
             .ToListAsync(cancellationToken);
-        var subtaskModels = subtasks.Select(x => new TaskModel()
-        {
-            Id = x.Id,
-            Description = x.Description
-        });
+        var subtaskModels = subtasks.Select(x => x.Adapt<TaskModel>());
         return subtaskModels;
     }
 
